@@ -3,4 +3,6 @@ export interface Card {
   icon: string;
   pair: number;
   value: string;
+  match?: boolean;
+  selected?: boolean;
 }
