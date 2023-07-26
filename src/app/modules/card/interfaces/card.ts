@@ -1,4 +1,6 @@
 export interface Card {
-  id: number,
-  value: string
+  id: number;
+  icon: string;
+  pair: number;
+  value: string;
 }

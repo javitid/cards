@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import { Card } from '../../interfaces/card';
 
 @Component({
   selector: 'app-card',
@@ -7,8 +8,9 @@ import { Component, Input } from '@angular/core';
 })
 export class CardComponent {
   @Input()
-  title!: string;
+  card!: Card;
 
-  @Input()
-  icon!: string;
+  selectCard(item: Card) {
+    console.log(item.value);
+  }
 }
