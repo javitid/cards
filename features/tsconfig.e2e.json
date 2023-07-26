@@ -1,8 +1,9 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
+        "outDir": "../out-tsc/dc-web-app-e2e",
         "module": "commonjs",
-        "target": "es5",
+        "target": "es6",
         "types": [
             "node",
             "webdriverio/async",
@@ -10,6 +11,7 @@
             "@wdio/local-runner",
             "@wdio/cucumber-framework",
             "@wdio/spec-reporter"
-        ]
+        ],
+        "include": ["**/*.ts"]
     }
 }
