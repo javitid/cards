@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "test-e2e": "npx wdio run wdio.conf.ts"
+    "test": "ng test"
   },
   "private": true,
   "dependencies": {
