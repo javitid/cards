@@ -6,6 +6,12 @@ Check registry: `npm config get registry`
 Set default registry:  `npm install --registry=https://registry.npmjs.org/`
 Upgrade node version with nvm: `nvm use 18`
 Create project: `ng new cards`
+Deploy in github: `npm run deploy`
+
+## Deploy in github
+Add gh-pages dependency: `npm install gh-pages --save-dev`
+Add script in the package.json: `"deploy": "gh-pages -d dist/awstests",`
+In index.html set `<base href="./">`
 
 ## Development server
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
