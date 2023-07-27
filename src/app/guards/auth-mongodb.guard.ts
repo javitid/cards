@@ -7,8 +7,6 @@ import { map, shareReplay } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { environment } from '../../environments/environment';
 
-const URL_BEARER_TOKEN = 'https://eu-west-2.aws.realm.mongodb.com/api/client/v2.0/app/data-iuwtk/auth/providers/api-key/login';
-
 @Injectable()
 export class AuthMongoDBGuard implements CanActivate {
   constructor(
@@ -20,7 +18,7 @@ export class AuthMongoDBGuard implements CanActivate {
     const requestBody = {'key': environment.mongoDBApiKey};
     if(this.authService.getToken()) { return of(true) }
 
-    return this.http.post<string>(URL_BEARER_TOKEN, requestBody).pipe(
+    return this.http.post<string>(environment.urlBearerToken, requestBody).pipe(
       shareReplay(1),
       map((tokenBearer: any) => {
         this.authService.saveToken('Bearer ' + tokenBearer.access_token);
