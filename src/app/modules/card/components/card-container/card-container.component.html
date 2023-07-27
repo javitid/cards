@@ -1,5 +1,3 @@
-<div class="flex mt-[82px] mb-32 px-16 flex-col items-center" role="main">
-    <div class="card-container flex flex-wrap mt-16">
-        <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
-    </div>
+<div class="flex flex-wrap justify-center mt-32">
+    <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
 </div>
