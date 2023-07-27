@@ -42,3 +42,13 @@
     box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
   }
 }
+
+.card.matched-card {
+  background-color: #0cc32e;
+  cursor: default;
+
+  &:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
