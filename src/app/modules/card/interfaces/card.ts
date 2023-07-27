@@ -6,3 +6,7 @@ export interface Card {
   match?: boolean;
   selected?: boolean;
 }
+
+export interface CardResponse {
+  documents: Card[];
+}
