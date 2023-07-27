@@ -11,7 +11,7 @@ export class CardContainerComponent {
   lastSelection: Card|undefined;
   isLastCardSelected = false;
 
-  cards: Card[] = [
+  cards: Card[] = this.shuffleArray([
     {
       id: 1,
       icon: 'M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82zM12 3L1 9l11 6 9-4.91V17h2V9L12 3z',
@@ -40,7 +40,15 @@ export class CardContainerComponent {
       value: 'Car',
       match: false
     }
-  ];
+  ]);
+
+  shuffleArray(array: Card[]): Card[] {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
 
   selectCard(card: Card) {
     // When the card is already selected then unselect it
