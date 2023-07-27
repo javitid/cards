@@ -46,23 +46,28 @@ export class CardContainerComponent {
   ];
 
   selectCard(card: Card) {
+    card.selected = !card.selected;
+
+    this.cardsInfo(card);
+
+    // if(this.lastSelection?.selected && card.id === this.lastSelection.pair) {
+    //   card.match = true;
+    //   this.lastSelection.match = true;
+    // }
+
+    if(this.lastSelection) {
+      this.lastSelection = undefined;
+    } else {
+      this.lastSelection = card;
+    }
+  }
+
+  cardsInfo(card: Card) {
     console.log('Last selection: ' + this.lastSelection?.value);
     console.log('Last selection selected: ' + this.lastSelection?.selected);
     console.log('Last selection match: ' + this.lastSelection?.match);
     console.log('Current selection: ' + card.value);
     console.log('Current selection selected: ' + card.selected);
     console.log('Current selection match: ' + card.match);
-
-    if(this.lastSelection?.selected && card.id === this.lastSelection.pair) {
-      card.match = true;
-      this.lastSelection.match = true;
-    }
-
-    if(this.lastSelection) {
-      this.lastSelection = undefined;
-    } else {
-      card.selected = true;
-      this.lastSelection = card;
-    }
   }
 }
