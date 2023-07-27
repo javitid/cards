@@ -24,7 +24,7 @@ import { HelperService } from './services/helper.service';
     HttpClientModule,
 
     // Material
-     MatSnackBarModule,
+    MatSnackBarModule,
 
     // Cards
     CardModule
