@@ -1,3 +1,4 @@
-<div class="flex flex-wrap justify-center mt-32">
+<div class="flex flex-wrap justify-center">
+    <mat-progress-bar mode="determinate" [value]="progress" class="m-12"></mat-progress-bar>
     <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
 </div>

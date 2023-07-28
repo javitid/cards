@@ -46,17 +46,17 @@ export class UtilsService {
     return pairs.flatMap((pair: Pair, index) => {
       return [
         {
-          id: index,
+          id: 2*index,
           icon: pair.icon,
-          pair: index + 1,
+          pair: 2*index + 1,
           value: pair.es,
           match: false,
           selected: false
         },
         {
-          id: index + 1,
+          id: 2*index + 1,
           icon: pair.icon,
-          pair: index,
+          pair: 2*index,
           value: pair.en,
           match: false,
           selected: false

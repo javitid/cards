@@ -14,6 +14,7 @@ export class CardContainerComponent {
   lastSelection: Card|undefined;
   isLastCardSelected = false;
   cards: Card[] = [];
+  progress = 0;
 
   constructor(
     private readonly dataService: DataService,
@@ -63,6 +64,10 @@ export class CardContainerComponent {
       const isMatch = card.id === this.lastSelection.pair;
       card.match = isMatch;
       this.lastSelection.match = isMatch;
+      // Update progress bar
+      if (isMatch) {
+        this.progress = this.progress + 200/this.cards.length;
+      }
 
       // Unselect both cards
       this.isLastCardSelected = false;
