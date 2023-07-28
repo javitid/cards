@@ -1,0 +1,114 @@
+[
+  {
+      "id": 0,
+      "icon": "home",
+      "pair": 1,
+      "value": "Casa",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 1,
+      "icon": "home",
+      "pair": 0,
+      "value": "Home",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 1,
+      "icon": "directions_car",
+      "pair": 2,
+      "value": "Coche",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 2,
+      "icon": "directions_car",
+      "pair": 1,
+      "value": "Car",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 2,
+      "icon": "wb_cloudy",
+      "pair": 3,
+      "value": "Nube",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 3,
+      "icon": "wb_cloudy",
+      "pair": 2,
+      "value": "Cloud",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 3,
+      "icon": "beach_access",
+      "pair": 4,
+      "value": "Playa",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 4,
+      "icon": "beach_access",
+      "pair": 3,
+      "value": "Beach",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 4,
+      "icon": "flight",
+      "pair": 5,
+      "value": "Avión",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 5,
+      "icon": "flight",
+      "pair": 4,
+      "value": "Plane",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 5,
+      "icon": "arrow_forward",
+      "pair": 6,
+      "value": "Flecha",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 6,
+      "icon": "arrow_forward",
+      "pair": 5,
+      "value": "Arrow",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 6,
+      "icon": "close",
+      "pair": 7,
+      "value": "Cruz",
+      "match": false,
+      "selected": false
+  },
+  {
+      "id": 7,
+      "icon": "close",
+      "pair": 6,
+      "value": "Cross",
+      "match": false,
+      "selected": false
+  }
+]

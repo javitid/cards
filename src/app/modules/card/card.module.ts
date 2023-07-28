@@ -4,6 +4,7 @@ import { MatIconModule } from '@angular/material/icon'
 
 import { CardComponent } from './components/card/card.component';
 import { CardContainerComponent } from './components/card-container/card-container.component';
+import { UtilsService } from './utils/utils-service';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,9 @@ import { CardContainerComponent } from './components/card-container/card-contain
   exports: [
     CardComponent,
     CardContainerComponent
+  ],
+  providers: [
+    UtilsService
   ]
 })
 export class CardModule { }

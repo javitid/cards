@@ -2,6 +2,7 @@ import { Component, ViewEncapsulation } from '@angular/core';
 
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
+import { UtilsService } from '../../utils/utils-service';
 
 @Component({
   selector: 'app-card-container',
@@ -15,9 +16,14 @@ export class CardContainerComponent {
   cards: Card[] = [];
 
   constructor(
-    private _dataService: DataService,
-  ) { 
-    this._dataService.getCards().subscribe( (cards: Card[]) => {
+    private readonly dataService: DataService,
+    private readonly utilsService: UtilsService
+  ) {
+
+    // Generate array of pairs
+    // console.log(this.utilsService.generateCards());
+
+    this.dataService.getCards().subscribe( (cards: Card[]) => {
       this.cards = this.shuffleArray(cards);
     });
   }

@@ -10,3 +10,10 @@ export interface Card {
 export interface CardResponse {
   documents: Card[];
 }
+
+// Helper to generate Cards
+export interface Pair {
+  icon: string;
+  es: string;
+  en: string;
+}
