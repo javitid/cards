@@ -1,5 +1,7 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
+import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { UtilsService } from '../../utils/utils-service';
@@ -17,6 +19,7 @@ export class CardContainerComponent {
   progress = 0;
 
   constructor(
+    private readonly bottomSheet: MatBottomSheet,
     private readonly dataService: DataService,
     private readonly utilsService: UtilsService
   ) {
@@ -66,13 +69,24 @@ export class CardContainerComponent {
       this.lastSelection.match = isMatch;
       // Update progress bar
       if (isMatch) {
-        this.progress = this.progress + 200/this.cards.length;
+        this.progress = this.progress + 2*100/this.cards.length;
       }
 
       // Unselect both cards
       this.isLastCardSelected = false;
       this.lastSelection.selected = false;
       card.selected = false;
+    }
+  }
+
+  progressBarCompleted() {
+    if (Math.round(this.progress) === 100) {
+      const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent);
+
+      bottomSheetRef.afterDismissed().subscribe(result => {
+        // TODO: shuffle the cards and reset the page instead reload it
+        location.reload();
+      });
     }
   }
 }
