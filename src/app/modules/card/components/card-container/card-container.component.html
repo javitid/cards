@@ -1,7 +1,18 @@
-<div class="p-8" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
+<div class="flex items-center p-8" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
+    <mat-icon class="ml-4 cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
 </div>
 
-<div class="flex flex-wrap justify-center">
-    <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
-</div>
+<!-- 2 columns in small screens -->
+<mat-grid-list *ngIf="isSmallScreen; else isLargeScreen" cols="2" rowHeight="2:1" gutterSize="4px">
+    <mat-grid-tile *ngFor="let card of cards">
+        <app-card [card]="card" (selectCard)="selectCard($event)"></app-card>
+    </mat-grid-tile>
+</mat-grid-list>
+
+<!-- More columns in large screens -->
+<ng-template #isLargeScreen>
+    <div class="flex flex-wrap justify-center">
+        <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
+    </div>
+</ng-template>

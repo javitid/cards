@@ -5,6 +5,7 @@ import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { UtilsService } from '../../utils/utils-service';
+import { HelperService } from 'src/app/services/helper.service';
 
 const STICKY_HEADER_FROM = 30;
 
@@ -18,17 +19,21 @@ export class CardContainerComponent {
   cards: Card[] = [];
   isHeaderFixed = false;
   isLastCardSelected = false;
+  isSmallScreen: boolean;
   lastSelection: Card|undefined;
   progress = 0;
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
     private readonly dataService: DataService,
+    private readonly helperService: HelperService,
     private readonly utilsService: UtilsService
   ) {
 
     // Generate array of pairs
     // console.log(this.utilsService.generateCards());
+
+    this.isSmallScreen = helperService.isSmallScreen;
 
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       this.cards = this.shuffleArray(cards);
@@ -45,6 +50,10 @@ export class CardContainerComponent {
       [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+  }
+
+  toggleColumns() {
+    this.isSmallScreen = !this.isSmallScreen;
   }
 
   selectCard(card: Card) {
