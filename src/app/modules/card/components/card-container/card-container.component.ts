@@ -1,10 +1,12 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, ViewEncapsulation } from '@angular/core';
 import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { UtilsService } from '../../utils/utils-service';
+
+const STICKY_HEADER_FROM = 30;
 
 @Component({
   selector: 'app-card-container',
@@ -13,9 +15,10 @@ import { UtilsService } from '../../utils/utils-service';
   encapsulation: ViewEncapsulation.None
 })
 export class CardContainerComponent {
-  lastSelection: Card|undefined;
-  isLastCardSelected = false;
   cards: Card[] = [];
+  isHeaderFixed = false;
+  isLastCardSelected = false;
+  lastSelection: Card|undefined;
   progress = 0;
 
   constructor(
@@ -30,6 +33,10 @@ export class CardContainerComponent {
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       this.cards = this.shuffleArray(cards);
     });
+  }
+
+  @HostListener('window:scroll',['$event']) onScroll() {
+    this.isHeaderFixed = window.scrollY > STICKY_HEADER_FROM;
   }
 
   shuffleArray(array: Card[]): Card[] {

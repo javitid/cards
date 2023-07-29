@@ -1,4 +1,7 @@
+<div class="p-8" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
+    <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
+</div>
+
 <div class="flex flex-wrap justify-center">
-    <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()" class="m-12"></mat-progress-bar>
     <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
 </div>
