@@ -1,17 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
-// Material
-import { MatBottomSheetModule} from '@angular/material/bottom-sheet';
-import { MatButtonModule } from '@angular/material/button';
-import { MatGridListModule } from '@angular/material/grid-list';
-import { MatIconModule } from '@angular/material/icon'
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { SharedModule } from '../../shared/shared.module';
 
 import { CardComponent } from './components/card/card.component';
 import { CardContainerComponent } from './components/card-container/card-container.component';
 import { BottomSheetComponent } from './components/card-container/bottom-sheet/bottom-sheet.component';
-import { UtilsService } from './utils/utils-service';
 
 @NgModule({
   declarations: [
@@ -21,20 +15,11 @@ import { UtilsService } from './utils/utils-service';
   ],
   imports: [
     CommonModule,
-
-    // Material
-    MatBottomSheetModule,
-    MatButtonModule,
-    MatGridListModule,
-    MatIconModule,
-    MatProgressBarModule
+    SharedModule
   ],
   exports: [
     CardComponent,
     CardContainerComponent
-  ],
-  providers: [
-    UtilsService
   ]
 })
 export class CardModule { }

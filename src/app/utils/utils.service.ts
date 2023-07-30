@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Card, Pair } from '../interfaces/card';
+import { Card, Pair } from '../modules/card/interfaces/card';
 
 // Add new elements to generate the cards
 export const pairs: Pair[] = [

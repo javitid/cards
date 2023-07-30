@@ -1,11 +1,11 @@
 import { Component, HostListener, ViewEncapsulation } from '@angular/core';
-import { MatBottomSheet, MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
-import { UtilsService } from '../../utils/utils-service';
-import { HelperService } from 'src/app/services/helper.service';
+import { HelperService } from '../../../../utils/helper.service';
+import { UtilsService } from '../../../../utils/utils.service';
 
 const STICKY_HEADER_FROM = 30;
 

@@ -12,7 +12,7 @@ import { GameComponent } from './pages/game/game.component';
 
 import { AuthMongoDBInterceptorService } from './services/auth-mongodb-interceptor.service';
 import { AuthService } from './services/auth.service';
-import { HelperService } from './services/helper.service';
+import { HelperService } from './utils/helper.service';
 
 @NgModule({
   declarations: [
