@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { AuthMongoDBGuard } from './guards/auth-mongodb.guard';
 import { GameComponent } from './pages/game/game.component';
+import { GenerateComponent } from './pages/generate/generate.component';
 
 const routes: Routes = [
   {
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: 'game',
         component: GameComponent
+      },
+      {
+        path: 'generate',
+        component: GenerateComponent
       }
     ],
   },

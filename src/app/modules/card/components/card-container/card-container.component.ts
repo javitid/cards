@@ -5,7 +5,6 @@ import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
-import { UtilsService } from '../../../../utils/utils.service';
 
 const STICKY_HEADER_FROM = 30;
 
@@ -26,12 +25,8 @@ export class CardContainerComponent {
   constructor(
     private readonly bottomSheet: MatBottomSheet,
     private readonly dataService: DataService,
-    private readonly helperService: HelperService,
-    private readonly utilsService: UtilsService
+    private readonly helperService: HelperService
   ) {
-
-    // Generate array of pairs
-    // console.log(this.utilsService.generateCards());
 
     this.isSmallScreen = helperService.isSmallScreen;
 
