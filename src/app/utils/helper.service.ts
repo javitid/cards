@@ -6,6 +6,6 @@ export class HelperService {
   public isSmallScreen: boolean;
 
   constructor(private _breakpointObserver: BreakpointObserver) {
-    this.isSmallScreen = this._breakpointObserver.isMatched('(max-width: 480px)');
+    this.isSmallScreen = this._breakpointObserver.isMatched('(max-width: 640px)');
   }
 }

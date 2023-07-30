@@ -4,11 +4,9 @@
 </div>
 
 <!-- 2 columns in small screens -->
-<mat-grid-list *ngIf="isSmallScreen; else isLargeScreen" cols="2" rowHeight="2:1" gutterSize="4px">
-    <mat-grid-tile *ngFor="let card of cards">
-        <app-card [card]="card" (selectCard)="selectCard($event)"></app-card>
-    </mat-grid-tile>
-</mat-grid-list>
+<div *ngIf="isSmallScreen; else isLargeScreen" class="flex flex-wrap justify-center">
+    <app-card class="justify-center basis-6/12 sm:flex" *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
+</div>
 
 <!-- More columns in large screens -->
 <ng-template #isLargeScreen>
