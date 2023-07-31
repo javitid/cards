@@ -3,7 +3,10 @@ import { NgModule } from '@angular/core';
 // Material
 import { MatBottomSheetModule} from '@angular/material/bottom-sheet';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon'
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
@@ -13,7 +16,10 @@ import { UtilsService } from '../utils/utils.service';
 const UI = [
   MatBottomSheetModule,
   MatButtonModule,
+  MatCardModule,
+  MatFormFieldModule,
   MatIconModule,
+  MatInputModule,
   MatProgressBarModule,
   MatSnackBarModule
 ];

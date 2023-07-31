@@ -1,0 +1,19 @@
+mat-card {
+  max-width: 400px;
+  margin: 2em auto;
+  text-align: center;
+}
+
+mat-form-field {
+  display: block;
+}
+
+.btn-facebook,
+.btn-facebook:hover,
+.btn-facebook:first-child:active {
+  background: #3b5998;
+  border-color: #3b5998;
+  color: #fff;
+  width: 300px;
+  height: 50px;
+}
