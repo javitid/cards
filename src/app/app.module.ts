@@ -17,13 +17,15 @@ import { LoginComponent } from './pages/login/login.component';
 import { AuthMongoDBInterceptorService } from './services/auth-mongodb-interceptor.service';
 import { AuthService } from './services/auth.service';
 import { HelperService } from './utils/helper.service';
+import { RegisterComponent } from './pages/register/register.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     GameComponent,
     GenerateComponent,
-    LoginComponent
+    LoginComponent,
+    RegisterComponent
   ],
   imports: [
     BrowserModule,

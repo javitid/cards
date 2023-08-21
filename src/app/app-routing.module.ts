@@ -6,6 +6,7 @@ import { TokenGuard } from './guards/token.guard';
 import { GameComponent } from './pages/game/game.component';
 import { GenerateComponent } from './pages/generate/generate.component';
 import { LoginComponent } from './pages/login/login.component';
+import { RegisterComponent } from './pages/register/register.component';
 
 const routes: Routes = [
   {
@@ -31,6 +32,10 @@ const routes: Routes = [
         path: 'generate',
         component: GenerateComponent,
         canActivate: [TokenGuard]
+      },
+      {
+        path: 'register',
+        component: RegisterComponent
       }
     ],
   },
