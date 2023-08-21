@@ -49,6 +49,16 @@ export class AuthService {
     );
   }
 
+  register(loginModel: any): Observable<any> {
+    const header = new HttpHeaders().set('Content-type', 'application/json');
+
+    return this.httpClient.post(
+      this.path + 'local-userpass/register',
+      JSON.stringify(loginModel),
+      { headers: header, withCredentials: false }
+    );
+  }
+
   getClient(): Observable<any> {
     const header = new HttpHeaders().set('Content-type', 'application/json');
     return this.httpClient.get(this.path + 'GetColorList', {

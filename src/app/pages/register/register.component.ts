@@ -22,7 +22,7 @@ export class RegisterComponent {
     private _snackBar: MatSnackBar
   ) {
     this.form = this.fb.group({
-      username: ['', Validators.email],
+      email: ['', Validators.email],
       password: ['', Validators.required],
       confirmPassword: ['', Validators.required]
     }, { validators: this.passwordMatchingValidatior });
@@ -31,20 +31,24 @@ export class RegisterComponent {
   async onSubmit() {
     if (this.form.valid) {
       try {
-        this.authService.login(this.form.value).subscribe(
-          (tokenBearer: any) => {
-            this.authService.saveToken('Bearer ' + tokenBearer.access_token);
-            this.router.navigate(['/game']);
+        this.authService.register({
+          email: this.form.value.email,
+          password: this.form.value.password
+        }).subscribe(
+          () => {
+            this._snackBar.open('User created', 'Close', {
+              duration: 5000,
+            });
+            this.router.navigate(['/login']);
           },
           (error: any) => {
-            console.error(error);
-            this._snackBar.open('Error with Username or Password', 'Close', {
-              duration: 5000,
+            this._snackBar.open('HTTP ' + error.status + ' ' + error.error.error_code + ': '+ error.error.error, 'Close', {
+              duration: 10000,
             });
           }
         );
       } catch (err) {
-        this._snackBar.open('Error with Username or Password', 'Close', {
+        this._snackBar.open('Error with Email or Password', 'Close', {
           duration: 5000,
         });
       }
