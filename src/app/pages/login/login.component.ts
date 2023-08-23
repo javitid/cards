@@ -16,6 +16,7 @@ declare const FB: any;
 })
 export class LoginComponent implements OnInit {
   private clientId = environment.clientId;
+  public isPwdHidden = true;
 
   constructor(
     private router: Router,

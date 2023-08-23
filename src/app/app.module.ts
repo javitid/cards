@@ -1,7 +1,8 @@
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
-import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // import { AuthMongoDBGuard } from './guards/auth-mongodb.guard';
@@ -46,7 +47,8 @@ import { RegisterComponent } from './pages/register/register.component';
     TokenGuard,
     AuthService,
     HelperService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthMongoDBInterceptorService, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthMongoDBInterceptorService, multi: true },
+    { provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: { appearance: 'fill' }}
   ],
   bootstrap: [AppComponent]
 })

@@ -14,6 +14,8 @@ declare const FB: any;
 })
 export class RegisterComponent {
   public form: any;
+  public isPwdHidden = true;
+  public isPwdRepeatedHidden = true;
 
   constructor(
     private router: Router,

@@ -1,29 +1,35 @@
 <div>
-    <mat-card>
-        <mat-card-content>
-            <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                <h2>Register</h2>
-                <mat-form-field class="full-width-input">
-                    <input matInput placeholder="Email" formControlName="email" required>
-                    <mat-error>
-                        Please provide a valid email address
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field class="full-width-input">
-                    <input matInput type="password" placeholder="Password" formControlName="password" required>
-                    <mat-error>
-                        Please provide a valid password
-                    </mat-error>
-                </mat-form-field>
-                <mat-form-field class="full-width-input">
-                    <input matInput type="password" placeholder="Repeat Password" formControlName="confirmPassword" required>
-                    <mat-error>
-                        Please repeat password
-                    </mat-error>
-                </mat-form-field>
-                <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary">Register</button>
-                <a routerLink="/login">Login</a>
-            </form>
-        </mat-card-content>
-      </mat-card>
+  <mat-card>
+      <mat-card-content>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+          <h2>Register</h2>
+          <mat-form-field class="full-width-input">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" required>
+            <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            <mat-error>
+              Please provide a valid email address
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input">
+            <mat-label>Password</mat-label>
+            <input matInput [type]="isPwdHidden ? 'password' : 'text'" formControlName="password" formControlName="password" required>
+            <mat-icon matSuffix (click)="isPwdHidden = !isPwdHidden">{{isPwdHidden ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <mat-error>
+               Please provide a valid password
+            </mat-error>
+          </mat-form-field>
+          <mat-form-field class="full-width-input">
+            <mat-label>Repeat password</mat-label>
+            <input matInput [type]="isPwdRepeatedHidden ? 'password' : 'text'" formControlName="password" formControlName="confirmPassword" required>
+            <mat-icon matSuffix (click)="isPwdRepeatedHidden = !isPwdRepeatedHidden">{{isPwdRepeatedHidden ? 'visibility_off' : 'visibility'}}</mat-icon>
+            <mat-error>
+              Please repeat password
+            </mat-error>
+          </mat-form-field>
+          <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary">Register</button>
+          <a routerLink="/login">Login</a>
+        </form>
+      </mat-card-content>
+  </mat-card>
 </div> 
