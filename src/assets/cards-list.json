@@ -1,114 +1,1602 @@
 [
-    {
-        "id": 0,
-        "icon": "home",
-        "pair": 1,
-        "value": "Casa",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 1,
-        "icon": "home",
-        "pair": 0,
-        "value": "Home",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 2,
-        "icon": "directions_car",
-        "pair": 3,
-        "value": "Coche",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 3,
-        "icon": "directions_car",
-        "pair": 2,
-        "value": "Car",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 4,
-        "icon": "wb_cloudy",
-        "pair": 5,
-        "value": "Nube",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 5,
-        "icon": "wb_cloudy",
-        "pair": 4,
-        "value": "Cloud",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 6,
-        "icon": "beach_access",
-        "pair": 7,
-        "value": "Playa",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 7,
-        "icon": "beach_access",
-        "pair": 6,
-        "value": "Beach",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 8,
-        "icon": "flight",
-        "pair": 9,
-        "value": "Avión",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 9,
-        "icon": "flight",
-        "pair": 8,
-        "value": "Plane",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 10,
-        "icon": "arrow_forward",
-        "pair": 11,
-        "value": "Flecha",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 11,
-        "icon": "arrow_forward",
-        "pair": 10,
-        "value": "Arrow",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 12,
-        "icon": "close",
-        "pair": 13,
-        "value": "Cruz",
-        "match": false,
-        "selected": false
-    },
-    {
-        "id": 13,
-        "icon": "close",
-        "pair": 12,
-        "value": "Cross",
-        "match": false,
-        "selected": false
-    }
+  {
+    "id": 0,
+    "icon": "home",
+    "pair": 1,
+    "value": "Casa",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 1,
+    "icon": "home",
+    "pair": 0,
+    "value": "House",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 2,
+    "icon": "directions_car",
+    "pair": 3,
+    "value": "Coche",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 3,
+    "icon": "directions_car",
+    "pair": 2,
+    "value": "Car",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 4,
+    "icon": "",
+    "pair": 5,
+    "value": "Perro",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 5,
+    "icon": "",
+    "pair": 4,
+    "value": "Dog",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 6,
+    "icon": "",
+    "pair": 7,
+    "value": "Gato",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 7,
+    "icon": "",
+    "pair": 6,
+    "value": "Cat",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 8,
+    "icon": "",
+    "pair": 9,
+    "value": "Árbol",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 9,
+    "icon": "",
+    "pair": 8,
+    "value": "Tree",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 10,
+    "icon": "",
+    "pair": 11,
+    "value": "Montaña",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 11,
+    "icon": "",
+    "pair": 10,
+    "value": "Mountain",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 12,
+    "icon": "",
+    "pair": 13,
+    "value": "Mar",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 13,
+    "icon": "",
+    "pair": 12,
+    "value": "Sea",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 14,
+    "icon": "",
+    "pair": 15,
+    "value": "Sol",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 15,
+    "icon": "",
+    "pair": 14,
+    "value": "Sun",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 16,
+    "icon": "",
+    "pair": 17,
+    "value": "Luna",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 17,
+    "icon": "",
+    "pair": 16,
+    "value": "Moon",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 18,
+    "icon": "",
+    "pair": 19,
+    "value": "Estrella",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 19,
+    "icon": "",
+    "pair": 18,
+    "value": "Star",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 20,
+    "icon": "",
+    "pair": 21,
+    "value": "Libro",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 21,
+    "icon": "",
+    "pair": 20,
+    "value": "Book",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 22,
+    "icon": "",
+    "pair": 23,
+    "value": "Lápiz",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 23,
+    "icon": "",
+    "pair": 22,
+    "value": "Pencil",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 24,
+    "icon": "",
+    "pair": 25,
+    "value": "Computadora",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 25,
+    "icon": "",
+    "pair": 24,
+    "value": "Computer",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 26,
+    "icon": "",
+    "pair": 27,
+    "value": "Teléfono",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 27,
+    "icon": "",
+    "pair": 26,
+    "value": "Phone",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 28,
+    "icon": "",
+    "pair": 29,
+    "value": "Reloj",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 29,
+    "icon": "",
+    "pair": 28,
+    "value": "Watch",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 30,
+    "icon": "",
+    "pair": 31,
+    "value": "Pelota",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 31,
+    "icon": "",
+    "pair": 30,
+    "value": "Ball",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 32,
+    "icon": "",
+    "pair": 33,
+    "value": "Silla",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 33,
+    "icon": "",
+    "pair": 32,
+    "value": "Chair",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 34,
+    "icon": "",
+    "pair": 35,
+    "value": "Mesa",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 35,
+    "icon": "",
+    "pair": 34,
+    "value": "Table",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 36,
+    "icon": "",
+    "pair": 37,
+    "value": "Agua",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 37,
+    "icon": "",
+    "pair": 36,
+    "value": "Water",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 38,
+    "icon": "",
+    "pair": 39,
+    "value": "Fuego",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 39,
+    "icon": "",
+    "pair": 38,
+    "value": "Fire",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 40,
+    "icon": "",
+    "pair": 41,
+    "value": "Aire",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 41,
+    "icon": "",
+    "pair": 40,
+    "value": "Air",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 42,
+    "icon": "",
+    "pair": 43,
+    "value": "Tierra",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 43,
+    "icon": "",
+    "pair": 42,
+    "value": "Earth",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 44,
+    "icon": "",
+    "pair": 45,
+    "value": "Nube",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 45,
+    "icon": "",
+    "pair": 44,
+    "value": "Cloud",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 46,
+    "icon": "",
+    "pair": 47,
+    "value": "Arcoíris",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 47,
+    "icon": "",
+    "pair": 46,
+    "value": "Rainbow",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 48,
+    "icon": "",
+    "pair": 49,
+    "value": "Cielo",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 49,
+    "icon": "",
+    "pair": 48,
+    "value": "Sky",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 50,
+    "icon": "",
+    "pair": 51,
+    "value": "Nieve",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 51,
+    "icon": "",
+    "pair": 50,
+    "value": "Snow",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 52,
+    "icon": "",
+    "pair": 53,
+    "value": "Flor",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 53,
+    "icon": "",
+    "pair": 52,
+    "value": "Flower",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 54,
+    "icon": "",
+    "pair": 55,
+    "value": "Playa",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 55,
+    "icon": "",
+    "pair": 54,
+    "value": "Beach",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 56,
+    "icon": "",
+    "pair": 57,
+    "value": "Río",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 57,
+    "icon": "",
+    "pair": 56,
+    "value": "River",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 58,
+    "icon": "",
+    "pair": 59,
+    "value": "Lago",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 59,
+    "icon": "",
+    "pair": 58,
+    "value": "Lake",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 60,
+    "icon": "",
+    "pair": 61,
+    "value": "Pájaro",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 61,
+    "icon": "",
+    "pair": 60,
+    "value": "Bird",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 62,
+    "icon": "",
+    "pair": 63,
+    "value": "Pez",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 63,
+    "icon": "",
+    "pair": 62,
+    "value": "Fish",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 64,
+    "icon": "",
+    "pair": 65,
+    "value": "Montaña",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 65,
+    "icon": "",
+    "pair": 64,
+    "value": "Mountain",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 66,
+    "icon": "",
+    "pair": 67,
+    "value": "Bosque",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 67,
+    "icon": "",
+    "pair": 66,
+    "value": "Forest",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 68,
+    "icon": "",
+    "pair": 69,
+    "value": "Estrella",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 69,
+    "icon": "",
+    "pair": 68,
+    "value": "Star",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 70,
+    "icon": "",
+    "pair": 71,
+    "value": "Luz",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 71,
+    "icon": "",
+    "pair": 70,
+    "value": "Light",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 72,
+    "icon": "",
+    "pair": 73,
+    "value": "Sombra",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 73,
+    "icon": "",
+    "pair": 72,
+    "value": "Shadow",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 74,
+    "icon": "",
+    "pair": 75,
+    "value": "Fruta",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 75,
+    "icon": "",
+    "pair": 74,
+    "value": "Fruit",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 76,
+    "icon": "",
+    "pair": 77,
+    "value": "Verdura",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 77,
+    "icon": "",
+    "pair": 76,
+    "value": "Vegetable",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 78,
+    "icon": "",
+    "pair": 79,
+    "value": "Leche",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 79,
+    "icon": "",
+    "pair": 78,
+    "value": "Milk",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 80,
+    "icon": "",
+    "pair": 81,
+    "value": "Pan",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 81,
+    "icon": "",
+    "pair": 80,
+    "value": "Bread",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 82,
+    "icon": "",
+    "pair": 83,
+    "value": "Carne",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 83,
+    "icon": "",
+    "pair": 82,
+    "value": "Meat",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 84,
+    "icon": "",
+    "pair": 85,
+    "value": "Pollo",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 85,
+    "icon": "",
+    "pair": 84,
+    "value": "Chicken",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 86,
+    "icon": "",
+    "pair": 87,
+    "value": "Arroz",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 87,
+    "icon": "",
+    "pair": 86,
+    "value": "Rice",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 88,
+    "icon": "",
+    "pair": 89,
+    "value": "Huevo",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 89,
+    "icon": "",
+    "pair": 88,
+    "value": "Egg",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 90,
+    "icon": "",
+    "pair": 91,
+    "value": "Queso",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 91,
+    "icon": "",
+    "pair": 90,
+    "value": "Cheese",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 92,
+    "icon": "",
+    "pair": 93,
+    "value": "Café",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 93,
+    "icon": "",
+    "pair": 92,
+    "value": "Coffee",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 94,
+    "icon": "",
+    "pair": 95,
+    "value": "Té",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 95,
+    "icon": "",
+    "pair": 94,
+    "value": "Tea",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 96,
+    "icon": "",
+    "pair": 97,
+    "value": "Jugo",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 97,
+    "icon": "",
+    "pair": 96,
+    "value": "Juice",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 98,
+    "icon": "",
+    "pair": 99,
+    "value": "Agua",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 99,
+    "icon": "",
+    "pair": 98,
+    "value": "Water",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 100,
+    "icon": "",
+    "pair": 101,
+    "value": "Vino",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 101,
+    "icon": "",
+    "pair": 100,
+    "value": "Wine",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 102,
+    "icon": "",
+    "pair": 103,
+    "value": "Cerveza",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 103,
+    "icon": "",
+    "pair": 102,
+    "value": "Beer",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 104,
+    "icon": "",
+    "pair": 105,
+    "value": "Cama",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 105,
+    "icon": "",
+    "pair": 104,
+    "value": "Bed",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 106,
+    "icon": "",
+    "pair": 107,
+    "value": "Baño",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 107,
+    "icon": "",
+    "pair": 106,
+    "value": "Bathroom",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 108,
+    "icon": "",
+    "pair": 109,
+    "value": "Cocina",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 109,
+    "icon": "",
+    "pair": 108,
+    "value": "Kitchen",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 110,
+    "icon": "",
+    "pair": 111,
+    "value": "Sala",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 111,
+    "icon": "",
+    "pair": 110,
+    "value": "Living Room",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 112,
+    "icon": "",
+    "pair": 113,
+    "value": "Comedor",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 113,
+    "icon": "",
+    "pair": 112,
+    "value": "Dining Room",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 114,
+    "icon": "",
+    "pair": 115,
+    "value": "Habitación",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 115,
+    "icon": "",
+    "pair": 114,
+    "value": "Bedroom",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 116,
+    "icon": "",
+    "pair": 117,
+    "value": "Escuela",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 117,
+    "icon": "",
+    "pair": 116,
+    "value": "School",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 118,
+    "icon": "",
+    "pair": 119,
+    "value": "Universidad",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 119,
+    "icon": "",
+    "pair": 118,
+    "value": "University",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 120,
+    "icon": "",
+    "pair": 121,
+    "value": "Oficina",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 121,
+    "icon": "",
+    "pair": 120,
+    "value": "Office",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 122,
+    "icon": "",
+    "pair": 123,
+    "value": "Hospital",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 123,
+    "icon": "",
+    "pair": 122,
+    "value": "Hospital",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 124,
+    "icon": "",
+    "pair": 125,
+    "value": "Farmacia",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 125,
+    "icon": "",
+    "pair": 124,
+    "value": "Pharmacy",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 126,
+    "icon": "",
+    "pair": 127,
+    "value": "Parque",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 127,
+    "icon": "",
+    "pair": 126,
+    "value": "Park",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 128,
+    "icon": "",
+    "pair": 129,
+    "value": "Cine",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 129,
+    "icon": "",
+    "pair": 128,
+    "value": "Cinema",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 130,
+    "icon": "",
+    "pair": 131,
+    "value": "Teatro",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 131,
+    "icon": "",
+    "pair": 130,
+    "value": "Theater",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 132,
+    "icon": "",
+    "pair": 133,
+    "value": "Música",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 133,
+    "icon": "",
+    "pair": 132,
+    "value": "Music",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 134,
+    "icon": "",
+    "pair": 135,
+    "value": "Arte",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 135,
+    "icon": "",
+    "pair": 134,
+    "value": "Art",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 136,
+    "icon": "",
+    "pair": 137,
+    "value": "Deporte",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 137,
+    "icon": "",
+    "pair": 136,
+    "value": "Sport",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 138,
+    "icon": "",
+    "pair": 139,
+    "value": "Juego",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 139,
+    "icon": "",
+    "pair": 138,
+    "value": "Game",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 140,
+    "icon": "",
+    "pair": 141,
+    "value": "Película",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 141,
+    "icon": "",
+    "pair": 140,
+    "value": "Movie",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 142,
+    "icon": "",
+    "pair": 143,
+    "value": "Fiesta",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 143,
+    "icon": "",
+    "pair": 142,
+    "value": "Party",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 144,
+    "icon": "",
+    "pair": 145,
+    "value": "Trabajo",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 145,
+    "icon": "",
+    "pair": 144,
+    "value": "Work",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 146,
+    "icon": "",
+    "pair": 147,
+    "value": "Vacaciones",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 147,
+    "icon": "",
+    "pair": 146,
+    "value": "Vacation",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 148,
+    "icon": "",
+    "pair": 149,
+    "value": "Dinero",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 149,
+    "icon": "",
+    "pair": 148,
+    "value": "Money",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 150,
+    "icon": "",
+    "pair": 151,
+    "value": "Amor",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 151,
+    "icon": "",
+    "pair": 150,
+    "value": "Love",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 152,
+    "icon": "",
+    "pair": 153,
+    "value": "Odio",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 153,
+    "icon": "",
+    "pair": 152,
+    "value": "Hate",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 154,
+    "icon": "",
+    "pair": 155,
+    "value": "Risa",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 155,
+    "icon": "",
+    "pair": 154,
+    "value": "Laughter",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 156,
+    "icon": "",
+    "pair": 157,
+    "value": "Llanto",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 157,
+    "icon": "",
+    "pair": 156,
+    "value": "Tears",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 158,
+    "icon": "",
+    "pair": 159,
+    "value": "Silencio",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 159,
+    "icon": "",
+    "pair": 158,
+    "value": "Silence",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 160,
+    "icon": "",
+    "pair": 161,
+    "value": "Ruido",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 161,
+    "icon": "",
+    "pair": 160,
+    "value": "Noise",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 162,
+    "icon": "",
+    "pair": 163,
+    "value": "Vida",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 163,
+    "icon": "",
+    "pair": 162,
+    "value": "Life",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 164,
+    "icon": "",
+    "pair": 165,
+    "value": "Muerte",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 165,
+    "icon": "",
+    "pair": 164,
+    "value": "Death",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 166,
+    "icon": "",
+    "pair": 167,
+    "value": "Sueño",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 167,
+    "icon": "",
+    "pair": 166,
+    "value": "Dream",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 168,
+    "icon": "",
+    "pair": 169,
+    "value": "Realidad",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 169,
+    "icon": "",
+    "pair": 168,
+    "value": "Reality",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 170,
+    "icon": "",
+    "pair": 171,
+    "value": "Éxito",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 171,
+    "icon": "",
+    "pair": 170,
+    "value": "Success",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 172,
+    "icon": "",
+    "pair": 173,
+    "value": "Fracaso",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 173,
+    "icon": "",
+    "pair": 172,
+    "value": "Failure",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 174,
+    "icon": "",
+    "pair": 175,
+    "value": "Esperanza",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 175,
+    "icon": "",
+    "pair": 174,
+    "value": "Hope",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 176,
+    "icon": "",
+    "pair": 177,
+    "value": "Desesperación",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 177,
+    "icon": "",
+    "pair": 176,
+    "value": "Desperation",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 178,
+    "icon": "",
+    "pair": 179,
+    "value": "Fuerza",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 179,
+    "icon": "",
+    "pair": 178,
+    "value": "Strength",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 180,
+    "icon": "",
+    "pair": 181,
+    "value": "Debilidad",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 181,
+    "icon": "",
+    "pair": 180,
+    "value": "Weakness",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 182,
+    "icon": "",
+    "pair": 183,
+    "value": "Victoria",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 183,
+    "icon": "",
+    "pair": 182,
+    "value": "Victory",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 184,
+    "icon": "",
+    "pair": 185,
+    "value": "Derrota",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 185,
+    "icon": "",
+    "pair": 184,
+    "value": "Defeat",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 186,
+    "icon": "",
+    "pair": 187,
+    "value": "Amistad",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 187,
+    "icon": "",
+    "pair": 186,
+    "value": "Friendship",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 188,
+    "icon": "",
+    "pair": 189,
+    "value": "Soledad",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 189,
+    "icon": "",
+    "pair": 188,
+    "value": "Loneliness",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 190,
+    "icon": "wb_cloudy",
+    "pair": 191,
+    "value": "Nube",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 191,
+    "icon": "wb_cloudy",
+    "pair": 190,
+    "value": "Cloud",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 192,
+    "icon": "beach_access",
+    "pair": 193,
+    "value": "Playa",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 193,
+    "icon": "beach_access",
+    "pair": 192,
+    "value": "Beach",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 194,
+    "icon": "flight",
+    "pair": 195,
+    "value": "Avión",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 195,
+    "icon": "flight",
+    "pair": 194,
+    "value": "Plane",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 196,
+    "icon": "arrow_forward",
+    "pair": 197,
+    "value": "Flecha",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 197,
+    "icon": "arrow_forward",
+    "pair": 196,
+    "value": "Arrow",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 198,
+    "icon": "close",
+    "pair": 199,
+    "value": "Cruz",
+    "match": false,
+    "selected": false
+  },
+  {
+    "id": 199,
+    "icon": "close",
+    "pair": 198,
+    "value": "Cross",
+    "match": false,
+    "selected": false
+  }
 ]
