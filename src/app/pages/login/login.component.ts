@@ -63,9 +63,10 @@ export class LoginComponent implements OnInit {
 
   async handleCredentialResponse(response: CredentialResponse) {
     await this.authService.LoginWithGoogle(response.credential).subscribe(
-      (x: any) => {
+      (tokenBearer: any) => {
         this._ngZone.run(() => {
-          this.router.navigate(['/logout']);
+          this.authService.saveToken('Bearer ' + tokenBearer.access_token);
+          this.router.navigate(['/game']);
         });
       },
       (error: any) => {
@@ -106,9 +107,10 @@ export class LoginComponent implements OnInit {
         await this.authService
           .LoginWithFacebook(result.authResponse.accessToken)
           .subscribe(
-            (x: any) => {
+            (tokenBearer: any) => {
               this._ngZone.run(() => {
-                this.router.navigate(['/logout']);
+                this.authService.saveToken('Bearer ' + tokenBearer.access_token);
+                this.router.navigate(['/game']);
               });
             },
             (error: any) => {
