@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { concatMap } from 'rxjs';
 
 import { DataService } from '../../services/data.service';
 import { UtilsService } from '../../utils/utils.service';
 import { Card, Pair } from '../../modules/card/interfaces/card';
 
-// TODO: fill from screen input and do a request to MongoDB server to update the Data Base
+// Fill from screen input and do a request to MongoDB server to update the Data Base
 // Add new elements to generate the cards
 const pairs: Pair[] = [
   { icon: 'home', es: 'Casa', en: 'House' },
@@ -116,7 +117,6 @@ const pairs: Pair[] = [
   styleUrls: ['./generate.component.scss']
 })
 export class GenerateComponent {
-  generatedCards = '';
   generatedJSON: Card[] = [];
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
@@ -132,12 +132,13 @@ export class GenerateComponent {
   generateJSON() {
     if (this.form.value.content) {
       this.generatedJSON = this.utilsService.generateCards(JSON.parse(this.form.value.content));
-      this.generatedCards = JSON.stringify(this.generatedJSON);
     }
   }
 
   // Upload JSON of cards to mongoDB
   uploadCards() {
-    this.dataService.setCards(this.generatedJSON);
+    this.dataService.deleteCards().pipe(
+      concatMap(resultDelete => this.dataService.setCards(this.generatedJSON)),
+    ).subscribe();
   }
 }

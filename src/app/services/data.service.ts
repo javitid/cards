@@ -8,6 +8,11 @@ import { environment } from '../../environments/environment';
 
 let cards: Observable<Card[]>;
 
+const LEVEL = {
+  EASY: 'easy',
+  PRUEBA: 'prueba'
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,7 +21,7 @@ export class DataService {
   
   constructor(private http: HttpClient) { }
 
-  getCards(level = 'easy'): Observable<Card[]>{
+  getCards(level = LEVEL.EASY): Observable<Card[]>{
     const requestHeaders = {
       'Accept': 'application/json',
     }
@@ -40,7 +45,7 @@ export class DataService {
     return cards;
   }
 
-  setCards(cards: Card[] ) {
+  setCards(cards: Card[]) {
     const requestHeaders = {
       'Accept': 'application/json'
     }
@@ -48,14 +53,32 @@ export class DataService {
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',
-      collection: 'prueba',
+      collection: LEVEL.EASY,
       documents: cards
     };
 
-    this.http.post<CardResponse>(environment.urlUploadCards, requestBody, {headers: requestHeaders}).pipe(
+    return this.http.post<CardResponse>(environment.urlUploadCards, requestBody, {headers: requestHeaders}).pipe(
       map(result => result.documents),
       shareReplay(1)
-    ).subscribe(res => console.log(res));
+    );
+  }
+
+  deleteCards() {
+    const requestHeaders = {
+      'Accept': 'application/json'
+    }
+
+    const requestBody = {
+      dataSource: 'Cluster0',
+      database: 'cards',
+      collection: LEVEL.EASY,
+      filter: {}
+    };
+
+    return this.http.post<CardResponse>(environment.urlDeleteCards, requestBody, {headers: requestHeaders}).pipe(
+      map(result => result.documents),
+      shareReplay(1)
+    );
   }
 
   getHttpError(): HttpErrorResponse|undefined  {
