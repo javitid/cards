@@ -1,13 +1,14 @@
-<h1>Generate JSON with new cards</h1>
+<h1 class="p-12">Generate JSON with new cards</h1>
 
-<section>
+<section class="px-12">
     <div class="flex flex-col justify-between items-center">
-        <form [formGroup]="form" (ngSubmit)="generateJSON()" class="w-full p-12">
+        <form [formGroup]="form" (ngSubmit)="generateJSON()" class="w-full">
             <mat-form-field>
                 <mat-label>JSON</mat-label>
                 <textarea matInput formControlName="content" class="!h-96" placeholder="Ex. [{ icon: 'home', es: 'Casa', en: 'House' }]" required></textarea>
             </mat-form-field>
-            <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary">Generate Cards</button>
+            <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary" class="mr-4">Generate Cards</button>
+            <button [disabled]="!generatedJSON" mat-raised-button color="secondary" (click)="uploadCards()">Upload Cards</button>
             <a routerLink="/register" class="ml-4 text-blue-800">Register</a>
         </form>
         

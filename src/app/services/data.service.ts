@@ -33,11 +33,15 @@ export class DataService {
         match: 5
       }
     };
-    cards = this.http.post<CardResponse>(environment.urlPostCards, requestBody, {headers: requestHeaders}).pipe(
+    cards = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
       map(result => result.documents),
       shareReplay(1)
     );
     return cards;
+  }
+
+  setCards(cardsString: string) {
+    console.log('TODO uploadCards');
   }
 
   getHttpError(): HttpErrorResponse|undefined  {

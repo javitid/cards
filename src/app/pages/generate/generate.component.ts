@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 
+import { DataService } from '../../services/data.service';
 import { UtilsService } from '../../utils/utils.service';
 import { Pair } from '../../modules/card/interfaces/card';
 
@@ -121,7 +122,8 @@ export class GenerateComponent {
   });
 
   constructor(
-    private fb: FormBuilder,
+    private readonly dataService: DataService,
+    private readonly fb: FormBuilder,
     private readonly utilsService: UtilsService
   ) {}
 
@@ -130,5 +132,10 @@ export class GenerateComponent {
     if (this.form.value.content) {
       this.generatedJSON = JSON.stringify(this.utilsService.generateCards(JSON.parse(this.form.value.content)));
     }
+  }
+
+  // Upload JSON of cards to mongoDB
+  uploadCards() {
+    this.dataService.setCards(this.generatedJSON);
   }
 }
