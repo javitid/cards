@@ -40,8 +40,22 @@ export class DataService {
     return cards;
   }
 
-  setCards(cardsString: string) {
-    console.log('TODO uploadCards');
+  setCards(cards: Card[] ) {
+    const requestHeaders = {
+      'Accept': 'application/json'
+    }
+
+    const requestBody = {
+      dataSource: 'Cluster0',
+      database: 'cards',
+      collection: 'prueba',
+      documents: cards
+    };
+
+    this.http.post<CardResponse>(environment.urlUploadCards, requestBody, {headers: requestHeaders}).pipe(
+      map(result => result.documents),
+      shareReplay(1)
+    ).subscribe(res => console.log(res));
   }
 
   getHttpError(): HttpErrorResponse|undefined  {

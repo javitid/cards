@@ -8,11 +8,11 @@
                 <textarea matInput formControlName="content" class="!h-96" placeholder="Ex. [{ icon: 'home', es: 'Casa', en: 'House' }]" required></textarea>
             </mat-form-field>
             <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary" class="mr-4">Generate Cards</button>
-            <button [disabled]="!generatedJSON" mat-raised-button color="secondary" (click)="uploadCards()">Upload Cards</button>
+            <button [disabled]="generatedJSON.length === 0" mat-raised-button color="secondary" (click)="uploadCards()">Upload Cards</button>
         </form>
         
         <div class="mt-12">
-            {{generatedJSON}}
+            {{generatedCards}}
         </div>
     </div>
 </section>

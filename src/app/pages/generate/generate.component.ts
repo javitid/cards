@@ -3,7 +3,7 @@ import { FormBuilder, Validators } from '@angular/forms';
 
 import { DataService } from '../../services/data.service';
 import { UtilsService } from '../../utils/utils.service';
-import { Pair } from '../../modules/card/interfaces/card';
+import { Card, Pair } from '../../modules/card/interfaces/card';
 
 // TODO: fill from screen input and do a request to MongoDB server to update the Data Base
 // Add new elements to generate the cards
@@ -116,7 +116,8 @@ const pairs: Pair[] = [
   styleUrls: ['./generate.component.scss']
 })
 export class GenerateComponent {
-  generatedJSON = '';
+  generatedCards = '';
+  generatedJSON: Card[] = [];
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
   });
@@ -130,7 +131,8 @@ export class GenerateComponent {
   // Generate array of pairs
   generateJSON() {
     if (this.form.value.content) {
-      this.generatedJSON = JSON.stringify(this.utilsService.generateCards(JSON.parse(this.form.value.content)));
+      this.generatedJSON = this.utilsService.generateCards(JSON.parse(this.form.value.content));
+      this.generatedCards = JSON.stringify(this.generatedJSON);
     }
   }
 
