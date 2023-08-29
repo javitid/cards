@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
+
 import { UtilsService } from '../../utils/utils.service';
 import { Pair } from '../../modules/card/interfaces/card';
 
@@ -27,7 +29,7 @@ const pairs: Pair[] = [
   { icon: '', es: 'Fuego', en: 'Fire' },
   { icon: '', es: 'Aire', en: 'Air' },
   { icon: '', es: 'Tierra', en: 'Earth' },
-  { icon: '', es: 'Nube', en: 'Cloud' },
+  { icon: '', es: 'Azúcar', en: 'Sugar' },
   { icon: '', es: 'Arcoíris', en: 'Rainbow' },
   { icon: '', es: 'Cielo', en: 'Sky' },
   { icon: '', es: 'Nieve', en: 'Snow' },
@@ -114,11 +116,19 @@ const pairs: Pair[] = [
 })
 export class GenerateComponent {
   generatedJSON = '';
+  form = this.fb.group({
+    content: [JSON.stringify(pairs), Validators.required],
+  });
 
-  constructor( private readonly utilsService: UtilsService ) {}
+  constructor(
+    private fb: FormBuilder,
+    private readonly utilsService: UtilsService
+  ) {}
 
   // Generate array of pairs
   generateJSON() {
-    this.generatedJSON = JSON.stringify(this.utilsService.generateCards(pairs));
+    if (this.form.value.content) {
+      this.generatedJSON = JSON.stringify(this.utilsService.generateCards(JSON.parse(this.form.value.content)));
+    }
   }
 }
