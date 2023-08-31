@@ -16,9 +16,11 @@ const STICKY_HEADER_FROM = 30;
 })
 export class CardContainerComponent {
   cards: Card[] = [];
+  esCards: Card[] = [];
+  enCards: Card[] = [];
   isHeaderFixed = false;
   isLastCardSelected = false;
-  isSmallScreen: boolean;
+  isTwoColumns: boolean;
   lastSelection: Card|undefined;
   progress = 0;
 
@@ -28,9 +30,11 @@ export class CardContainerComponent {
     private readonly helperService: HelperService
   ) {
 
-    this.isSmallScreen = helperService.isSmallScreen;
+    this.isTwoColumns = helperService.isSmallScreen;
 
     this.dataService.getCards().subscribe( (cards: Card[]) => {
+      this.esCards = this.shuffleArray(cards.filter((card, index) => index%2 === 0));
+      this.enCards = this.shuffleArray(cards.filter((card, index) => index%2 === 1));
       this.cards = this.shuffleArray(cards);
     });
   }
@@ -47,8 +51,19 @@ export class CardContainerComponent {
     return array;
   }
 
+  twoColumnsArray(esCards: Card[], enCards: Card[]): Card[] {
+    return esCards.flatMap((card: Card, index) => {
+      return [card, enCards[index]];
+    });
+  }
+
   toggleColumns() {
-    this.isSmallScreen = !this.isSmallScreen;
+    this.isTwoColumns = !this.isTwoColumns;
+    if(this.isTwoColumns) {
+      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.enCards));
+    } else {
+      this.cards = this.shuffleArray(this.cards);
+    }
   }
 
   selectCard(card: Card) {

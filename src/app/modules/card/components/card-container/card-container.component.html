@@ -4,7 +4,7 @@
 </div>
 
 <!-- 2 columns in small screens -->
-<div *ngIf="isSmallScreen; else isLargeScreen" class="flex flex-wrap justify-center">
+<div *ngIf="isTwoColumns; else isLargeScreen" class="flex flex-wrap justify-center">
     <app-card class="justify-center basis-6/12 sm:flex" *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
 </div>
 
