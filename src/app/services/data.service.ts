@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay } from 'rxjs/operators';
 
-import { Card, CardResponse } from '../modules/card/interfaces/card';
+import { Card, CardResponse, Credentials } from '../modules/card/interfaces/card';
 import { environment } from '../../environments/environment';
 
 let cards: Observable<Card[]>;
@@ -11,6 +11,10 @@ let cards: Observable<Card[]>;
 const LEVEL = {
   EASY: 'easy',
   PRUEBA: 'prueba'
+}
+
+const requestHeaders = {
+  'Accept': 'application/json'
 }
 
 @Injectable({
@@ -21,11 +25,13 @@ export class DataService {
   
   constructor(private http: HttpClient) { }
 
-  getCards(level = LEVEL.EASY): Observable<Card[]>{
-    const requestHeaders = {
-      'Accept': 'application/json',
-    }
+  getOpenAICredentials(): Observable<Credentials> {
+    return this.http.get<Credentials>(environment.urlOpenAICredentials, {headers: requestHeaders}).pipe(
+      shareReplay(1)
+    );
+  }
 
+  getCards(level = LEVEL.EASY): Observable<Card[]>{
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',
@@ -46,10 +52,6 @@ export class DataService {
   }
 
   setCards(cards: Card[]) {
-    const requestHeaders = {
-      'Accept': 'application/json'
-    }
-
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',
@@ -64,10 +66,6 @@ export class DataService {
   }
 
   deleteCards() {
-    const requestHeaders = {
-      'Accept': 'application/json'
-    }
-
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',

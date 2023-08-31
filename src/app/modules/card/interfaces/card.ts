@@ -11,6 +11,11 @@ export interface CardResponse {
   documents: Card[];
 }
 
+export interface Credentials {
+  apiKey: 'string',
+  organization: 'string'
+}
+
 // Helper to generate Cards
 export interface Pair {
   icon: string;

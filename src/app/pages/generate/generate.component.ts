@@ -5,7 +5,7 @@ import { OpenAI } from "openai";
 
 import { DataService } from '../../services/data.service';
 import { UtilsService } from '../../utils/utils.service';
-import { Card, Pair } from '../../modules/card/interfaces/card';
+import { Card, Credentials, Pair } from '../../modules/card/interfaces/card';
 
 // Fill from screen input and do a request to MongoDB server to update the Data Base
 // Add new elements to generate the cards
@@ -118,10 +118,11 @@ const pairs: Pair[] = [
   styleUrls: ['./generate.component.scss']
 })
 export class GenerateComponent {
+  chatCompletion: any;
   generatedJSON: Card[] = [];
   generatedString = '';
   generatedStringOpenAI = '';
-  chatCompletion: any;
+  openAICredentials!: Credentials;
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
   });
@@ -130,7 +131,9 @@ export class GenerateComponent {
     private readonly dataService: DataService,
     private readonly fb: FormBuilder,
     private readonly utilsService: UtilsService
-  ) {}
+  ) {
+    this.dataService.getOpenAICredentials().subscribe(result => this.openAICredentials = result);
+  }
 
   // Generate array of pairs
   generateJSON() {
@@ -143,8 +146,7 @@ export class GenerateComponent {
   // Generate cards using AI
   generateCardsWithAI() {
     const openai = new OpenAI({
-      apiKey: "TODO",
-      organization: "TODO",
+      ...this.openAICredentials,
       dangerouslyAllowBrowser: true
     });
 
