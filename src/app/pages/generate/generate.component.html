@@ -2,14 +2,19 @@
 
 <section class="px-12">
     <div class="flex flex-col justify-between items-center">
-        <form [formGroup]="form" (ngSubmit)="generateJSON()" class="w-full">
+        <form [formGroup]="form" class="w-full">
             <mat-form-field>
                 <mat-label>JSON</mat-label>
                 <textarea matInput formControlName="content" class="!h-96" placeholder="Ex. [{ icon: 'home', es: 'Casa', en: 'House' }]" required></textarea>
             </mat-form-field>
-            <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary" class="mr-4">Generate Cards</button>
-            <button [disabled]="generatedJSON.length === 0" mat-raised-button color="secondary" (click)="uploadCards()">Upload Cards</button>
-            <a routerLink="/game" class="ml-4 text-blue-800">Game</a>
+            <button [disabled]="!form.valid" mat-raised-button color="primary" (click)="generateJSON()" class="mr-4 mt-2">Generate Cards</button>
+            <button mat-raised-button color="primary" class="mr-4 mt-2" (click)="generateCardsWithAI()">Generate Cards with AI</button>
+            <button [disabled]="generatedJSON.length === 0" mat-raised-button color="secondary" class="mr-4 mt-2" (click)="uploadCards()">Upload Generated Cards</button>
+            <a routerLink="/game" class="text-blue-800">Game</a>
         </form>
+    </div>
+    <div class="mt-12">
+        {{ generatedStringOpenAI }}
+        {{ generatedString }}
     </div>
 </section>

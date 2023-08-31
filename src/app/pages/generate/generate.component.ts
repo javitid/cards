@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { concatMap } from 'rxjs';
+import { OpenAI } from "openai";
 
 import { DataService } from '../../services/data.service';
 import { UtilsService } from '../../utils/utils.service';
@@ -118,6 +119,9 @@ const pairs: Pair[] = [
 })
 export class GenerateComponent {
   generatedJSON: Card[] = [];
+  generatedString = '';
+  generatedStringOpenAI = '';
+  chatCompletion: any;
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
   });
@@ -132,6 +136,59 @@ export class GenerateComponent {
   generateJSON() {
     if (this.form.value.content) {
       this.generatedJSON = this.utilsService.generateCards(JSON.parse(this.form.value.content));
+      this.generatedString = JSON.stringify(this.generatedJSON);
+    }
+  }
+
+  // Generate cards using AI
+  generateCardsWithAI() {
+    const openai = new OpenAI({
+      apiKey: "TODO",
+      organization: "TODO",
+      dangerouslyAllowBrowser: true
+    });
+
+    try {
+      this.chatCompletion = openai.chat.completions.create({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Perform function requests for the user"
+          },
+          {
+            role: "user",
+            content: `Genera un array de 10 elementos, cada uno de ellos con 3 parámetros, el primer parámetro 'es' debe ser una palabra en castellano,
+            el segundo parámetro 'en' debe ser esa misma palabra en traducida a inglés, y el tercer parámetro 'icon' debe ser un string vacio.
+            En utf-8 y formato JSON sin escapar los carácteres, por ejemplo: 
+              [
+                {
+                  "icon": "home",
+                  "es": "Casa",
+                  "en": "House"
+                },
+                {
+                  "icon": "directions_car",
+                  "es": "Coche",
+                  "en": "Car"
+                }
+              ]`
+          }
+        ]
+      });
+
+      this.chatCompletion.then((result: any) => {
+        this.generatedStringOpenAI = result.choices[0].message.content;
+        this.form.controls.content.reset();
+      });
+
+    } catch (error: any) {
+      if (error.response) {
+        console.log(error.response.status);
+        console.log(error.response.data);
+      } else {
+        console.log(error.message);
+      }
     }
   }
 
