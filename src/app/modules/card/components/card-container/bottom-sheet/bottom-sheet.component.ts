@@ -10,7 +10,7 @@ export class BottomSheetComponent {
   constructor(private readonly bottomSheetRef: MatBottomSheetRef<BottomSheetComponent>) {}
 
   newGame(event: MouseEvent): void {
-    this.bottomSheetRef.dismiss();
+    this.bottomSheetRef.dismiss(true);
     event.preventDefault();
   }
 }

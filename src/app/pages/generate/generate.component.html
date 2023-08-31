@@ -14,7 +14,9 @@
         </form>
     </div>
     <div class="mt-12">
-        {{ generatedStringOpenAI }}
-        {{ generatedString }}
+        <mat-spinner *ngIf="isLoading; else notLoading"></mat-spinner>
+        <ng-template #notLoading>
+            {{ generatedString }}
+        </ng-template>
     </div>
 </section>

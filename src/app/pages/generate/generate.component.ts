@@ -121,7 +121,7 @@ export class GenerateComponent {
   chatCompletion: any;
   generatedJSON: Card[] = [];
   generatedString = '';
-  generatedStringOpenAI = '';
+  isLoading = false;
   openAICredentials!: Credentials;
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
@@ -145,6 +145,8 @@ export class GenerateComponent {
 
   // Generate cards using AI
   generateCardsWithAI() {
+    this.isLoading = true;
+
     const openai = new OpenAI({
       ...this.openAICredentials,
       dangerouslyAllowBrowser: true
@@ -180,7 +182,8 @@ export class GenerateComponent {
       });
 
       this.chatCompletion.then((result: any) => {
-        this.generatedStringOpenAI = result.choices[0].message.content;
+        this.isLoading = false;
+        this.generatedString = result.choices[0].message.content;
         this.form.controls.content.reset();
       });
 
@@ -196,8 +199,9 @@ export class GenerateComponent {
 
   // Upload JSON of cards to mongoDB
   uploadCards() {
+    this.isLoading = true;
     this.dataService.deleteCards().pipe(
       concatMap(resultDelete => this.dataService.setCards(this.generatedJSON)),
-    ).subscribe();
+    ).subscribe((result => this.isLoading = false));
   }
 }

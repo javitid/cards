@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
 
 import { HelperService } from '../utils/helper.service';
@@ -21,6 +22,7 @@ const UI = [
   MatIconModule,
   MatInputModule,
   MatProgressBarModule,
+  MatProgressSpinnerModule,
   MatSnackBarModule
 ];
 

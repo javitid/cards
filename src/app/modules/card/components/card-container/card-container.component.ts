@@ -92,11 +92,13 @@ export class CardContainerComponent {
 
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
-      const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent);
+      const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent, {disableClose: true});
 
-      bottomSheetRef.afterDismissed().subscribe(result => {
+      bottomSheetRef.afterDismissed().subscribe(reload => {
         // TODO: shuffle the cards and reset the page instead reload it
-        location.reload();
+        if (reload) {
+          location.reload();
+        }
       });
     }
   }
