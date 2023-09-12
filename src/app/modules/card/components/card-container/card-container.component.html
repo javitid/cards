@@ -1,5 +1,9 @@
 <div class="flex items-center p-8" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
-    <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
+    <mat-icon class="cursor-pointer" (click)="isSoundOn = !isSoundOn">
+        <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
+        <ng-template #isSoundOff>volume_off</ng-template>
+    </mat-icon>
+    <mat-progress-bar mode="determinate" [value]="progress" class="ml-4" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
     <mat-icon class="ml-4 cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
     <div class="ml-4">{{ timeLeft }}</div>
 </div>

@@ -25,9 +25,15 @@ export class CardContainerComponent {
   isTwoColumns: boolean;
   lastSelection: Card|undefined;
   progress = 0;
+
   // TIMER
   timeLeft = DEFAULT_TIMER;
   timerInterval: any;
+
+  // TEXT TO SPEECH
+  isSoundOn = true;
+  private synth = window.speechSynthesis;
+  private utterThis = new SpeechSynthesisUtterance();
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
@@ -36,9 +42,7 @@ export class CardContainerComponent {
   ) {
 
     this.startTimer();
-
     this.isTwoColumns = helperService.isSmallScreen;
-
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
       let randomNumbers: number[] = [];
@@ -99,6 +103,22 @@ export class CardContainerComponent {
       card.selected = false;
       this.isLastCardSelected = false;
       return;
+    }
+
+    // Speech
+    if ('speechSynthesis' in window && this.isSoundOn) {
+      this.utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : 'en-GB';
+
+      // Change voice
+      this.utterThis.pitch = 1;
+      this.utterThis.rate = 0.8;
+      // if (this.synth.getVoices().length > 0) {
+      //   this.utterThis.voice = this.synth.getVoices()[8];
+      // }
+
+      this.synth.cancel();
+      this.utterThis.text = card.value;
+      this.synth.speak(this.utterThis);
     }
 
     // When it's the first card then save it as last selection and set the selected indicator to true
