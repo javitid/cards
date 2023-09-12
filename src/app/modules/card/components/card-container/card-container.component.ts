@@ -27,6 +27,7 @@ export class CardContainerComponent {
   progress = 0;
   // TIMER
   timeLeft = DEFAULT_TIMER;
+  timerInterval: any;
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
@@ -133,18 +134,19 @@ export class CardContainerComponent {
 
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
+      clearInterval(this.timerInterval);
       this.openBottomSheet('Completed, perfect!');
     }
   }
 
   startTimer(timer: number = DEFAULT_TIMER) {
     this.timeLeft = timer;
-    let timerInterval = setInterval(() => {
+    this.timerInterval = setInterval(() => {
       if(this.timeLeft > 0) {
         this.timeLeft--;
       } else {
         this.openBottomSheet('Time expired!');
-        clearInterval(timerInterval);
+        clearInterval(this.timerInterval);
       }
     },1000)
   }
