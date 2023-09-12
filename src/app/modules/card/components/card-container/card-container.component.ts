@@ -135,7 +135,7 @@ export class CardContainerComponent {
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
       clearInterval(this.timerInterval);
-      this.openBottomSheet('Completed, perfect!');
+      this.openBottomSheet(`Completed in ${this.timeLeft} seconds!`);
     }
   }
 
