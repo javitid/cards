@@ -6,6 +6,7 @@ import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
+const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
 
 @Component({
@@ -33,9 +34,25 @@ export class CardContainerComponent {
     this.isTwoColumns = helperService.isSmallScreen;
 
     this.dataService.getCards().subscribe( (cards: Card[]) => {
-      this.esCards = this.shuffleArray(cards.filter((card, index) => index%2 === 0));
-      this.enCards = this.shuffleArray(cards.filter((card, index) => index%2 === 1));
-      this.cards = this.shuffleArray(cards);
+      // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
+      let randomNumbers: number[] = [];
+      this.cards = [];
+      for(let i = 0; i < PAIRS_AMOUNT; i++) {
+        // Only even numbers
+        let randomNumber = Math.floor(Math.random() * cards.length/2) * 2;
+
+        if (randomNumbers.includes(randomNumber)) {
+          i--;
+        } else {
+          randomNumbers.push(randomNumber);
+          this.cards.push(cards[randomNumber]);
+          this.cards.push(cards[randomNumber+1]);
+        }
+      }
+
+      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 0));
+      this.enCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 1));
+      this.cards = this.shuffleArray(this.cards);
     });
   }
 
