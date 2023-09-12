@@ -52,7 +52,11 @@ export class CardContainerComponent {
 
       this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 0));
       this.enCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 1));
-      this.cards = this.shuffleArray(this.cards);
+      if(this.isTwoColumns) {
+        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.enCards));
+      } else {
+        this.cards = this.shuffleArray(this.cards);
+      }
     });
   }
 
