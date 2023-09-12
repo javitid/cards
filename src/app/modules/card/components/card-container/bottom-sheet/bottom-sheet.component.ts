@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
+import { Component, Inject } from '@angular/core';
+import { MAT_BOTTOM_SHEET_DATA, MatBottomSheetRef } from '@angular/material/bottom-sheet';
 
 @Component({
   selector: 'app-bottom-sheet',
@@ -7,7 +7,12 @@ import { MatBottomSheetRef } from '@angular/material/bottom-sheet';
   styleUrls: ['./bottom-sheet.component.scss']
 })
 export class BottomSheetComponent {
-  constructor(private readonly bottomSheetRef: MatBottomSheetRef<BottomSheetComponent>) {}
+  content = this.bottomSheetRef.instance;
+
+  constructor(
+    @Inject(MAT_BOTTOM_SHEET_DATA)public readonly data: any,
+    private readonly bottomSheetRef: MatBottomSheetRef<BottomSheetComponent>
+  ) {}
 
   newGame(event: MouseEvent): void {
     this.bottomSheetRef.dismiss(true);

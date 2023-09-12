@@ -6,6 +6,7 @@ import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
+const DEFAULT_TIMER = 60;
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
 
@@ -24,12 +25,16 @@ export class CardContainerComponent {
   isTwoColumns: boolean;
   lastSelection: Card|undefined;
   progress = 0;
+  // TIMER
+  timeLeft = DEFAULT_TIMER;
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
     private readonly dataService: DataService,
     private readonly helperService: HelperService
   ) {
+
+    this.startTimer();
 
     this.isTwoColumns = helperService.isSmallScreen;
 
@@ -128,14 +133,30 @@ export class CardContainerComponent {
 
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
-      const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent, {disableClose: true});
-
-      bottomSheetRef.afterDismissed().subscribe(reload => {
-        // TODO: shuffle the cards and reset the page instead reload it
-        if (reload) {
-          location.reload();
-        }
-      });
+      this.openBottomSheet('Completed, perfect!');
     }
+  }
+
+  startTimer(timer: number = DEFAULT_TIMER) {
+    this.timeLeft = timer;
+    let timerInterval = setInterval(() => {
+      if(this.timeLeft > 0) {
+        this.timeLeft--;
+      } else {
+        this.openBottomSheet('Time expired!');
+        clearInterval(timerInterval);
+      }
+    },1000)
+  }
+
+  openBottomSheet(data: string) {
+    const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent, {data: data , disableClose: true});
+
+    bottomSheetRef.afterDismissed().subscribe(reload => {
+      // TODO: shuffle the cards and reset the page instead reload it
+      if (reload) {
+        location.reload();
+      }
+    });
   }
 }
