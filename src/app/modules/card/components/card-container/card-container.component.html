@@ -1,14 +1,16 @@
-<div class="flex items-center p-8 gap-4" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
-    <mat-icon class="cursor-pointer" (click)="isSoundOn = !isSoundOn">
-        <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
-        <ng-template #isSoundOff>volume_off</ng-template>
-    </mat-icon>
-    <mat-icon class="cursor-pointer" (click)="isFlipEffect = !isFlipEffect">
-        <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
-        <ng-template #isNotFlipEffect>visibility</ng-template>
-    </mat-icon>
+<div class="flex items-center p-8 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
+    <div class="flex gap-2" >
+        <mat-icon class="cursor-pointer" (click)="isSoundOn = !isSoundOn">
+            <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
+            <ng-template #isSoundOff>volume_off</ng-template>
+        </mat-icon>
+        <mat-icon class="cursor-pointer" (click)="isFlipEffect = !isFlipEffect">
+            <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
+            <ng-template #isNotFlipEffect>visibility</ng-template>
+        </mat-icon>
+        <mat-icon class="cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
+    </div>
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
-    <mat-icon class="cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
     <div>{{ timeLeft }}</div>
 </div>
 
