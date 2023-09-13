@@ -1,21 +1,25 @@
-<div class="flex items-center p-8" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
+<div class="flex items-center p-8 gap-4" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
     <mat-icon class="cursor-pointer" (click)="isSoundOn = !isSoundOn">
         <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
         <ng-template #isSoundOff>volume_off</ng-template>
     </mat-icon>
-    <mat-progress-bar mode="determinate" [value]="progress" class="ml-4" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
-    <mat-icon class="ml-4 cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
-    <div class="ml-4">{{ timeLeft }}</div>
+    <mat-icon class="cursor-pointer" (click)="isFlipEffect = !isFlipEffect">
+        <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
+        <ng-template #isNotFlipEffect>visibility</ng-template>
+    </mat-icon>
+    <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
+    <mat-icon class="cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
+    <div>{{ timeLeft }}</div>
 </div>
 
 <!-- 2 columns in small screens -->
 <div *ngIf="isTwoColumns; else isLargeScreen" class="flex flex-wrap justify-center">
-    <app-card class="justify-center basis-6/12 sm:flex" *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
+    <app-card class="justify-center basis-6/12 sm:flex" *ngFor="let card of cards" [card]="card" [isFlipEffect]="isFlipEffect" (selectCard)="selectCard($event)"></app-card>
 </div>
 
 <!-- More columns in large screens -->
 <ng-template #isLargeScreen>
     <div class="flex flex-wrap justify-center">
-        <app-card *ngFor="let card of cards" [card]="card" (selectCard)="selectCard($event)"></app-card>
+        <app-card *ngFor="let card of cards" [card]="card" [isFlipEffect]="isFlipEffect" (selectCard)="selectCard($event)"></app-card>
     </div>
 </ng-template>

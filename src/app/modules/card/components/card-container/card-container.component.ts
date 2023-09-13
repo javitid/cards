@@ -20,6 +20,7 @@ export class CardContainerComponent {
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
+  isFlipEffect = false;
   isHeaderFixed = false;
   isLastCardSelected = false;
   isTwoColumns: boolean;
@@ -134,22 +135,28 @@ export class CardContainerComponent {
   }
 
   // When there is a previous card selected, else save selected card
-  checkMatch(card: Card) {
-    if(this.lastSelection) {
-      // Check match
+  async checkMatch(card: Card) {
+    // Check match
+    if(this.lastSelection) { 
+      card.selected = true;
       const isMatch = card.id === this.lastSelection.pair;
       card.match = isMatch;
       this.lastSelection.match = isMatch;
+
       // Update progress bar
       if (isMatch) {
         this.progress = this.progress + 2*100/this.cards.length;
       }
-
-      // Unselect both cards
-      this.isLastCardSelected = false;
-      this.lastSelection.selected = false;
-      card.selected = false;
     }
+
+    await setTimeout(() => {
+      if(this.lastSelection) {
+        // Unselect both cards
+        this.isLastCardSelected = false;
+        this.lastSelection.selected = false;
+        card.selected = false;
+      }
+    }, 500);
   }
 
   progressBarCompleted() {

@@ -1,4 +1,16 @@
-<div class="card" [ngClass]="{'highlight-card': card.selected, 'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
+<div *ngIf="!isFlipEffect; else flipEffect" class="card" [ngClass]="{'highlight-card': card.selected, 'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
     <mat-icon *ngIf="card.icon && card.match" class="material-icons mr-4" color="primary">{{card.icon}}</mat-icon>
     <span>{{card.value}}</span>
 </div>
+
+<ng-template #flipEffect>
+    <div *ngIf="card.match || card.selected; else showBack" class="card card-front" [ngClass]="{'highlight-card': card.selected, 'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
+        <mat-icon *ngIf="card.icon && card.match" class="material-icons mr-4" color="primary">{{card.icon}}</mat-icon>
+        <span>{{card.value}}</span>
+    </div>
+    <ng-template #showBack>
+        <div class="card card-back" [ngClass]="{'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
+            <span>...</span>
+        </div>
+    </ng-template>
+</ng-template>

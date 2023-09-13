@@ -10,6 +10,9 @@ export class CardComponent {
   @Input()
   card!: Card;
 
+  @Input()
+  isFlipEffect: boolean = false;
+
   @Output()
   selectCard = new EventEmitter<Card>();
 }
