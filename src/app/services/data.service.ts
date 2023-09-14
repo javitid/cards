@@ -48,6 +48,9 @@ export class DataService {
       map(result => result.documents),
       shareReplay(1)
     );
+    return cards.pipe(
+      map(arr => arr.sort())
+    );
     return cards;
   }
 
