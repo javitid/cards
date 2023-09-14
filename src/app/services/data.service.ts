@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 
 import { Card, CardResponse, Credentials } from '../modules/card/interfaces/card';
 import { environment } from '../../environments/environment';
@@ -48,8 +48,10 @@ export class DataService {
       map(result => result.documents),
       shareReplay(1)
     );
+
+    // Order response elements by id because MongoDB service doesn't keep the order all the times (but the pairs where saved in order)
     return cards.pipe(
-      map(arr => arr.sort())
+      map(arr => arr.sort((a, b) => a.id > b.id ? 1 : -1))
     );
     return cards;
   }
