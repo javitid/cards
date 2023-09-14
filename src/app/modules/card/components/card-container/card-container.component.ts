@@ -140,13 +140,16 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   // When there is a previous card selected, else save selected card
-  async checkMatch(card: Card) {
+  checkMatch(card: Card) {
     // If the selection is blocked don't check the match
     if (this.isSelectionBlocked) { return }
 
     // Check match
     if(this.lastSelection) {
-      this.isSelectionBlocked = true;
+      if (this.isFlipEffect) {
+        this.isSelectionBlocked = true;
+      }
+
       card.selected = true;
       const isMatch = card.id === this.lastSelection.pair;
       card.match = isMatch;
@@ -155,18 +158,33 @@ export class CardContainerComponent implements OnDestroy {
       // Update progress bar
       if (isMatch) {
         this.progress = this.progress + 2*100/this.cards.length;
-      }
-    }
 
-    await setTimeout(() => {
-      if(this.lastSelection) {
         // Unselect both cards
         this.isLastCardSelected = false;
         this.lastSelection.selected = false;
-        this.isSelectionBlocked = false;
         card.selected = false;
+        this.isSelectionBlocked = false;
+      } else {
+        if (this.isFlipEffect) {
+          setTimeout(() => {
+            if(this.lastSelection) {
+              // Unselect both cards
+              this.isLastCardSelected = false;
+              this.lastSelection.selected = false;
+              card.selected = false;
+              this.isSelectionBlocked = false;
+            }
+          }, 500);
+        } else {
+          if(this.lastSelection) {
+            // Unselect both cards
+            this.isLastCardSelected = false;
+            this.lastSelection.selected = false;
+            card.selected = false;
+          }
+        }
       }
-    }, 500);
+    }
   }
 
   progressBarCompleted() {
