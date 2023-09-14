@@ -9,6 +9,7 @@ import { HelperService } from '../../../../utils/helper.service';
 const DEFAULT_TIMER = 60;
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
+const DESKTOP_VIEW_TWO_COLUMNS = true;
 
 @Component({
   selector: 'app-card-container',
@@ -44,7 +45,7 @@ export class CardContainerComponent implements OnDestroy {
   ) {
 
     this.startTimer();
-    this.isTwoColumns = helperService.isSmallScreen;
+    this.isTwoColumns = helperService.isSmallScreen || DESKTOP_VIEW_TWO_COLUMNS;
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
       let randomNumbers: number[] = [];
