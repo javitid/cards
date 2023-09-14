@@ -20,7 +20,7 @@ export class CardContainerComponent implements OnDestroy {
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
-  isFlipEffect = false;
+  isFlipEffect = true;
   isHeaderFixed = false;
   isLastCardSelected = false;
   isSelectionBlocked = false; // To avoid a new card selection before timeout expires
