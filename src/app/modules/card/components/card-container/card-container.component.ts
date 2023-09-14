@@ -23,6 +23,7 @@ export class CardContainerComponent implements OnDestroy {
   isFlipEffect = false;
   isHeaderFixed = false;
   isLastCardSelected = false;
+  isSelectionBlocked = false; // To avoid a new card selection before timeout expires
   isTwoColumns: boolean;
   lastSelection: Card|undefined;
   progress = 0;
@@ -140,8 +141,12 @@ export class CardContainerComponent implements OnDestroy {
 
   // When there is a previous card selected, else save selected card
   async checkMatch(card: Card) {
+    // If the selection is blocked don't check the match
+    if (this.isSelectionBlocked) { return }
+
     // Check match
-    if(this.lastSelection) { 
+    if(this.lastSelection) {
+      this.isSelectionBlocked = true;
       card.selected = true;
       const isMatch = card.id === this.lastSelection.pair;
       card.match = isMatch;
@@ -158,6 +163,7 @@ export class CardContainerComponent implements OnDestroy {
         // Unselect both cards
         this.isLastCardSelected = false;
         this.lastSelection.selected = false;
+        this.isSelectionBlocked = false;
         card.selected = false;
       }
     }, 500);
