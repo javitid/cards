@@ -1,4 +1,4 @@
-import { Component, HostListener, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
 import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
@@ -16,7 +16,7 @@ const STICKY_HEADER_FROM = 30;
   styleUrls: ['./card-container.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class CardContainerComponent {
+export class CardContainerComponent implements OnDestroy {
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
@@ -69,6 +69,10 @@ export class CardContainerComponent {
         this.cards = this.shuffleArray(this.cards);
       }
     });
+  }
+
+  ngOnDestroy() {
+    this.stopTimer();
   }
 
   @HostListener('window:scroll',['$event']) onScroll() {
@@ -176,6 +180,10 @@ export class CardContainerComponent {
         clearInterval(this.timerInterval);
       }
     },1000)
+  }
+
+  stopTimer() {
+    clearInterval(this.timerInterval);
   }
 
   openBottomSheet(data: string) {
