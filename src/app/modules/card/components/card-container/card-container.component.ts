@@ -7,9 +7,10 @@ import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
 const DEFAULT_TIMER = 60;
+const DESKTOP_VIEW_TWO_COLUMNS = true;
+const LANGUAGES = ['us'];
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
-const DESKTOP_VIEW_TWO_COLUMNS = true;
 
 @Component({
   selector: 'app-card-container',
@@ -18,6 +19,7 @@ const DESKTOP_VIEW_TWO_COLUMNS = true;
   encapsulation: ViewEncapsulation.None
 })
 export class CardContainerComponent implements OnDestroy {
+  currentLanguage = 'us';
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
@@ -26,6 +28,7 @@ export class CardContainerComponent implements OnDestroy {
   isLastCardSelected = false;
   isSelectionBlocked = false; // To avoid a new card selection before timeout expires
   isTwoColumns: boolean;
+  languages = LANGUAGES;
   lastSelection: Card|undefined;
   progress = 0;
 

@@ -12,6 +12,16 @@
     </div>
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
     <div>{{ timeLeft }}</div>
+    <div>
+        <mat-select [(value)]="currentLanguage" panelWidth="120px">
+            <mat-select-trigger>
+                <span class="fi fi-{{currentLanguage}} leading-8 w-16 rounded-lg"></span>
+            </mat-select-trigger>
+            <mat-option *ngFor="let lang of languages" [value]="lang">
+                <span class="fi fi-{{lang}} leading-8 w-16 rounded-lg"></span>
+            </mat-option>
+        </mat-select>
+    </div>
 </div>
 
 <!-- 2 columns in small screens -->
