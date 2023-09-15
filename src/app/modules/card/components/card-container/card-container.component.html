@@ -13,7 +13,7 @@
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
     <div>{{ timeLeft }}</div>
     <div>
-        <mat-select [(value)]="currentLanguage" panelWidth="120px">
+        <mat-select [(value)]="currentLanguage" panelWidth="120px" (selectionChange)="loadCards()">
             <mat-select-trigger>
                 <span class="fi fi-{{currentLanguage}} leading-8 w-16 rounded-lg"></span>
             </mat-select-trigger>

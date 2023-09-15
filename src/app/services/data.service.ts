@@ -3,7 +3,8 @@ import { HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, shareReplay, tap } from 'rxjs/operators';
 
-import { Card, CardResponse, Credentials } from '../modules/card/interfaces/card';
+import { Card, CardResponse, Credentials, Pair } from '../modules/card/interfaces/card';
+import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 
 let cards: Observable<Card[]>;
@@ -23,7 +24,10 @@ const requestHeaders = {
 export class DataService {
   httpError?: HttpErrorResponse;
   
-  constructor(private http: HttpClient) { }
+  constructor(
+    private readonly http: HttpClient,
+    private readonly utilsService: UtilsService
+  ) { }
 
   getOpenAICredentials(): Observable<Credentials> {
     return this.http.get<Credentials>(environment.urlOpenAICredentials, {headers: requestHeaders}).pipe(
@@ -39,24 +43,22 @@ export class DataService {
       projection: {
         id: 1,
         icon: 2,
-        pair: 3,
-        value: 4,
-        match: 5
+        es: 3,
+        en: 4,
+        it: 5
       }
     };
     cards = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
-      map(result => result.documents),
+      map(result => {
+        return this.utilsService.generateCards(result.documents);
+      }),
       shareReplay(1)
     );
 
-    // Order response elements by id because MongoDB service doesn't keep the order all the times (but the pairs where saved in order)
-    return cards.pipe(
-      map(arr => arr.sort((a, b) => a.id > b.id ? 1 : -1))
-    );
     return cards;
   }
 
-  setCards(cards: Card[]) {
+  setCards(cards: Pair[]) {
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',

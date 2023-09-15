@@ -1,14 +1,14 @@
 export interface Card {
   id: number;
   icon: string;
-  pair: number;
+  pairs: number[];
   value: string;
   match?: boolean;
   selected?: boolean;
 }
 
 export interface CardResponse {
-  documents: Card[];
+  documents: Pair[];
 }
 
 export interface Credentials {
@@ -21,4 +21,5 @@ export interface Pair {
   icon: string;
   es: string;
   en: string;
+  it: string;
 }

@@ -7,9 +7,8 @@
                 <mat-label>JSON</mat-label>
                 <textarea matInput formControlName="content" class="!h-96" placeholder="Ex. [{ icon: 'home', es: 'Casa', en: 'House' }]" required></textarea>
             </mat-form-field>
-            <button [disabled]="!form.valid" mat-raised-button color="primary" (click)="generateJSON()" class="mr-4 mt-2">Generate Cards</button>
             <button *ngIf="openAICredentials" mat-raised-button color="primary" class="mr-4 mt-2" (click)="generateCardsWithAI()">Generate Cards with AI</button>
-            <button [disabled]="generatedJSON.length === 0" mat-raised-button color="secondary" class="mr-4 mt-2" (click)="uploadCards()">Upload Generated Cards</button>
+            <button mat-raised-button color="secondary" class="mr-4 mt-2" (click)="uploadCards()">Upload Cards</button>
             <a routerLink="/game" class="text-blue-800">Game</a>
         </form>
     </div>

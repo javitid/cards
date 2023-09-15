@@ -8,7 +8,7 @@ import { HelperService } from '../../../../utils/helper.service';
 
 const DEFAULT_TIMER = 60;
 const DESKTOP_VIEW_TWO_COLUMNS = true;
-const LANGUAGES = ['us'];
+const LANGUAGES = ['us', 'it'];
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
 
@@ -23,7 +23,8 @@ export class CardContainerComponent implements OnDestroy {
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
-  isFlipEffect = true;
+  itCards: Card[] = [];
+  isFlipEffect = false;
   isHeaderFixed = false;
   isLastCardSelected = false;
   isSelectionBlocked = false; // To avoid a new card selection before timeout expires
@@ -46,16 +47,20 @@ export class CardContainerComponent implements OnDestroy {
     private readonly dataService: DataService,
     private readonly helperService: HelperService
   ) {
-
-    this.startTimer();
     this.isTwoColumns = helperService.isSmallScreen || DESKTOP_VIEW_TWO_COLUMNS;
+    this.loadCards();
+  }
+
+  loadCards() {
+    this.progress = 0;
+    this.startTimer();
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
       let randomNumbers: number[] = [];
       this.cards = [];
       for(let i = 0; i < PAIRS_AMOUNT; i++) {
-        // Only even numbers
-        let randomNumber = Math.floor(Math.random() * cards.length/2) * 2;
+        // Only numbers with index%3 === 0
+        let randomNumber = Math.floor(Math.random() * cards.length/3) * 3;
 
         if (randomNumbers.includes(randomNumber)) {
           i--;
@@ -63,13 +68,16 @@ export class CardContainerComponent implements OnDestroy {
           randomNumbers.push(randomNumber);
           this.cards.push(cards[randomNumber]);
           this.cards.push(cards[randomNumber+1]);
+          this.cards.push(cards[randomNumber+2]);
         }
       }
 
-      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 0));
-      this.enCards = this.shuffleArray(this.cards.filter((card, index) => index%2 === 1));
+      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%3 === 0));
+      this.itCards = this.shuffleArray(this.cards.filter((card, index) => (index+1)%3 === 0));
+      this.enCards = this.shuffleArray(this.cards.filter((card, index) => (index+2)%3 === 0));
+
       if(this.isTwoColumns) {
-        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.enCards));
+        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
       } else {
         this.cards = this.shuffleArray(this.cards);
       }
@@ -92,16 +100,16 @@ export class CardContainerComponent implements OnDestroy {
     return array;
   }
 
-  twoColumnsArray(esCards: Card[], enCards: Card[]): Card[] {
+  twoColumnsArray(esCards: Card[], otherCards: Card[]): Card[] {
     return esCards.flatMap((card: Card, index) => {
-      return [card, enCards[index]];
+      return [card, otherCards[index]];
     });
   }
 
   toggleColumns() {
     this.isTwoColumns = !this.isTwoColumns;
     if(this.isTwoColumns) {
-      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.enCards));
+      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
     } else {
       this.cards = this.shuffleArray(this.cards);
     }
@@ -117,7 +125,7 @@ export class CardContainerComponent implements OnDestroy {
 
     // Speech
     if ('speechSynthesis' in window && this.isSoundOn) {
-      this.utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : 'en-GB';
+      this.utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : (this.enCards.some(enCard => enCard.id === card.id) ? 'en-GB' : 'it-IT');
 
       // Change voice
       this.utterThis.pitch = 1;
@@ -155,7 +163,7 @@ export class CardContainerComponent implements OnDestroy {
       }
 
       card.selected = true;
-      const isMatch = card.id === this.lastSelection.pair;
+      const isMatch = this.lastSelection.pairs.includes(card.id);
       card.match = isMatch;
       this.lastSelection.match = isMatch;
 

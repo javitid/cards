@@ -7,21 +7,29 @@ export class UtilsService {
     return pairs.flatMap((pair: Pair, index) => {
       return [
         {
-          id: 2*index,
+          id: 3*index,
           icon: pair.icon,
-          pair: 2*index + 1,
+          pairs: [3*index + 1, 3*index + 2],
           value: pair.es,
           match: false,
           selected: false
         },
         {
-          id: 2*index + 1,
+          id: 3*index + 1,
           icon: pair.icon,
-          pair: 2*index,
+          pairs: [3*index, 3*index + 2],
           value: pair.en,
           match: false,
           selected: false
         },
+        {
+          id: 3*index + 2,
+          icon: pair.icon,
+          pairs: [3*index, 3*index + 1],
+          value: pair.it,
+          match: false,
+          selected: false
+        }
       ];
     });
   }
