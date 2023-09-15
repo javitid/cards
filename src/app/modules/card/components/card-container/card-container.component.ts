@@ -24,7 +24,7 @@ export class CardContainerComponent implements OnDestroy {
   esCards: Card[] = [];
   enCards: Card[] = [];
   itCards: Card[] = [];
-  isFlipEffect = false;
+  isFlipEffect = true;
   isHeaderFixed = false;
   isLastCardSelected = false;
   isSelectionBlocked = false; // To avoid a new card selection before timeout expires
@@ -53,6 +53,7 @@ export class CardContainerComponent implements OnDestroy {
 
   loadCards() {
     this.progress = 0;
+    this.stopTimer();
     this.startTimer();
     this.dataService.getCards().subscribe( (cards: Card[]) => {
       // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
