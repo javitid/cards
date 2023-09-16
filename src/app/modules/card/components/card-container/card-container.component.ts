@@ -6,11 +6,19 @@ import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
+const DEFAULT_CURRENT_LANGUAGE = 'us';
+const DEFAULT_FLIP_EFFECT = true;
+const DEFAULT_SOUND = true;
 const DEFAULT_TIMER = 60;
 const DESKTOP_VIEW_TWO_COLUMNS = true;
 const LANGUAGES = ['us', 'it'];
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
+const LOCAL_STORAGE = {
+  CURRENT_LANGUAGE: 'currentLanguage',
+  SOUND: 'sound',
+  FLIP_EFFECT: 'flipEffect'
+}
 
 @Component({
   selector: 'app-card-container',
@@ -19,12 +27,12 @@ const STICKY_HEADER_FROM = 30;
   encapsulation: ViewEncapsulation.None
 })
 export class CardContainerComponent implements OnDestroy {
-  currentLanguage = 'us';
+  currentLanguage!: string;
   cards: Card[] = [];
   esCards: Card[] = [];
   enCards: Card[] = [];
   itCards: Card[] = [];
-  isFlipEffect = true;
+  isFlipEffect !: boolean;
   isHeaderFixed = false;
   isLastCardSelected = false;
   isSelectionBlocked = false; // To avoid a new card selection before timeout expires
@@ -38,7 +46,7 @@ export class CardContainerComponent implements OnDestroy {
   timerInterval: any;
 
   // TEXT TO SPEECH
-  isSoundOn = true;
+  isSoundOn!: boolean;
   private synth = window.speechSynthesis;
   private utterThis = new SpeechSynthesisUtterance();
 
@@ -52,6 +60,11 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   loadCards() {
+    // Local storage
+    this.currentLanguage = localStorage.getItem(LOCAL_STORAGE.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
+    this.isFlipEffect = localStorage.getItem(LOCAL_STORAGE.FLIP_EFFECT) === 'true' ? true: localStorage.getItem(LOCAL_STORAGE.FLIP_EFFECT) === 'false' ? false: DEFAULT_FLIP_EFFECT;
+    this.isSoundOn = localStorage.getItem(LOCAL_STORAGE.SOUND) === 'true' ? true: localStorage.getItem(LOCAL_STORAGE.SOUND) === 'false' ? false: DEFAULT_SOUND;
+
     this.progress = 0;
     this.stopTimer();
     this.startTimer();
@@ -85,6 +98,30 @@ export class CardContainerComponent implements OnDestroy {
     });
   }
 
+  selectLanguage(event: any) {
+    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, event.value);
+    this.loadCards();
+  }
+
+  toggleSound() {
+    this.isSoundOn = !this.isSoundOn;
+    localStorage.setItem(LOCAL_STORAGE.SOUND, JSON.stringify(this.isSoundOn));
+  }
+
+  toggleFlipEffect() {
+    this.isFlipEffect = !this.isFlipEffect;
+    localStorage.setItem(LOCAL_STORAGE.FLIP_EFFECT, JSON.stringify(this.isFlipEffect));
+  }
+
+  toggleColumns() {
+    this.isTwoColumns = !this.isTwoColumns;
+    if(this.isTwoColumns) {
+      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
+    } else {
+      this.cards = this.shuffleArray(this.cards);
+    }
+  }
+
   ngOnDestroy() {
     this.stopTimer();
   }
@@ -105,15 +142,6 @@ export class CardContainerComponent implements OnDestroy {
     return esCards.flatMap((card: Card, index) => {
       return [card, otherCards[index]];
     });
-  }
-
-  toggleColumns() {
-    this.isTwoColumns = !this.isTwoColumns;
-    if(this.isTwoColumns) {
-      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
-    } else {
-      this.cards = this.shuffleArray(this.cards);
-    }
   }
 
   selectCard(card: Card) {

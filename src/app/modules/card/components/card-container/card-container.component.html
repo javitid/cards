@@ -1,10 +1,10 @@
 <div class="flex items-center p-8 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
     <div class="flex gap-2" >
-        <mat-icon class="cursor-pointer" (click)="isSoundOn = !isSoundOn">
+        <mat-icon class="cursor-pointer" (click)="toggleSound()">
             <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
             <ng-template #isSoundOff>volume_off</ng-template>
         </mat-icon>
-        <mat-icon class="cursor-pointer" (click)="isFlipEffect = !isFlipEffect">
+        <mat-icon class="cursor-pointer" (click)="toggleFlipEffect()">
             <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
             <ng-template #isNotFlipEffect>visibility</ng-template>
         </mat-icon>
@@ -13,7 +13,7 @@
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
     <div>{{ timeLeft }}</div>
     <div>
-        <mat-select [(value)]="currentLanguage" panelWidth="120px" (selectionChange)="loadCards()">
+        <mat-select [(value)]="currentLanguage" panelWidth="120px" (selectionChange)="selectLanguage($event)">
             <mat-select-trigger>
                 <span class="fi fi-{{currentLanguage}} leading-8 w-16 rounded-lg"></span>
             </mat-select-trigger>
