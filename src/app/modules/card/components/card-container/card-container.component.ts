@@ -47,8 +47,6 @@ export class CardContainerComponent implements OnDestroy {
 
   // TEXT TO SPEECH
   isSoundOn!: boolean;
-  private synth = window.speechSynthesis;
-  private utterThis = new SpeechSynthesisUtterance();
 
   constructor(
     private readonly bottomSheet: MatBottomSheet,
@@ -154,18 +152,20 @@ export class CardContainerComponent implements OnDestroy {
 
     // Speech
     if ('speechSynthesis' in window && this.isSoundOn) {
-      this.utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : (this.enCards.some(enCard => enCard.id === card.id) ? 'en-GB' : 'it-IT');
+      const synth = window.speechSynthesis;
+      const utterThis = new SpeechSynthesisUtterance();
+      utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : (this.enCards.some(enCard => enCard.id === card.id) ? 'en-GB' : 'it-IT');
 
       // Change voice
-      this.utterThis.pitch = 1;
-      this.utterThis.rate = 0.8;
-      // if (this.synth.getVoices().length > 0) {
-      //   this.utterThis.voice = this.synth.getVoices()[8];
+      utterThis.pitch = 1;
+      utterThis.rate = 0.8;
+      // if (synth.getVoices().length > 0) {
+      //   utterThis.voice = synth.getVoices()[8];
       // }
 
-      this.synth.cancel();
-      this.utterThis.text = card.value;
-      this.synth.speak(this.utterThis);
+      synth.cancel();
+      utterThis.text = card.value;
+      synth.speak(utterThis);
     }
 
     // When it's the first card then save it as last selection and set the selected indicator to true
