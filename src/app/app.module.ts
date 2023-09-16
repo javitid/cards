@@ -31,7 +31,6 @@ import { RegisterComponent } from './pages/register/register.component';
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    AppRoutingModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
@@ -40,7 +39,10 @@ import { RegisterComponent } from './pages/register/register.component';
     SharedModule,
 
     // Cards
-    CardModule
+    CardModule,
+
+    // Routing
+    AppRoutingModule
   ],
   providers: [
     // AuthMongoDBGuard,
