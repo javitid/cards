@@ -298,9 +298,8 @@ export class CardContainerComponent implements OnDestroy {
     const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent, {data: data , disableClose: true});
 
     bottomSheetRef.afterDismissed().subscribe(reload => {
-      // TODO: shuffle the cards and reset the page instead reload it
       if (reload) {
-        location.reload();
+        this.loadCards();
       }
     });
   }
