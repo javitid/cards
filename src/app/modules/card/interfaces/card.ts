@@ -1,6 +1,7 @@
 export interface Card {
   id: number;
   icon: string;
+  voice: string;
   pairs: number[];
   value: string;
   match?: boolean;
@@ -20,6 +21,8 @@ export interface Credentials {
 export interface Pair {
   icon: string;
   es: string;
-  en: string;
+  gb: string;
   it: string;
+  pt: string;
+  de: string;
 }

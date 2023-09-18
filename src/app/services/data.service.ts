@@ -35,22 +35,27 @@ export class DataService {
     );
   }
 
-  getCards(level = LEVEL.EASY): Observable<Card[]>{
+  getCards(languages: string[], level = LEVEL.EASY): Observable<Card[]>{
+    const projection: { [key: string]: number } = {
+      id: 1,
+      icon: 2,
+      es: 3
+    };
+
+    // Add languages
+    languages.forEach((lang, index) => {
+      projection[lang] = index+4;
+    });
+
     const requestBody = {
       dataSource: 'Cluster0',
       database: 'cards',
       collection: level,
-      projection: {
-        id: 1,
-        icon: 2,
-        es: 3,
-        en: 4,
-        it: 5
-      }
+      projection: projection
     };
     cards = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
       map(result => {
-        return this.utilsService.generateCards(result.documents);
+        return this.utilsService.generateCards(result.documents, languages);
       }),
       shareReplay(1)
     );

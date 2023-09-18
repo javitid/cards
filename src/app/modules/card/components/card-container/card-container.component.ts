@@ -6,12 +6,12 @@ import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
-const DEFAULT_CURRENT_LANGUAGE = 'us';
+const DEFAULT_CURRENT_LANGUAGE = 'gb';
 const DEFAULT_FLIP_EFFECT = true;
 const DEFAULT_SOUND = true;
 const DEFAULT_TIMER = 60;
 const DESKTOP_VIEW_TWO_COLUMNS = true;
-const LANGUAGES = ['us', 'it'];
+const LANGUAGES = ['gb', 'it', 'pt', 'de'];
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
 const LOCAL_STORAGE = {
@@ -30,8 +30,10 @@ export class CardContainerComponent implements OnDestroy {
   currentLanguage!: string;
   cards: Card[] = [];
   esCards: Card[] = [];
-  enCards: Card[] = [];
+  gbCards: Card[] = [];
   itCards: Card[] = [];
+  ptCards: Card[] = [];
+  deCards: Card[] = [];
   isFlipEffect !: boolean;
   isHeaderFixed = false;
   isLastCardSelected = false;
@@ -66,13 +68,14 @@ export class CardContainerComponent implements OnDestroy {
     this.progress = 0;
     this.stopTimer();
     this.startTimer();
-    this.dataService.getCards().subscribe( (cards: Card[]) => {
+    this.dataService.getCards(LANGUAGES).subscribe( (cards: Card[]) => {
       // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
       let randomNumbers: number[] = [];
+      const cardsForEachPair = LANGUAGES.length + 1;
       this.cards = [];
       for(let i = 0; i < PAIRS_AMOUNT; i++) {
-        // Only numbers with index%3 === 0
-        let randomNumber = Math.floor(Math.random() * cards.length/3) * 3;
+        // Only numbers with index%cardForEachPair === 0
+        let randomNumber = Math.floor(Math.random() * cards.length/cardsForEachPair) * cardsForEachPair;
 
         if (randomNumbers.includes(randomNumber)) {
           i--;
@@ -81,17 +84,39 @@ export class CardContainerComponent implements OnDestroy {
           this.cards.push(cards[randomNumber]);
           this.cards.push(cards[randomNumber+1]);
           this.cards.push(cards[randomNumber+2]);
+          this.cards.push(cards[randomNumber+3]);
+          this.cards.push(cards[randomNumber+4]);
         }
       }
 
-      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%3 === 0));
-      this.itCards = this.shuffleArray(this.cards.filter((card, index) => (index+1)%3 === 0));
-      this.enCards = this.shuffleArray(this.cards.filter((card, index) => (index+2)%3 === 0));
+      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%cardsForEachPair === 0));
+      this.deCards = this.shuffleArray(this.cards.filter((card, index) => (index+1)%cardsForEachPair === 0));
+      this.ptCards = this.shuffleArray(this.cards.filter((card, index) => (index+2)%cardsForEachPair === 0));
+      this.itCards = this.shuffleArray(this.cards.filter((card, index) => (index+3)%cardsForEachPair === 0));
+      this.gbCards = this.shuffleArray(this.cards.filter((card, index) => (index+4)%cardsForEachPair === 0));
+
+      let secondLang: Card[];
+      switch(this.currentLanguage) {
+        case 'gb':
+          secondLang = this.gbCards;
+          break;
+        case 'it':
+          secondLang = this.itCards;
+          break;
+        case 'pt':
+          secondLang = this.ptCards;
+          break;
+        case 'de':
+          secondLang = this.deCards;
+          break;
+        default:
+          secondLang = this.gbCards;
+      }
 
       if(this.isTwoColumns) {
-        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
+        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(secondLang));
       } else {
-        this.cards = this.shuffleArray(this.cards);
+        this.cards = this.shuffleArray([...this.esCards, ...secondLang]);
       }
     });
   }
@@ -112,11 +137,29 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   toggleColumns() {
+    let secondLang: Card[];
+    switch(this.currentLanguage) {
+      case 'gb':
+        secondLang = this.gbCards;
+        break;
+      case 'it':
+        secondLang = this.itCards;
+        break;
+      case 'pt':
+        secondLang = this.ptCards;
+        break;
+      case 'de':
+        secondLang = this.deCards;
+        break;
+      default:
+        secondLang = this.gbCards;
+    }
+
     this.isTwoColumns = !this.isTwoColumns;
     if(this.isTwoColumns) {
-      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(this.currentLanguage === 'us' ? this.enCards : this.itCards));
+      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(secondLang));
     } else {
-      this.cards = this.shuffleArray(this.cards);
+      this.cards = this.shuffleArray([...this.esCards, ...secondLang]);
     }
   }
 
@@ -154,7 +197,7 @@ export class CardContainerComponent implements OnDestroy {
     if ('speechSynthesis' in window && this.isSoundOn) {
       const synth = window.speechSynthesis;
       const utterThis = new SpeechSynthesisUtterance();
-      utterThis.lang = this.esCards.some(esCard => esCard.id === card.id) ? 'es-ES' : (this.enCards.some(enCard => enCard.id === card.id) ? 'en-GB' : 'it-IT');
+      utterThis.lang = card.voice;
 
       // Change voice
       utterThis.pitch = 1;
