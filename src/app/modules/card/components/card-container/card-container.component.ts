@@ -274,7 +274,7 @@ export class CardContainerComponent implements OnDestroy {
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
       clearInterval(this.timerInterval);
-      this.openBottomSheet(`Completed in ${this.timeLeft} seconds!`);
+      this.openBottomSheet(`Completed in ${DEFAULT_TIMER - this.timeLeft} seconds!`);
     }
   }
 
