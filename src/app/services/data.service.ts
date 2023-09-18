@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse} from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 
 import { Card, CardResponse, Credentials, Pair } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 
-let cards: Observable<Card[]>;
+const cards: Map<string, Observable<Card[]>> = new Map();
 
 const LEVEL = {
   EASY: 'easy',
@@ -53,14 +53,18 @@ export class DataService {
       collection: level,
       projection: projection
     };
-    cards = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
-      map(result => {
-        return this.utilsService.generateCards(result.documents, languages);
-      }),
-      shareReplay(1)
-    );
 
-    return cards;
+    if (!cards.get(level)) {
+      const cards$ = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
+        map(result => {
+          return this.utilsService.generateCards(result.documents, languages);
+        }),
+        shareReplay(1)
+      );
+      cards.set(level, cards$);
+    }
+
+    return cards.get(level) || of();
   }
 
   setCards(cards: Pair[]) {
