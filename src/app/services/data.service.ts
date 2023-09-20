@@ -54,17 +54,24 @@ export class DataService {
       projection: projection
     };
 
-    if (!cards.get(level)) {
-      const cards$ = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
-        map(result => {
-          return this.utilsService.generateCards(result.documents, languages);
-        }),
-        shareReplay(1)
-      );
-      cards.set(level, cards$);
-    }
+    return this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
+      map(result => {
+        return this.utilsService.generateCards(result.documents, languages);
+      }),
+      shareReplay(1)
+    );
 
-    return cards.get(level) || of();
+    // TODO: Add cache to the request
+    // if (!cards.get(level)) {
+    //   const cards$ = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
+    //     map(result => {
+    //       return this.utilsService.generateCards(result.documents, languages);
+    //     }),
+    //     shareReplay(1)
+    //   );
+    //   cards.set(level, cards$);
+    // }
+    // return cards.get(level) || of();
   }
 
   setCards(cards: Pair[]) {
