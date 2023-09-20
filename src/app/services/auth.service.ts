@@ -63,6 +63,19 @@ export class AuthService {
     );
   }
 
+  confirmUser(token: string, tokenId: string): Observable<any> {
+    const header = new HttpHeaders().set('Content-type', 'application/json');
+    const confirmModel = {
+      token,
+      tokenId
+    }
+
+    return this.httpClient.post<any>(
+      this.path + 'local-userpass/confirm',
+      JSON.stringify(confirmModel),
+      {headers: header});
+  }
+
   getClient(): Observable<any> {
     const header = new HttpHeaders().set('Content-type', 'application/json');
     return this.httpClient.get(this.path + 'GetColorList', {

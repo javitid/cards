@@ -1,7 +1,7 @@
 import { Component, OnInit, NgZone } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CredentialResponse, PromptMomentNotification } from 'google-one-tap';
 
 import { environment } from '../../../environments/environment';
@@ -19,11 +19,12 @@ export class LoginComponent implements OnInit {
   public isPwdHidden = true;
 
   constructor(
-    private router: Router,
-    private authService: AuthService,
-    private _ngZone: NgZone,
-    private fb: FormBuilder,
-    private _snackBar: MatSnackBar
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly authService: AuthService,
+    private readonly fb: FormBuilder,
+    private readonly router: Router,
+    private readonly _ngZone: NgZone,
+    private readonly _snackBar: MatSnackBar
   ) {}
 
   form = this.fb.group({
@@ -32,6 +33,25 @@ export class LoginComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // Check if user comes from mongoDB confirmation email (token and tokenId)
+    // Confirm user
+    this.activatedRoute.queryParams.pipe().subscribe(({ token, tokenId }) => {
+      if (token) {
+        try {
+          this.authService.confirmUser(token, tokenId).subscribe(result => {
+            this.router.navigate(['/game']);
+            this._snackBar.open('User confirmed! Please, do log-in', 'Close', {
+              duration: 5000,
+            });
+          });
+        } catch (err) {
+          this._snackBar.open('Error with the user confirmation', 'Close', {
+            duration: 5000,
+          });
+        }
+      }
+    });
+
     // Show button when the user is already logged in and the path has changed
     // @ts-ignore
     if(window.google) {
