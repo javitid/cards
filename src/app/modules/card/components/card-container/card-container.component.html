@@ -1,14 +1,52 @@
-<div class="flex items-center p-8 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
-    <div class="flex gap-2" >
-        <mat-icon class="cursor-pointer" (click)="toggleSound()">
+<div class="flex items-center p-4 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
+    <div class="w-16">
+        <mat-icon mat-button class="cursor-pointer" [matMenuTriggerFor]="menu">menu</mat-icon>
+        <mat-menu #menu="matMenu">
+            <div class="flex flex-col gap-2 mx-4" *ngIf="isMenuShown">
+                <div class="cursor-pointer" (click)="toggleSound()">
+                    <div *ngIf="isSoundOn; else isSoundOff" class="flex gap-2">
+                        <mat-icon color="primary">volume_up</mat-icon> Sound On
+                    </div>
+                    <ng-template #isSoundOff>
+                        <div class="flex gap-2">
+                            <mat-icon color="primary">volume_off</mat-icon> Sound Off
+                        </div>
+                    </ng-template>
+                </div>
+                <div class="cursor-pointer" (click)="toggleFlipEffect()">
+                    <div *ngIf="isFlipEffect; else isNotFlipEffect" class="flex gap-2">
+                        <mat-icon color="primary">visibility_off</mat-icon> Visibility Off
+                    </div>
+                    <ng-template #isNotFlipEffect>
+                        <div class="flex gap-2">
+                            <mat-icon color="primary">visibility_on</mat-icon> Visibility On
+                        </div>
+                    </ng-template>
+                </div>
+
+                <div class="cursor-pointer" (click)="toggleColumns()">
+                    <div *ngIf="isTwoColumns; else isNotTwoColumns" class="flex gap-2">
+                        <mat-icon color="primary">view_column</mat-icon> 2 columns
+                    </div>
+                    <ng-template #isNotTwoColumns>
+                        <div class="flex gap-2">
+                            <mat-icon color="primary">view_column</mat-icon> All mixed
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </mat-menu>
+    </div>
+    <div class="flex gap-2" *ngIf="isMenuShown">
+        <mat-icon matTooltip="Sound">
             <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
             <ng-template #isSoundOff>volume_off</ng-template>
         </mat-icon>
-        <mat-icon class="cursor-pointer" (click)="toggleFlipEffect()">
+        <mat-icon matTooltip="Visibility">
             <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
             <ng-template #isNotFlipEffect>visibility</ng-template>
         </mat-icon>
-        <mat-icon class="cursor-pointer" color="primary" (click)="toggleColumns()">view_column</mat-icon>
+        <mat-icon matTooltip="2 columns">view_column</mat-icon>
     </div>
     <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
     <div>{{ timeLeft }}</div>
@@ -35,3 +73,14 @@
         <app-card *ngFor="let card of cards" [card]="card" [isFlipEffect]="isFlipEffect" (selectCard)="selectCard($event)"></app-card>
     </div>
 </ng-template>
+
+<mat-toolbar color="primary" class="absolute bottom-0 left-0 flex gap-8">
+    Games list
+    <mat-icon color="secondary" matTooltip="Languages">flag</mat-icon>
+    <div class="flex-auto"></div>
+    Soon
+    <mat-icon color="secondary" matTooltip="Childs">child_care</mat-icon>
+    <mat-icon color="secondary" matTooltip="Maths">casino</mat-icon>
+    <mat-icon color="secondary" matTooltip="Synonyms">supervisor_account</mat-icon>
+    <mat-icon color="secondary" matTooltip="Antonyms">done_all</mat-icon>
+</mat-toolbar>

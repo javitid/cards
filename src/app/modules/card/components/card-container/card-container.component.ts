@@ -34,6 +34,7 @@ export class CardContainerComponent implements OnDestroy {
   itCards: Card[] = [];
   ptCards: Card[] = [];
   deCards: Card[] = [];
+  isMenuShown = true;
   isFlipEffect !: boolean;
   isHeaderFixed = false;
   isLastCardSelected = false;
