@@ -45,13 +45,25 @@ export class AuthService {
     });
   }
 
-  public signOutExternal = () => {
+  public logout(): void {
     signOut(auth).finally(() => {
       sessionStorage.removeItem('token');
       sessionStorage.removeItem('username');
       this.setLoginStatus(false);
     });
+  }
+
+  public signOutExternal = () => {
+    this.logout();
   };
+
+  getUsername(): Observable<string> {
+    return this.username.asObservable();
+  }
+
+  getLoginStatus(): Observable<boolean> {
+    return this.loginStatus.asObservable();
+  }
 
   LoginWithGoogle(): Observable<UserCredential> {
     const provider = new GoogleAuthProvider();

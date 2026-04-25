@@ -1,1 +1,21 @@
-<app-card-container></app-card-container>
+<div class="game-container">
+  <p-toolbar class="game-toolbar">
+    <ng-template pTemplate="left">
+      <span class="toolbar-username">{{ username$ | async }}</span>
+    </ng-template>
+    <ng-template pTemplate="right">
+      <button
+        pButton
+        type="button"
+        label="Logout"
+        icon="pi pi-sign-out"
+        class="p-button-warning"
+        (click)="logout()">
+      </button>
+    </ng-template>
+  </p-toolbar>
+
+  <div class="game-content">
+    <app-card-container></app-card-container>
+  </div>
+</div>

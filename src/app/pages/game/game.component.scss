@@ -3,28 +3,49 @@
   flex-direction: column;
   height: 100vh;
   width: 100%;
+  background: var(--app-bg);
 
-  ::ng-deep {
-    .p-toolbar {
-      background-color: var(--app-surface);
-      border-bottom: 1px solid var(--app-border);
-      padding: 0.75rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1rem;
+  .game-toolbar {
+    flex-shrink: 0;
+    background: var(--app-surface);
+    border-bottom: 1px solid var(--app-border);
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 
-      .p-toolbar-group-left,
-      .p-toolbar-group-right {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
+    .toolbar-username {
+      font-size: 0.875rem;
+      color: var(--app-text);
+      font-weight: 500;
     }
   }
 
-  app-card-container {
+  .game-content {
     flex: 1;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background: var(--app-bg);
+
+    app-card-container {
+      flex: 1;
+    }
+  }
+}
+
+::ng-deep {
+  .game-toolbar {
+    .p-toolbar-group-left,
+    .p-toolbar-group-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .p-button {
+      height: auto;
+      padding: 0.5rem 1rem;
+    }
   }
 }
