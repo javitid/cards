@@ -20,6 +20,21 @@ const LEVEL = {
   PRUEBA: 'prueba'
 };
 
+const FALLBACK_PAIRS: Pair[] = [
+  { icon: 'house', es: 'casa', gb: 'house', it: 'casa', pt: 'casa', de: 'Haus' },
+  { icon: '', es: 'coche', gb: 'car', it: 'macchina', pt: 'carro', de: 'Auto' },
+  { icon: '', es: 'perro', gb: 'dog', it: 'cane', pt: 'cachorro', de: 'Hund' },
+  { icon: '', es: 'gato', gb: 'cat', it: 'gatto', pt: 'gato', de: 'Katze' },
+  { icon: '', es: 'arbol', gb: 'tree', it: 'albero', pt: 'arvore', de: 'Baum' },
+  { icon: '', es: 'montana', gb: 'mountain', it: 'montagna', pt: 'montanha', de: 'Berg' },
+  { icon: '', es: 'sol', gb: 'sun', it: 'sole', pt: 'sol', de: 'Sonne' },
+  { icon: '', es: 'luna', gb: 'moon', it: 'luna', pt: 'lua', de: 'Mond' },
+  { icon: 'water', es: 'agua', gb: 'water', it: 'acqua', pt: 'agua', de: 'Wasser' },
+  { icon: '', es: 'fuego', gb: 'fire', it: 'fuoco', pt: 'fogo', de: 'Feuer' },
+  { icon: '', es: 'amigo', gb: 'friend', it: 'amico', pt: 'amigo', de: 'Freund' },
+  { icon: 'book', es: 'libro', gb: 'book', it: 'libro', pt: 'livro', de: 'Buch' },
+];
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,6 +44,10 @@ export class DataService {
   constructor(
     private readonly utilsService: UtilsService
   ) { }
+
+  private getFallbackCards(languages: string[]): Card[] {
+    return this.utilsService.generateCards(FALLBACK_PAIRS, languages);
+  }
 
   getOpenAICredentials(): Observable<Credentials> {
     return from(getDoc(doc(db, 'config', 'openaiCredentials'))).pipe(
@@ -47,7 +66,17 @@ export class DataService {
   getCards(languages: string[], level = LEVEL.EASY): Observable<Card[]>{
     return from(getDocs(collection(db, level))).pipe(
       map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
-      map((documents) => this.utilsService.generateCards(documents, languages)),
+      map((documents) => {
+        if (!documents.length) {
+          return this.getFallbackCards(languages);
+        }
+
+        return this.utilsService.generateCards(documents, languages);
+      }),
+      catchError((error: HttpErrorResponse) => {
+        this.setHttpError(error);
+        return of(this.getFallbackCards(languages));
+      }),
       shareReplay(1)
     );
   }

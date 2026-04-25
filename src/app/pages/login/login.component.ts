@@ -65,4 +65,23 @@ export class LoginComponent {
       },
     });
   }
+
+  loginAsGuest() {
+    this.authService.loginAsGuest().subscribe({
+      next: () => {
+        this.router.navigate(['/game']);
+      },
+      error: (error: any) => {
+        console.error('Guest login error:', error);
+        console.error('Error code:', error?.code);
+        console.error('Error message:', error?.message);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Guest login error',
+          detail: error?.message || 'Error with guest login',
+          life: 5000,
+        });
+      },
+    });
+  }
 }

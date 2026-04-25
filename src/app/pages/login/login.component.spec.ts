@@ -13,7 +13,8 @@ describe('LoginComponent', () => {
   let fixture: ComponentFixture<LoginComponent>;
   const authServiceMock = {
     login: jest.fn(() => of({})),
-    LoginWithGoogle: jest.fn(() => of({}))
+    LoginWithGoogle: jest.fn(() => of({})),
+    loginAsGuest: jest.fn(() => of({}))
   };
   const messageServiceMock = {
     add: jest.fn()

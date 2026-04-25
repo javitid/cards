@@ -63,4 +63,19 @@
         (click)="loginWithGoogle()"></button>
     </div>
   </p-card>
+
+  <p-card>
+    <ng-template pTemplate="header">
+      <h2 class="mb-0">Guest Access</h2>
+    </ng-template>
+
+    <div class="google-login-container">
+      <button
+        pButton
+        type="button"
+        label="Continue as Guest"
+        class="w-full"
+        (click)="loginAsGuest()"></button>
+    </div>
+  </p-card>
 </div>

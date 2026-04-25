@@ -7,6 +7,7 @@ import {
   onIdTokenChanged,
   sendEmailVerification,
   setPersistence,
+  signInAnonymously,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
@@ -40,7 +41,7 @@ export class AuthService {
 
       const token = await user.getIdToken();
       this.saveToken(token);
-      this.saveUsername(user.email || '');
+      this.saveUsername(user.email || (user.isAnonymous ? 'Invitado' : ''));
       this.setLoginStatus(true);
     });
   }
@@ -68,6 +69,10 @@ export class AuthService {
   LoginWithGoogle(): Observable<UserCredential> {
     const provider = new GoogleAuthProvider();
     return from(signInWithPopup(auth, provider));
+  }
+
+  loginAsGuest(): Observable<UserCredential> {
+    return from(signInAnonymously(auth));
   }
 
   login(loginModel: {
