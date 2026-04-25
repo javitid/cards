@@ -44,3 +44,4 @@ Thumbs.db
 # Local secrets
 src/environments/*.firebase-adminsdk-*.json
 scripts/firebase-service-key.json
+src/environments/environment.local.ts
