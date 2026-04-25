@@ -4,35 +4,95 @@
 
 @import url('primeicons/primeicons.css');
 
-html, body { height: 100%; }
-
-:root {
-	--app-bg: #f4f7fb;
-	--app-text: #0f172a;
-	--app-surface: #ffffff;
-	--app-border: #d6deeb;
-	--app-primary: #2563eb;
-	--app-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+:root,
+.light-theme {
+  --app-bg: #f4f7fb;
+  --app-text: #0f172a;
+  --app-surface: #ffffff;
+  --app-surface-muted: #eef2ff;
+  --app-border: #d6deeb;
+  --app-primary: #2563eb;
+  --app-primary-strong: #1d4ed8;
+  --app-on-primary: #f8fafc;
+  --app-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
+html, body { height: 100%; }
+
 body {
-	background: var(--app-bg);
-	color: var(--app-text);
-	font-family: "Segoe UI", sans-serif;
-	margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .p-card {
-	background: var(--app-surface);
-	box-shadow: var(--app-shadow);
+  background: var(--app-surface);
+  box-shadow: var(--app-shadow);
+  border: 1px solid var(--app-border);
 }
 
 .p-inputtext,
 .p-password,
 .p-select {
-	width: 100%;
+  width: 100%;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+  padding: 0.625rem 0.75rem;
+  border-radius: 6px;
+  
+  &:focus {
+    outline: none;
+    border-color: var(--app-primary);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+  }
+
+  &:disabled {
+    background: #f5f5f5;
+    opacity: 0.6;
+  }
+}
+
+.p-button {
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &.p-button-primary {
+    background: var(--app-primary);
+    border-color: var(--app-primary);
+    color: white;
+
+    &:hover {
+      background: var(--app-primary-strong);
+      border-color: var(--app-primary-strong);
+    }
+  }
+
+  &.p-button-warning {
+    background: #f97316;
+    border-color: #f97316;
+    color: white;
+
+    &:hover {
+      background: #ea580c;
+      border-color: #ea580c;
+    }
+  }
+}
+
+.p-toolbar {
+  background: var(--app-surface);
+  border-bottom: 1px solid var(--app-border);
+  padding: 0.75rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .error-text {
-	color: #dc2626;
+  color: #dc2626;
 }
