@@ -6,7 +6,7 @@ import { OpenAI } from "openai";
 import { DataService } from '../../services/data.service';
 import { Credentials, Pair } from '../../modules/card/interfaces/card';
 
-// Fill from screen input and do a request to MongoDB server to update the Data Base
+// Fill from screen input and upload generated cards into Firestore
 // Add new elements to generate the cards
 const pairs: Pair[] = [
   {"icon": "house", "es": "casa", "gb": "house", "it": "casa", "pt": "casa", "de": "Haus"},
@@ -139,6 +139,7 @@ const pairs: Pair[] = [
 
 @Component({
   selector: 'app-generate',
+  standalone: false,
   templateUrl: './generate.component.html',
   styleUrls: ['./generate.component.scss']
 })
@@ -215,7 +216,7 @@ export class GenerateComponent {
     }
   }
 
-  // Upload JSON of cards to mongoDB
+  // Upload JSON of cards to Firestore
   uploadCards() {
     this.isLoading = true;
     this.dataService.deleteCards().pipe(

@@ -1,40 +1,42 @@
-<div>
-    <mat-card>
-        <mat-card-content>
-          <form [formGroup]="form" (ngSubmit)="onSubmit()">
-            <h2>Log In</h2>
-            <mat-form-field>
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="username" required>
-              <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-              <mat-error>
-                Please provide a valid email address
-              </mat-error>
-            </mat-form-field>
-            <mat-form-field>
-              <mat-label>Password</mat-label>
-              <input matInput [type]="isPwdHidden ? 'password' : 'text'" formControlName="password" required>
-              <mat-icon matSuffix (click)="isPwdHidden = !isPwdHidden">{{isPwdHidden ? 'visibility_off' : 'visibility'}}</mat-icon>
-              <mat-error>
-                Please provide a valid password
-              </mat-error>
-            </mat-form-field>
-            <button type="submit" [disabled]="!form.valid" mat-raised-button color="primary">Login</button>
-            <a routerLink="/register" class="ml-4 text-blue-800">Register</a>
-          </form>
-        </mat-card-content>
-      </mat-card>
+<div class="auth-stack">
+  <p-card>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
+      <h2>Log In</h2>
 
-    <mat-card class="pointer">
-      <h2>Login With Google</h2>
-      <div id="buttonDiv" class="flex justify-center pb-4"></div>
-    </mat-card>
+      <p-floatlabel>
+        <input pInputText id="login-email" formControlName="username" required />
+        <label for="login-email">Email</label>
+      </p-floatlabel>
+      <small class="error-text" *ngIf="form.controls.username.invalid && form.controls.username.touched">
+        Please provide a valid email address
+      </small>
 
-    <!-- <mat-card class="cardStyle">
-      <h4 class="card-header">Facebook Authentication</h4>
-      <button class="btn btn-facebook" (click)="login()">
-        <i class="fa fa-facebook me-1"></i>
-        Login with Facebook
-      </button>
-    </mat-card> -->
-</div> 
+      <p-floatlabel>
+        <p-password
+          inputId="login-password"
+          formControlName="password"
+          [feedback]="false"
+          [toggleMask]="true"
+          [inputStyleClass]="'w-full'"
+          [style]="{ width: '100%' }">
+        </p-password>
+        <label for="login-password">Password</label>
+      </p-floatlabel>
+      <small class="error-text" *ngIf="form.controls.password.invalid && form.controls.password.touched">
+        Please provide a valid password
+      </small>
+
+      <div class="auth-actions">
+        <button pButton type="submit" label="Login" [disabled]="!form.valid"></button>
+        <a routerLink="/register" class="text-blue-800">Register</a>
+      </div>
+    </form>
+  </p-card>
+
+  <p-card>
+    <h2>Login With Google</h2>
+    <div class="flex justify-center pb-4 pt-2">
+      <button pButton type="button" severity="contrast" label="Continue with Google" (click)="loginWithGoogle()"></button>
+    </div>
+  </p-card>
+</div>

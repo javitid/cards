@@ -1,8 +1,20 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import { Observable } from 'rxjs/internal/Observable';
-import { environment } from 'src/environments/environment';
+import {
+  GoogleAuthProvider,
+  UserCredential,
+  browserSessionPersistence,
+  createUserWithEmailAndPassword,
+  onIdTokenChanged,
+  sendEmailVerification,
+  setPersistence,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+} from 'firebase/auth';
+import { BehaviorSubject, Observable, from, of, throwError } from 'rxjs';
+import { map, switchMap } from 'rxjs/operators';
+
+import { auth } from '../utils/firebase';
 
 @Injectable({
   providedIn: 'root',
@@ -12,92 +24,65 @@ export class AuthService {
   private username = new BehaviorSubject<string>(
     sessionStorage.getItem('username')!
   );
-  private path = environment.apiUrl;
 
-  constructor( private httpClient: HttpClient ) {}
+  constructor() {
+    setPersistence(auth, browserSessionPersistence).catch((error) => {
+      console.error('Could not set Firebase session persistence', error);
+    });
+
+    onIdTokenChanged(auth, async (user) => {
+      if (!user) {
+        this.saveToken('');
+        this.saveUsername('');
+        this.setLoginStatus(false);
+        return;
+      }
+
+      const token = await user.getIdToken();
+      this.saveToken(token);
+      this.saveUsername(user.email || '');
+      this.setLoginStatus(true);
+    });
+  }
 
   public signOutExternal = () => {
-    sessionStorage.removeItem('token');
-    console.log('token deleted');
+    signOut(auth).finally(() => {
+      sessionStorage.removeItem('token');
+      sessionStorage.removeItem('username');
+      this.setLoginStatus(false);
+    });
   };
 
-  LoginWithGoogle(credentials: string): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    const loginModel = {
-      id_token: credentials
+  LoginWithGoogle(): Observable<UserCredential> {
+    const provider = new GoogleAuthProvider();
+    return from(signInWithPopup(auth, provider));
+  }
+
+  login(loginModel: {
+    username?: string | null;
+    email?: string | null;
+    password?: string | null;
+  }): Observable<UserCredential> {
+    const email = loginModel.email || loginModel.username;
+    const password = loginModel.password;
+
+    if (!email || !password) {
+      return throwError(() => new Error('Email and password are required'));
     }
 
-    return this.httpClient.post(
-      this.path + 'oauth2-google/login',
-      JSON.stringify(loginModel),
-      { headers: header, withCredentials: true }
+    return from(signInWithEmailAndPassword(auth, email, password));
+  }
+
+  register(loginModel: { email: string; password: string }): Observable<UserCredential> {
+    return from(createUserWithEmailAndPassword(auth, loginModel.email, loginModel.password)).pipe(
+      switchMap((credentials) =>
+        from(sendEmailVerification(credentials.user)).pipe(map(() => credentials))
+      )
     );
   }
 
-  LoginWithFacebook(credentials: string): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    return this.httpClient.post(
-      this.path + 'oauth2-facebook/login',
-      JSON.stringify(credentials),
-      { headers: header, withCredentials: true }
-    );
-  }
-
-  login(loginModel: any): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-
-    return this.httpClient.post(
-      this.path + 'local-userpass/login',
-      JSON.stringify(loginModel),
-      { headers: header, withCredentials: true }
-    );
-  }
-
-  register(loginModel: any): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-
-    return this.httpClient.post(
-      this.path + 'local-userpass/register',
-      JSON.stringify(loginModel),
-      { headers: header, withCredentials: false }
-    );
-  }
-
-  confirmUser(token: string, tokenId: string): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    const confirmModel = {
-      token,
-      tokenId
-    }
-
-    return this.httpClient.post<any>(
-      this.path + 'local-userpass/confirm',
-      JSON.stringify(confirmModel),
-      {headers: header});
-  }
-
-  getClient(): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    return this.httpClient.get(this.path + 'GetColorList', {
-      headers: header,
-      withCredentials: true,
-    });
-  }
-
-  refreshToken(): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    return this.httpClient.get(this.path + 'RefreshToken', {
-      headers: header,
-      withCredentials: true,
-    });
-  }
-
-  revokeToken(): Observable<any> {
-    const header = new HttpHeaders().set('Content-type', 'application/json');
-    return this.httpClient.delete(
-      this.path + 'RevokeToken/' + this.username.value,
-      { headers: header, withCredentials: true }
-    );
+  confirmUser(): Observable<{ ok: boolean }> {
+    return of({ ok: true });
   }
 
   saveToken(token: string) {

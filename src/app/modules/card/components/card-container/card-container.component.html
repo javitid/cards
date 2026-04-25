@@ -1,64 +1,58 @@
 <div class="flex items-center p-4 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
     <div class="w-16">
-        <mat-icon mat-button class="cursor-pointer" [matMenuTriggerFor]="menu">menu</mat-icon>
-        <mat-menu #menu="matMenu">
-            <div class="flex flex-col gap-2 mx-4" *ngIf="isMenuShown">
+        <button pButton type="button" icon="pi pi-bars" [text]="true" (click)="isMenuOpen = !isMenuOpen"></button>
+        <div class="game-menu" *ngIf="isMenuOpen && isMenuShown">
+            <div class="flex flex-col gap-2 mx-4 py-3">
                 <div class="cursor-pointer" (click)="toggleSound()">
                     <div *ngIf="isSoundOn; else isSoundOff" class="flex gap-2">
-                        <mat-icon color="primary">volume_up</mat-icon> Sound On
+                        <i class="pi pi-volume-up text-blue-600"></i> Sound On
                     </div>
                     <ng-template #isSoundOff>
                         <div class="flex gap-2">
-                            <mat-icon color="primary">volume_off</mat-icon> Sound Off
+                            <i class="pi pi-volume-off text-blue-600"></i> Sound Off
                         </div>
                     </ng-template>
                 </div>
                 <div class="cursor-pointer" (click)="toggleFlipEffect()">
                     <div *ngIf="isFlipEffect; else isNotFlipEffect" class="flex gap-2">
-                        <mat-icon color="primary">visibility_off</mat-icon> Visibility Off
+                        <i class="pi pi-eye-slash text-blue-600"></i> Visibility Off
                     </div>
                     <ng-template #isNotFlipEffect>
                         <div class="flex gap-2">
-                            <mat-icon color="primary">visibility_on</mat-icon> Visibility On
+                            <i class="pi pi-eye text-blue-600"></i> Visibility On
                         </div>
                     </ng-template>
                 </div>
 
                 <div class="cursor-pointer" (click)="toggleColumns()">
                     <div *ngIf="isTwoColumns; else isNotTwoColumns" class="flex gap-2">
-                        <mat-icon color="primary">view_column</mat-icon> 2 columns
+                        <i class="pi pi-table text-blue-600"></i> 2 columns
                     </div>
                     <ng-template #isNotTwoColumns>
                         <div class="flex gap-2">
-                            <mat-icon color="primary">view_column</mat-icon> All mixed
+                            <i class="pi pi-th-large text-blue-600"></i> All mixed
                         </div>
                     </ng-template>
                 </div>
             </div>
-        </mat-menu>
+        </div>
     </div>
     <div class="flex gap-2" *ngIf="isMenuShown">
-        <mat-icon matTooltip="Sound">
-            <span *ngIf="isSoundOn; else isSoundOff">volume_up</span>
-            <ng-template #isSoundOff>volume_off</ng-template>
-        </mat-icon>
-        <mat-icon matTooltip="Visibility">
-            <span *ngIf="isFlipEffect; else isNotFlipEffect">visibility_off</span>
-            <ng-template #isNotFlipEffect>visibility</ng-template>
-        </mat-icon>
-        <mat-icon matTooltip="2 columns">view_column</mat-icon>
+        <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'" pTooltip="Sound"></i>
+        <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'" pTooltip="Visibility"></i>
+        <i class="pi pi-table" pTooltip="2 columns"></i>
     </div>
-    <mat-progress-bar mode="determinate" [value]="progress" (animationEnd)="progressBarCompleted()"></mat-progress-bar>
+    <p-progressBar [value]="progress"></p-progressBar>
     <div>{{ timeLeft }}</div>
     <div>
-        <mat-select [(value)]="currentLanguage" panelWidth="120px" (selectionChange)="selectLanguage($event)">
-            <mat-select-trigger>
+        <p-select [options]="languages" [(ngModel)]="currentLanguage" [style]="{ width: '120px' }" (onChange)="selectLanguage($event)">
+            <ng-template pTemplate="selectedItem">
                 <span class="fi fi-{{currentLanguage}} leading-8 w-16 rounded-lg"></span>
-            </mat-select-trigger>
-            <mat-option *ngFor="let lang of languages" [value]="lang">
+            </ng-template>
+            <ng-template let-lang pTemplate="item">
                 <span class="fi fi-{{lang}} leading-8 w-16 rounded-lg"></span>
-            </mat-option>
-        </mat-select>
+            </ng-template>
+        </p-select>
     </div>
 </div>
 
@@ -74,13 +68,32 @@
     </div>
 </ng-template>
 
-<mat-toolbar color="primary" class="absolute bottom-0 left-0 flex gap-4">
-    Games
-    <mat-icon color="secondary" matTooltip="Languages">flag</mat-icon>
-    <div class="flex-auto"></div>
-    Soon
-    <mat-icon color="secondary" matTooltip="Childs">child_care</mat-icon>
-    <mat-icon color="secondary" matTooltip="Maths">casino</mat-icon>
-    <mat-icon color="secondary" matTooltip="Synonyms">supervisor_account</mat-icon>
-    <mat-icon color="secondary" matTooltip="Antonyms">done_all</mat-icon>
-</mat-toolbar>
+<p-toolbar styleClass="game-toolbar absolute bottom-0 left-0 w-full">
+    <ng-template pTemplate="start">
+        <span class="font-semibold">Games</span>
+        <i class="pi pi-flag ml-3" pTooltip="Languages"></i>
+    </ng-template>
+    <ng-template pTemplate="end">
+        <span class="mr-3">Soon</span>
+        <i class="pi pi-users mr-3" pTooltip="Childs"></i>
+        <i class="pi pi-calculator mr-3" pTooltip="Maths"></i>
+        <i class="pi pi-user-plus mr-3" pTooltip="Synonyms"></i>
+        <i class="pi pi-check-double" pTooltip="Antonyms"></i>
+    </ng-template>
+</p-toolbar>
+
+<p-dialog
+    header="Game finished"
+    [(visible)]="isGameDialogVisible"
+    [modal]="true"
+    [closable]="false"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '24rem' }">
+    <div class="flex flex-col gap-4">
+        <span>{{ gameDialogMessage }}</span>
+        <div class="flex justify-end">
+            <button pButton type="button" label="New game" (click)="closeGameDialog(true)"></button>
+        </div>
+    </div>
+</p-dialog>

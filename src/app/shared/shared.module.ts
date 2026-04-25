@@ -1,41 +1,40 @@
 import { NgModule } from '@angular/core';
-
-// Material
-import { MatBottomSheetModule } from '@angular/material/bottom-sheet';
-import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSelectModule } from '@angular/material/select';
-import { MatTooltipModule } from '@angular/material/tooltip';
-
-import {
-  MatSnackBarModule,
-  MAT_SNACK_BAR_DEFAULT_OPTIONS,
-} from '@angular/material/snack-bar';
-import { MatToolbarModule } from '@angular/material/toolbar';
+import { FormsModule } from '@angular/forms';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { DialogModule } from 'primeng/dialog';
+import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { PasswordModule } from 'primeng/password';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
+import { ToastModule } from 'primeng/toast';
+import { ToolbarModule } from 'primeng/toolbar';
+import { TooltipModule } from 'primeng/tooltip';
+import { MessageService } from 'primeng/api';
 
 import { HelperService } from '../utils/helper.service';
 import { UtilsService } from '../utils/utils.service';
 
 const UI = [
-  MatBottomSheetModule,
-  MatButtonModule,
-  MatCardModule,
-  MatFormFieldModule,
-  MatIconModule,
-  MatMenuModule,
-  MatInputModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  MatSnackBarModule,
-  MatToolbarModule,
-  MatTooltipModule,
+  FormsModule,
+  ButtonModule,
+  CardModule,
+  DialogModule,
+  FloatLabelModule,
+  InputTextModule,
+  MessageModule,
+  PasswordModule,
+  ProgressBarModule,
+  ProgressSpinnerModule,
+  SelectModule,
+  TextareaModule,
+  ToastModule,
+  ToolbarModule,
+  TooltipModule,
 ];
 
 @NgModule({
@@ -44,7 +43,7 @@ const UI = [
   providers: [
     HelperService,
     UtilsService,
-    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } },
+    MessageService,
   ],
 })
 export class SharedModule {}

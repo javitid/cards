@@ -16,10 +16,6 @@
   transition: all 0.2s ease-in-out;
   line-height: 24px;
 
-  svg.material-icons path {
-    fill: #888;
-  }
-
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
@@ -33,14 +29,14 @@
   font-weight: 600;
   position: relative;
 
-  svg.material-icons path {
-    fill: white;
-  }
-
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
   }
+}
+
+.pi {
+  font-size: 1rem;
 }
 
 .card.matched-card {

@@ -12,6 +12,15 @@ describe('CardComponent', () => {
     });
     fixture = TestBed.createComponent(CardComponent);
     component = fixture.componentInstance;
+    component.card = {
+      id: 1,
+      value: 'casa',
+      voice: 'es-ES',
+      pairs: [2],
+      selected: false,
+      match: false,
+      icon: 'house'
+    } as any;
     fixture.detectChanges();
   });
 

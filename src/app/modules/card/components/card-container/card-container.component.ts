@@ -1,7 +1,5 @@
 import { Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
-import { MatBottomSheet } from '@angular/material/bottom-sheet';
 
-import { BottomSheetComponent } from './bottom-sheet/bottom-sheet.component';
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
@@ -22,11 +20,15 @@ const LOCAL_STORAGE = {
 
 @Component({
   selector: 'app-card-container',
+  standalone: false,
   templateUrl: './card-container.component.html',
   styleUrls: ['./card-container.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
 export class CardContainerComponent implements OnDestroy {
+  isGameDialogVisible = false;
+  gameDialogMessage = '';
+  isMenuOpen = false;
   currentLanguage!: string;
   cards: Card[] = [];
   esCards: Card[] = [];
@@ -52,7 +54,6 @@ export class CardContainerComponent implements OnDestroy {
   isSoundOn!: boolean;
 
   constructor(
-    private readonly bottomSheet: MatBottomSheet,
     private readonly dataService: DataService,
     private readonly helperService: HelperService
   ) {
@@ -123,7 +124,7 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   selectLanguage(event: any) {
-    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, event.value);
+    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, event.value ?? event);
     this.loadCards();
   }
 
@@ -168,7 +169,7 @@ export class CardContainerComponent implements OnDestroy {
     this.stopTimer();
   }
 
-  @HostListener('window:scroll',['$event']) onScroll() {
+  @HostListener('window:scroll') onScroll() {
     this.isHeaderFixed = window.scrollY > STICKY_HEADER_FROM;
   }
 
@@ -275,7 +276,7 @@ export class CardContainerComponent implements OnDestroy {
   progressBarCompleted() {
     if (Math.round(this.progress) === 100) {
       clearInterval(this.timerInterval);
-      this.openBottomSheet(`Completed in ${DEFAULT_TIMER - this.timeLeft} seconds!`);
+      this.openGameDialog(`Completed in ${DEFAULT_TIMER - this.timeLeft} seconds!`);
     }
   }
 
@@ -285,7 +286,7 @@ export class CardContainerComponent implements OnDestroy {
       if(this.timeLeft > 0) {
         this.timeLeft--;
       } else {
-        this.openBottomSheet('Time expired!');
+        this.openGameDialog('Time expired!');
         clearInterval(this.timerInterval);
       }
     },1000)
@@ -295,13 +296,17 @@ export class CardContainerComponent implements OnDestroy {
     clearInterval(this.timerInterval);
   }
 
-  openBottomSheet(data: string) {
-    const bottomSheetRef = this.bottomSheet.open(BottomSheetComponent, {data: data , disableClose: true});
+  openGameDialog(message: string) {
+    this.gameDialogMessage = message;
+    this.isGameDialogVisible = true;
+  }
 
-    bottomSheetRef.afterDismissed().subscribe(reload => {
-      if (reload) {
-        this.loadCards();
-      }
-    });
+  closeGameDialog(reload = false) {
+    this.isGameDialogVisible = false;
+    this.gameDialogMessage = '';
+
+    if (reload) {
+      this.loadCards();
+    }
   }
 }

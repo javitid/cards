@@ -1,3 +1,5 @@
-mat-form-field {
+:host ::ng-deep .p-floatlabel,
+:host ::ng-deep .p-inputtextarea {
   display: block;
+  width: 100%;
 }

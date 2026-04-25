@@ -8,10 +8,48 @@ Upgrade node version with nvm: `nvm use 18`
 Create project: `ng new cards`
 Deploy in github: `npm run deploy`
 
+## Firebase migration
+This project now uses Firebase for authentication and data storage.
+
+### 1. Configure Firebase project
+Update the `firebase` section in:
+- `src/environments/environment.ts`
+- `src/environments/environment.prod.ts`
+- `src/environments/environment.local.ts`
+
+Replace placeholder values:
+- `apiKey`
+- `authDomain`
+- `projectId`
+- `storageBucket`
+- `messagingSenderId`
+- `appId`
+
+### 2. Enable Authentication providers
+In Firebase Console -> Authentication -> Sign-in method, enable:
+- Email/Password
+- Google
+
+### 3. Firestore collections expected
+Create these collections/documents:
+- `easy`: documents with card pairs (`icon`, `es`, `gb`, `it`, `pt`, `de`)
+- `prueba`: optional same schema as `easy`
+- `config/openaiCredentials`: document with
+	- `apiKey`: string
+	- `organization`: string
+
+If `config/openaiCredentials` does not exist, app falls back to `openAICredentials` in environment files.
+
+### Local secrets
+Do not commit Firebase service account files or real local environment credentials.
+
+- Keep service account json outside git-tracked files or in an ignored path.
+- `src/environments/environment.local.ts` should stay local-only with your own values.
+
 ## Deploy in github
-Add gh-pages dependency: `npm install gh-pages --save-dev`
-Add script in the package.json: `"deploy": "gh-pages -d dist/awstests",`
-In index.html set `<base href="./">`
+Build for GitHub Pages: `npm run build:github`
+Deploy to GitHub Pages: `npm run deploy:github`
+The project already uses `<base href="./">` in `src/index.html`, which is compatible with GitHub Pages.
 
 ## Development server
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.

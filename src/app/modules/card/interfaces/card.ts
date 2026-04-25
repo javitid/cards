@@ -13,8 +13,8 @@ export interface CardResponse {
 }
 
 export interface Credentials {
-  apiKey: 'string',
-  organization: 'string'
+  apiKey: string;
+  organization: string;
 }
 
 // Helper to generate Cards

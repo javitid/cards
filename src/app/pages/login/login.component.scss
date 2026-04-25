@@ -1,11 +1,24 @@
-mat-card {
+.auth-stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+:host ::ng-deep .p-card {
   max-width: 400px;
   margin: 2em auto;
   text-align: center;
 }
 
-mat-form-field {
-  display: block;
+.auth-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.auth-actions {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
 }
 
 .btn-facebook,

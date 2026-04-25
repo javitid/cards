@@ -1,22 +1,24 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse} from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  writeBatch,
+} from 'firebase/firestore';
+import { Observable, from, of } from 'rxjs';
+import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
-import { Card, CardResponse, Credentials, Pair } from '../modules/card/interfaces/card';
+import { Card, Credentials, Pair } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
-
-const cards: Map<string, Observable<Card[]>> = new Map();
+import { db } from '../utils/firebase';
 
 const LEVEL = {
   EASY: 'easy',
   PRUEBA: 'prueba'
-}
-
-const requestHeaders = {
-  'Accept': 'application/json'
-}
+};
 
 @Injectable({
   providedIn: 'root'
@@ -25,79 +27,57 @@ export class DataService {
   httpError?: HttpErrorResponse;
   
   constructor(
-    private readonly http: HttpClient,
     private readonly utilsService: UtilsService
   ) { }
 
   getOpenAICredentials(): Observable<Credentials> {
-    return this.http.get<Credentials>(environment.urlOpenAICredentials, {headers: requestHeaders}).pipe(
+    return from(getDoc(doc(db, 'config', 'openaiCredentials'))).pipe(
+      map((result) => {
+        const data = result.data() as Partial<Credentials> | undefined;
+        return {
+          apiKey: data?.apiKey || environment.openAICredentials.apiKey,
+          organization: data?.organization || environment.openAICredentials.organization,
+        };
+      }),
+      catchError(() => of(environment.openAICredentials)),
       shareReplay(1)
     );
   }
 
   getCards(languages: string[], level = LEVEL.EASY): Observable<Card[]>{
-    const projection: { [key: string]: number } = {
-      id: 1,
-      icon: 2,
-      es: 3
-    };
-
-    // Add languages
-    languages.forEach((lang, index) => {
-      projection[lang] = index+4;
-    });
-
-    const requestBody = {
-      dataSource: 'Cluster0',
-      database: 'cards',
-      collection: level,
-      projection: projection
-    };
-
-    return this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
-      map(result => {
-        return this.utilsService.generateCards(result.documents, languages);
-      }),
+    return from(getDocs(collection(db, level))).pipe(
+      map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
+      map((documents) => this.utilsService.generateCards(documents, languages)),
       shareReplay(1)
     );
-
-    // TODO: Add cache to the request
-    // if (!cards.get(level)) {
-    //   const cards$ = this.http.post<CardResponse>(environment.urlFindCards, requestBody, {headers: requestHeaders}).pipe(
-    //     map(result => {
-    //       return this.utilsService.generateCards(result.documents, languages);
-    //     }),
-    //     shareReplay(1)
-    //   );
-    //   cards.set(level, cards$);
-    // }
-    // return cards.get(level) || of();
   }
 
-  setCards(cards: Pair[]) {
-    const requestBody = {
-      dataSource: 'Cluster0',
-      database: 'cards',
-      collection: LEVEL.EASY,
-      documents: cards
-    };
+  setCards(cards: Pair[]): Observable<Pair[]> {
+    const batch = writeBatch(db);
+    const cardsCollection = collection(db, LEVEL.EASY);
 
-    return this.http.post<CardResponse>(environment.urlUploadCards, requestBody, {headers: requestHeaders}).pipe(
-      map(result => result.documents),
+    cards.forEach((card) => {
+      batch.set(doc(cardsCollection), card);
+    });
+
+    return from(batch.commit()).pipe(
+      map(() => cards),
       shareReplay(1)
     );
   }
 
   deleteCards() {
-    const requestBody = {
-      dataSource: 'Cluster0',
-      database: 'cards',
-      collection: LEVEL.EASY,
-      filter: {}
-    };
+    const cardsCollection = collection(db, LEVEL.EASY);
 
-    return this.http.post<CardResponse>(environment.urlDeleteCards, requestBody, {headers: requestHeaders}).pipe(
-      map(result => result.documents),
+    return from(getDocs(cardsCollection)).pipe(
+      switchMap((snapshots) => {
+        const batch = writeBatch(db);
+        snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
+
+        return from(batch.commit()).pipe(
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as Pair))
+        );
+      }),
       shareReplay(1)
     );
   }

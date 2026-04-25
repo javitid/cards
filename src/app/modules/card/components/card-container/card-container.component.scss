@@ -11,3 +11,23 @@
   transition: 0.2s linear;
   top: -50px;
 }
+
+.game-menu {
+  background: white;
+  border: 1px solid #dbe3f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  left: 1rem;
+  margin-top: 0.5rem;
+  position: absolute;
+  top: 3.5rem;
+  z-index: 10;
+}
+
+:host ::ng-deep .p-progressbar {
+  flex: 1 1 auto;
+}
+
+:host ::ng-deep .game-toolbar {
+  border-radius: 0;
+}
