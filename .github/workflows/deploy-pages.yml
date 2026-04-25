@@ -45,31 +45,40 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
         run: |
-          if [ -n "${FIREBASE_API_KEY}" ] && [ -n "${FIREBASE_AUTH_DOMAIN}" ] && [ -n "${FIREBASE_PROJECT_ID}" ] && [ -n "${FIREBASE_STORAGE_BUCKET}" ] && [ -n "${FIREBASE_MESSAGING_SENDER_ID}" ] && [ -n "${FIREBASE_APP_ID}" ]; then
-            cat <<-EOF > src/environments/environment.prod.ts
-              export const environment = {
-                production: true,
-                appId: 'cards-397007',
-                firebase: {
-                  apiKey: "${FIREBASE_API_KEY}",
-                  authDomain: "${FIREBASE_AUTH_DOMAIN}",
-                  projectId: "${FIREBASE_PROJECT_ID}",
-                  storageBucket: "${FIREBASE_STORAGE_BUCKET}",
-                  messagingSenderId: "${FIREBASE_MESSAGING_SENDER_ID}",
-                  appId: "${FIREBASE_APP_ID}",
-                  measurementId: "${FIREBASE_MEASUREMENT_ID}"
-                },
-                openAICredentials: {
-                  apiKey: '',
-                  organization: ''
-                }
-              };
-            EOF
-            echo "Firebase config injected from GitHub Secrets."
-          else
-            echo "Missing Firebase secrets. Configure FIREBASE_* secrets before deploying."
+          if [ -z "$FIREBASE_API_KEY" ] || [ -z "$FIREBASE_AUTH_DOMAIN" ] || [ -z "$FIREBASE_PROJECT_ID" ] || [ -z "$FIREBASE_STORAGE_BUCKET" ] || [ -z "$FIREBASE_MESSAGING_SENDER_ID" ] || [ -z "$FIREBASE_APP_ID" ]; then
+            echo "Error: Missing Firebase secrets. Configure FIREBASE_* secrets in GitHub before deploying."
             exit 1
           fi
+          
+          cat > src/environments/environment.prod.ts << 'ENVEOF'
+          export const environment = {
+            production: true,
+            appId: 'cards-397007',
+            firebase: {
+              apiKey: "PLACEHOLDER_FIREBASE_API_KEY",
+              authDomain: "PLACEHOLDER_FIREBASE_AUTH_DOMAIN",
+              projectId: "PLACEHOLDER_FIREBASE_PROJECT_ID",
+              storageBucket: "PLACEHOLDER_FIREBASE_STORAGE_BUCKET",
+              messagingSenderId: "PLACEHOLDER_FIREBASE_MESSAGING_SENDER_ID",
+              appId: "PLACEHOLDER_FIREBASE_APP_ID",
+              measurementId: "PLACEHOLDER_FIREBASE_MEASUREMENT_ID"
+            },
+            openAICredentials: {
+              apiKey: '',
+              organization: ''
+            }
+          };
+          ENVEOF
+          
+          sed -i "s|PLACEHOLDER_FIREBASE_API_KEY|$FIREBASE_API_KEY|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_AUTH_DOMAIN|$FIREBASE_AUTH_DOMAIN|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_PROJECT_ID|$FIREBASE_PROJECT_ID|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_STORAGE_BUCKET|$FIREBASE_STORAGE_BUCKET|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_MESSAGING_SENDER_ID|$FIREBASE_MESSAGING_SENDER_ID|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_APP_ID|$FIREBASE_APP_ID|g" src/environments/environment.prod.ts
+          sed -i "s|PLACEHOLDER_FIREBASE_MEASUREMENT_ID|$FIREBASE_MEASUREMENT_ID|g" src/environments/environment.prod.ts
+          
+          echo "Firebase config injected from GitHub Secrets."
 
       - name: Build Angular app for Pages
         run: npm run build:pages
