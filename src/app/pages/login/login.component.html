@@ -1,42 +1,66 @@
 <div class="auth-stack">
   <p-card>
+    <ng-template pTemplate="header">
+      <h2 class="mb-0">Log In</h2>
+    </ng-template>
+    
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-      <h2>Log In</h2>
+      <div class="form-group">
+        <p-floatlabel>
+          <input 
+            pInputText 
+            id="login-email" 
+            type="email"
+            formControlName="username" 
+            [class.ng-invalid]="form.controls.username.invalid && form.controls.username.touched" />
+          <label for="login-email">Email</label>
+        </p-floatlabel>
+        <small class="error-text" *ngIf="form.controls.username.invalid && form.controls.username.touched">
+          Please provide a valid email address
+        </small>
+      </div>
 
-      <p-floatlabel>
-        <input pInputText id="login-email" formControlName="username" required />
-        <label for="login-email">Email</label>
-      </p-floatlabel>
-      <small class="error-text" *ngIf="form.controls.username.invalid && form.controls.username.touched">
-        Please provide a valid email address
-      </small>
-
-      <p-floatlabel>
-        <p-password
-          inputId="login-password"
-          formControlName="password"
-          [feedback]="false"
-          [toggleMask]="true"
-          [inputStyleClass]="'w-full'"
-          [style]="{ width: '100%' }">
-        </p-password>
-        <label for="login-password">Password</label>
-      </p-floatlabel>
-      <small class="error-text" *ngIf="form.controls.password.invalid && form.controls.password.touched">
-        Please provide a valid password
-      </small>
+      <div class="form-group">
+        <p-floatlabel>
+          <p-password
+            inputId="login-password"
+            formControlName="password"
+            [feedback]="false"
+            [toggleMask]="true"
+            [class.ng-invalid]="form.controls.password.invalid && form.controls.password.touched">
+          </p-password>
+          <label for="login-password">Password</label>
+        </p-floatlabel>
+        <small class="error-text" *ngIf="form.controls.password.invalid && form.controls.password.touched">
+          Please provide a valid password
+        </small>
+      </div>
 
       <div class="auth-actions">
-        <button pButton type="submit" label="Login" [disabled]="!form.valid"></button>
-        <a routerLink="/register" class="text-blue-800">Register</a>
+        <button 
+          pButton 
+          type="submit" 
+          label="Login" 
+          class="w-full"
+          [disabled]="!form.valid"></button>
+        <a routerLink="/register" class="register-link">Register</a>
       </div>
     </form>
   </p-card>
 
   <p-card>
-    <h2>Login With Google</h2>
-    <div class="flex justify-center pb-4 pt-2">
-      <button pButton type="button" severity="contrast" label="Continue with Google" (click)="loginWithGoogle()"></button>
+    <ng-template pTemplate="header">
+      <h2 class="mb-0">Login With Google</h2>
+    </ng-template>
+    
+    <div class="google-login-container">
+      <button 
+        pButton 
+        type="button" 
+        severity="contrast" 
+        label="Continue with Google" 
+        class="w-full"
+        (click)="loginWithGoogle()"></button>
     </div>
   </p-card>
 </div>

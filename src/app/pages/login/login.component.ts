@@ -32,12 +32,14 @@ export class LoginComponent {
         next: () => {
           this.router.navigate(['/game']);
         },
-        error: (error: unknown) => {
-          console.error(error);
+        error: (error: any) => {
+          console.error('Login error:', error);
+          console.error('Error code:', error?.code);
+          console.error('Error message:', error?.message);
           this.messageService.add({
             severity: 'error',
             summary: 'Login error',
-            detail: 'Error with Username or Password',
+            detail: error?.message || 'Error with Username or Password',
             life: 5000,
           });
         },
@@ -50,12 +52,14 @@ export class LoginComponent {
       next: () => {
         this.router.navigate(['/game']);
       },
-      error: (error: unknown) => {
-        console.error(error);
+      error: (error: any) => {
+        console.error('Google login error:', error);
+        console.error('Error code:', error?.code);
+        console.error('Error message:', error?.message);
         this.messageService.add({
           severity: 'error',
           summary: 'Google login error',
-          detail: 'Error with Google login',
+          detail: error?.message || 'Error with Google login',
           life: 5000,
         });
       },

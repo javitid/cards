@@ -17,7 +17,11 @@
   --app-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
 }
 
-html, body { height: 100%; }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 body {
   background: var(--app-bg);
@@ -27,22 +31,45 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/* PrimeNG Global Styles */
+.p-component {
+  font-family: "Segoe UI", sans-serif;
+  color: var(--app-text);
+}
+
 .p-card {
   background: var(--app-surface);
   box-shadow: var(--app-shadow);
   border: 1px solid var(--app-border);
+  border-radius: 6px;
+
+  .p-card-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--app-border);
+  }
+
+  .p-card-body {
+    padding: 1.25rem;
+  }
+
+  .p-card-footer {
+    padding: 1.25rem;
+    border-top: 1px solid var(--app-border);
+  }
 }
 
 .p-inputtext,
-.p-password,
-.p-select {
+.p-inputtextarea {
   width: 100%;
   border: 1px solid var(--app-border);
   background: var(--app-surface);
   color: var(--app-text);
   padding: 0.625rem 0.75rem;
   border-radius: 6px;
-  
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
   &:focus {
     outline: none;
     border-color: var(--app-primary);
@@ -52,6 +79,84 @@ body {
   &:disabled {
     background: #f5f5f5;
     opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &::placeholder {
+    color: #999;
+  }
+}
+
+.p-password {
+  .p-password-input {
+    width: 100%;
+    border: 1px solid var(--app-border);
+    background: var(--app-surface);
+    color: var(--app-text);
+    padding: 0.625rem 0.75rem;
+    border-radius: 6px;
+    font-family: inherit;
+
+    &:focus {
+      outline: none;
+      border-color: var(--app-primary);
+      box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+    }
+  }
+}
+
+.p-select {
+  width: 100%;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface);
+  color: var(--app-text);
+  border-radius: 6px;
+
+  .p-select-trigger {
+    padding: 0.625rem 0.75rem;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--app-primary);
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+  }
+}
+
+.p-floatlabel {
+  display: block;
+  position: relative;
+  margin-bottom: 1.5rem;
+
+  > input,
+  > textarea,
+  .p-password,
+  .p-select,
+  .p-autocomplete {
+    width: 100%;
+  }
+
+  label {
+    position: absolute;
+    top: 0.625rem;
+    left: 0.75rem;
+    font-size: 0.875rem;
+    color: #999;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background: var(--app-surface);
+    padding: 0 0.25rem;
+    font-weight: 500;
+  }
+
+  > input:focus ~ label,
+  > textarea:focus ~ label,
+  .p-password:has(input:focus) ~ label,
+  > input:not(:placeholder-shown) ~ label,
+  > textarea:not(:placeholder-shown) ~ label {
+    top: -0.75rem;
+    font-size: 0.75rem;
+    color: var(--app-primary);
   }
 }
 
@@ -59,16 +164,52 @@ body {
   padding: 0.625rem 1rem;
   border-radius: 6px;
   font-weight: 500;
+  font-size: 1rem;
+  border: none;
+  cursor: pointer;
   transition: all 0.2s ease;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  white-space: nowrap;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.1);
+  }
 
   &.p-button-primary {
     background: var(--app-primary);
     border-color: var(--app-primary);
     color: white;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: var(--app-primary-strong);
       border-color: var(--app-primary-strong);
+    }
+
+    &:active:not(:disabled) {
+      opacity: 0.9;
+    }
+  }
+
+  &.p-button-secondary,
+  &.p-button-outlined {
+    background: transparent;
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+
+    &:hover:not(:disabled) {
+      background: var(--app-surface-muted);
+      border-color: var(--app-primary);
     }
   }
 
@@ -77,11 +218,37 @@ body {
     border-color: #f97316;
     color: white;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: #ea580c;
       border-color: #ea580c;
     }
   }
+
+  &.p-button-danger {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #b91c1c;
+      border-color: #b91c1c;
+    }
+  }
+
+  &.p-button-contrast {
+    background: #6b7280;
+    border-color: #6b7280;
+    color: white;
+
+    &:hover:not(:disabled) {
+      background: #4b5563;
+      border-color: #4b5563;
+    }
+  }
+}
+
+.p-button-label {
+  flex: 1;
 }
 
 .p-toolbar {
@@ -91,8 +258,110 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-radius: 0;
+  gap: 1rem;
+
+  .p-toolbar-group-left,
+  .p-toolbar-group-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.p-toast {
+  z-index: 1000;
+
+  .p-toast-message {
+    border-radius: 6px;
+    box-shadow: var(--app-shadow);
+  }
+
+  .p-toast-message.ng-enter {
+    animation: slideIn 0.3s ease;
+  }
+
+  .p-toast-message.ng-leave {
+    animation: slideOut 0.3s ease;
+  }
+}
+
+.p-dialog {
+  .p-dialog-header {
+    background: var(--app-surface);
+    border-bottom: 1px solid var(--app-border);
+    color: var(--app-text);
+    padding: 1rem;
+  }
+
+  .p-dialog-content {
+    background: var(--app-surface);
+    color: var(--app-text);
+    padding: 1rem;
+  }
+
+  .p-dialog-footer {
+    background: var(--app-surface);
+    border-top: 1px solid var(--app-border);
+    padding: 1rem;
+  }
+}
+
+.p-message {
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  &.p-message-error {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+  }
+
+  &.p-message-success {
+    background: #dcfce7;
+    border: 1px solid #a7f3d0;
+    color: #059669;
+  }
+
+  &.p-message-warning {
+    background: #fef3c7;
+    border: 1px solid #fcd34d;
+    color: #b45309;
+  }
+
+  &.p-message-info {
+    background: #dbeafe;
+    border: 1px solid #93c5fd;
+    color: #1e40af;
+  }
 }
 
 .error-text {
   color: #dc2626;
+  font-size: 0.875rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
