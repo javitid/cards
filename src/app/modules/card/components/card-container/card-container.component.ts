@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnDestroy, Output, ViewEncapsulation } from '@angular/core';
 
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
@@ -28,6 +28,9 @@ const LOCAL_STORAGE = {
   encapsulation: ViewEncapsulation.None
 })
 export class CardContainerComponent implements OnDestroy {
+  @Input() username = '';
+  @Output() logoutRequested = new EventEmitter<void>();
+
   isGameDialogVisible = false;
   gameDialogMessage = '';
   isMenuOpen = false;

@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  getDocsFromServer,
   writeBatch,
 } from 'firebase/firestore';
 import { Observable, from, of } from 'rxjs';
@@ -69,7 +70,7 @@ export class DataService {
     const cacheKey = `${level}:${languages.join(',')}`;
 
     if (!this.cardsCache.has(cacheKey)) {
-      const cardsRequest$ = from(getDocs(collection(db, level))).pipe(
+      const cardsRequest$ = from(getDocsFromServer(collection(db, level))).pipe(
         map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
         map((documents) => {
           if (!documents.length) {
