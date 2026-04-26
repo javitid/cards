@@ -40,6 +40,8 @@ const FALLBACK_PAIRS: Pair[] = [
 })
 export class DataService {
   httpError?: HttpErrorResponse;
+  private readonly cardsCache = new Map<string, Observable<Card[]>>();
+  private cardsSource: 'firestore' | 'fallback' = 'firestore';
   
   constructor(
     private readonly utilsService: UtilsService
@@ -64,21 +66,32 @@ export class DataService {
   }
 
   getCards(languages: string[], level = LEVEL.EASY): Observable<Card[]>{
-    return from(getDocs(collection(db, level))).pipe(
-      map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
-      map((documents) => {
-        if (!documents.length) {
-          return this.getFallbackCards(languages);
-        }
+    const cacheKey = `${level}:${languages.join(',')}`;
 
-        return this.utilsService.generateCards(documents, languages);
-      }),
-      catchError((error: HttpErrorResponse) => {
-        this.setHttpError(error);
-        return of(this.getFallbackCards(languages));
-      }),
-      shareReplay(1)
-    );
+    if (!this.cardsCache.has(cacheKey)) {
+      const cardsRequest$ = from(getDocs(collection(db, level))).pipe(
+        map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
+        map((documents) => {
+          if (!documents.length) {
+            this.cardsSource = 'fallback';
+            return this.getFallbackCards(languages);
+          }
+
+          this.cardsSource = 'firestore';
+          return this.utilsService.generateCards(documents, languages);
+        }),
+        catchError((error: HttpErrorResponse) => {
+          this.setHttpError(error);
+          this.cardsSource = 'fallback';
+          return of(this.getFallbackCards(languages));
+        }),
+        shareReplay(1)
+      );
+
+      this.cardsCache.set(cacheKey, cardsRequest$);
+    }
+
+    return this.cardsCache.get(cacheKey)!;
   }
 
   setCards(cards: Pair[]): Observable<Pair[]> {
@@ -91,6 +104,10 @@ export class DataService {
 
     return from(batch.commit()).pipe(
       map(() => cards),
+      map((savedCards) => {
+        this.cardsCache.clear();
+        return savedCards;
+      }),
       shareReplay(1)
     );
   }
@@ -104,7 +121,11 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as Pair))
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as Pair)),
+          map((deletedCards) => {
+            this.cardsCache.clear();
+            return deletedCards;
+          })
         );
       }),
       shareReplay(1)
@@ -113,6 +134,10 @@ export class DataService {
 
   getHttpError(): HttpErrorResponse|undefined  {
     return this.httpError;
+  }
+
+  getCardsSource(): 'firestore' | 'fallback' {
+    return this.cardsSource;
   }
 
   setHttpError(error: HttpErrorResponse): void {

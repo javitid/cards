@@ -1,16 +1,16 @@
-<div *ngIf="!isFlipEffect; else flipEffect" class="card" [ngClass]="{'highlight-card': card.selected, 'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
-    <i *ngIf="card.icon && card.match" class="pi pi-check-circle mr-4"></i>
-    <span>{{card.value}}</span>
-</div>
+<button
+    type="button"
+    class="card"
+    [class.card-back]="isFlipEffect && !card.match && !card.selected"
+    [class.highlight-card]="card.selected"
+    [class.matched-card]="card.match"
+    [disabled]="card.match"
+    (click)="selectCard.emit(card)">
+    <span *ngIf="card.match" class="card-state">
+        <i class="pi pi-check-circle"></i>
+    </span>
 
-<ng-template #flipEffect>
-    <div *ngIf="card.match || card.selected; else showBack" class="card card-front" [ngClass]="{'highlight-card': card.selected, 'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
-        <i *ngIf="card.icon && card.match" class="pi pi-check-circle mr-4"></i>
-        <span>{{card.value}}</span>
-    </div>
-    <ng-template #showBack>
-        <div class="card card-back" [ngClass]="{'matched-card': card.match}" (click)="!card.match && selectCard.emit(card)">
-            <span>...</span>
-        </div>
-    </ng-template>
-</ng-template>
+    <span class="card-value">
+        {{ isFlipEffect && !card.match && !card.selected ? '•••' : card.value }}
+    </span>
+</button>

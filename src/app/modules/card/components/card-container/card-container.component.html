@@ -1,86 +1,128 @@
-<div class="flex items-center p-4 gap-2" [ngClass]="isHeaderFixed ? 'fixed':'nofixed'" (scroll)="onScroll()">
-    <div class="w-16">
-        <button pButton type="button" icon="pi pi-bars" [text]="true" (click)="isMenuOpen = !isMenuOpen"></button>
-        <div class="game-menu" *ngIf="isMenuOpen && isMenuShown">
-            <div class="flex flex-col gap-2 mx-4 py-3">
-                <div class="cursor-pointer" (click)="toggleSound()">
-                    <div *ngIf="isSoundOn; else isSoundOff" class="flex gap-2">
-                        <i class="pi pi-volume-up text-blue-600"></i> Sound On
-                    </div>
-                    <ng-template #isSoundOff>
-                        <div class="flex gap-2">
-                            <i class="pi pi-volume-off text-blue-600"></i> Sound Off
-                        </div>
-                    </ng-template>
-                </div>
-                <div class="cursor-pointer" (click)="toggleFlipEffect()">
-                    <div *ngIf="isFlipEffect; else isNotFlipEffect" class="flex gap-2">
-                        <i class="pi pi-eye-slash text-blue-600"></i> Visibility Off
-                    </div>
-                    <ng-template #isNotFlipEffect>
-                        <div class="flex gap-2">
-                            <i class="pi pi-eye text-blue-600"></i> Visibility On
-                        </div>
-                    </ng-template>
-                </div>
+<section class="board-shell">
+    <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
+        <div class="board-header__top">
+            <div class="board-header__title">
+                <span class="board-header__eyebrow">Language Match</span>
+                <h1>Empareja cada palabra con su traduccion</h1>
+            </div>
 
-                <div class="cursor-pointer" (click)="toggleColumns()">
-                    <div *ngIf="isTwoColumns; else isNotTwoColumns" class="flex gap-2">
-                        <i class="pi pi-table text-blue-600"></i> 2 columns
-                    </div>
-                    <ng-template #isNotTwoColumns>
-                        <div class="flex gap-2">
-                            <i class="pi pi-th-large text-blue-600"></i> All mixed
-                        </div>
-                    </ng-template>
+            <div class="board-header__actions">
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-bars"
+                    class="p-button-text board-header__menu-button"
+                    (click)="isMenuOpen = !isMenuOpen"
+                    aria-label="Open game options">
+                </button>
+
+                <div class="board-menu" *ngIf="isMenuOpen && isMenuShown">
+                    <button type="button" class="board-menu__item" (click)="toggleSound()">
+                        <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
+                        <span>{{ isSoundOn ? 'Sound on' : 'Sound off' }}</span>
+                    </button>
+
+                    <button type="button" class="board-menu__item" (click)="toggleFlipEffect()">
+                        <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
+                        <span>{{ isFlipEffect ? 'Hidden cards' : 'Visible cards' }}</span>
+                    </button>
+
+                    <button type="button" class="board-menu__item" (click)="toggleColumns()">
+                        <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
+                        <span>{{ isTwoColumns ? 'Two columns' : 'Mixed board' }}</span>
+                    </button>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="flex gap-2" *ngIf="isMenuShown">
-        <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'" pTooltip="Sound"></i>
-        <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'" pTooltip="Visibility"></i>
-        <i class="pi pi-table" pTooltip="2 columns"></i>
-    </div>
-    <p-progressBar [value]="progress"></p-progressBar>
-    <div>{{ timeLeft }}</div>
-    <div>
-        <p-select [options]="languages" [(ngModel)]="currentLanguage" [style]="{ width: '120px' }" (onChange)="selectLanguage($event)">
-            <ng-template pTemplate="selectedItem">
-                <span class="fi fi-{{currentLanguage}} leading-8 w-16 rounded-lg"></span>
-            </ng-template>
-            <ng-template let-lang pTemplate="item">
-                <span class="fi fi-{{lang}} leading-8 w-16 rounded-lg"></span>
-            </ng-template>
-        </p-select>
-    </div>
-</div>
 
-<!-- 2 columns in small screens -->
-<div *ngIf="isTwoColumns; else isLargeScreen" class="flex flex-wrap justify-center">
-    <app-card class="justify-center basis-6/12 sm:flex" *ngFor="let card of cards" [card]="card" [isFlipEffect]="isFlipEffect" (selectCard)="selectCard($event)"></app-card>
-</div>
+        <div class="board-status">
+            <div class="board-status__chips">
+                <span class="status-chip">
+                    <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
+                    <span>{{ isSoundOn ? 'Audio' : 'Mute' }}</span>
+                </span>
+                <span class="status-chip">
+                    <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
+                    <span>{{ isFlipEffect ? 'Flip' : 'Open' }}</span>
+                </span>
+                <span class="status-chip">
+                    <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
+                    <span>{{ isTwoColumns ? 'Columns' : 'Mixed' }}</span>
+                </span>
+                <span class="status-chip" [class.status-chip--warning]="isUsingFallbackCards">
+                    <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-exclamation-triangle' : 'pi-cloud-download'"></i>
+                    <span>{{ isUsingFallbackCards ? 'Fallback local data' : 'Firestore data' }}</span>
+                </span>
+            </div>
 
-<!-- More columns in large screens -->
-<ng-template #isLargeScreen>
-    <div class="flex flex-wrap justify-center">
-        <app-card *ngFor="let card of cards" [card]="card" [isFlipEffect]="isFlipEffect" (selectCard)="selectCard($event)"></app-card>
+            <div class="board-status__progress">
+                <div class="progress-copy">
+                    <span>Progress</span>
+                    <strong>{{ progress | number:'1.0-0' }}%</strong>
+                </div>
+                <p-progressBar [value]="progress"></p-progressBar>
+            </div>
+
+            <div class="board-status__timer">
+                <span class="timer-label">Time</span>
+                <strong>{{ timeLeft }}s</strong>
+            </div>
+
+            <label class="language-picker">
+                <span>Language</span>
+                <p-select
+                    [options]="languages"
+                    [(ngModel)]="currentLanguage"
+                    [style]="{ width: '140px' }"
+                    (onChange)="selectLanguage($event)">
+                    <ng-template pTemplate="selectedItem">
+                        <span class="language-option">
+                            <span class="fi fi-{{currentLanguage}}"></span>
+                            <span>{{ currentLanguage | uppercase }}</span>
+                        </span>
+                    </ng-template>
+                    <ng-template let-lang pTemplate="item">
+                        <span class="language-option">
+                            <span class="fi fi-{{lang}}"></span>
+                            <span>{{ lang | uppercase }}</span>
+                        </span>
+                    </ng-template>
+                </p-select>
+            </label>
+        </div>
+    </header>
+
+    <div class="board-grid" [class.board-grid--columns]="isTwoColumns" [class.board-grid--loading]="isLoading">
+        <ng-container *ngIf="!isLoading; else loadingState">
+            <app-card
+                *ngFor="let card of cards"
+                [card]="card"
+                [isFlipEffect]="isFlipEffect"
+                (selectCard)="selectCard($event)">
+            </app-card>
+        </ng-container>
     </div>
-</ng-template>
 
-<p-toolbar styleClass="game-toolbar absolute bottom-0 left-0 w-full">
-    <ng-template pTemplate="start">
-        <span class="font-semibold">Games</span>
-        <i class="pi pi-flag ml-3" pTooltip="Languages"></i>
+    <ng-template #loadingState>
+        <div class="board-loading">
+            <i class="pi pi-spin pi-spinner"></i>
+            <span>Loading cards...</span>
+        </div>
     </ng-template>
-    <ng-template pTemplate="end">
-        <span class="mr-3">Soon</span>
-        <i class="pi pi-users mr-3" pTooltip="Childs"></i>
-        <i class="pi pi-calculator mr-3" pTooltip="Maths"></i>
-        <i class="pi pi-user-plus mr-3" pTooltip="Synonyms"></i>
-        <i class="pi pi-check-double" pTooltip="Antonyms"></i>
-    </ng-template>
-</p-toolbar>
+
+    <p-toolbar styleClass="game-toolbar">
+        <ng-template pTemplate="start">
+            <span class="game-toolbar__title">More games</span>
+        </ng-template>
+        <ng-template pTemplate="end">
+            <span class="game-toolbar__item"><i class="pi pi-flag"></i> Languages</span>
+            <span class="game-toolbar__item"><i class="pi pi-users"></i> Kids</span>
+            <span class="game-toolbar__item"><i class="pi pi-calculator"></i> Maths</span>
+            <span class="game-toolbar__item"><i class="pi pi-user-plus"></i> Synonyms</span>
+            <span class="game-toolbar__item"><i class="pi pi-check-double"></i> Antonyms</span>
+        </ng-template>
+    </p-toolbar>
+</section>
 
 <p-dialog
     header="Game finished"
@@ -90,9 +132,9 @@
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '24rem' }">
-    <div class="flex flex-col gap-4">
+    <div class="dialog-content">
         <span>{{ gameDialogMessage }}</span>
-        <div class="flex justify-end">
+        <div class="dialog-content__actions">
             <button pButton type="button" label="New game" (click)="closeGameDialog(true)"></button>
         </div>
     </div>

@@ -2,11 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('flag-icons/css/flag-icons.min.css');
 @import url('primeicons/primeicons.css');
 
 :root,
 .light-theme {
-  --app-bg: #f4f7fb;
+  --app-bg:
+    radial-gradient(circle at top, rgba(191, 219, 254, 0.42), transparent 36%),
+    linear-gradient(180deg, #f8fbff 0%, #eef5ff 48%, #f6f9fc 100%);
   --app-text: #0f172a;
   --app-surface: #ffffff;
   --app-surface-muted: #eef2ff;
@@ -26,7 +29,7 @@ html, body {
 body {
   background: var(--app-bg);
   color: var(--app-text);
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
@@ -38,5 +41,5 @@ body {
 }
 
 .p-component {
-  font-family: "Segoe UI", sans-serif;
+  font-family: "Avenir Next", "Segoe UI", sans-serif;
 }

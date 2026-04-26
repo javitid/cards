@@ -4,19 +4,21 @@ import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
 import { HelperService } from '../../../../utils/helper.service';
 
+const BASE_LANGUAGE = 'es';
 const DEFAULT_CURRENT_LANGUAGE = 'gb';
 const DEFAULT_FLIP_EFFECT = true;
 const DEFAULT_SOUND = true;
 const DEFAULT_TIMER = 60;
-const DESKTOP_VIEW_TWO_COLUMNS = true;
+const DEFAULT_TWO_COLUMNS = false;
 const LANGUAGES = ['gb', 'it', 'pt', 'de'];
 const PAIRS_AMOUNT = 5;
 const STICKY_HEADER_FROM = 30;
+const CARDS_PER_PAIR = LANGUAGES.length + 1;
 const LOCAL_STORAGE = {
   CURRENT_LANGUAGE: 'currentLanguage',
   SOUND: 'sound',
   FLIP_EFFECT: 'flipEffect'
-}
+};
 
 @Component({
   selector: 'app-card-container',
@@ -29,7 +31,7 @@ export class CardContainerComponent implements OnDestroy {
   isGameDialogVisible = false;
   gameDialogMessage = '';
   isMenuOpen = false;
-  currentLanguage!: string;
+  currentLanguage = DEFAULT_CURRENT_LANGUAGE;
   cards: Card[] = [];
   esCards: Card[] = [];
   gbCards: Card[] = [];
@@ -37,276 +39,290 @@ export class CardContainerComponent implements OnDestroy {
   ptCards: Card[] = [];
   deCards: Card[] = [];
   isMenuShown = true;
-  isFlipEffect !: boolean;
+  isFlipEffect = DEFAULT_FLIP_EFFECT;
   isHeaderFixed = false;
   isLastCardSelected = false;
-  isSelectionBlocked = false; // To avoid a new card selection before timeout expires
+  isSelectionBlocked = false;
   isTwoColumns: boolean;
+  isLoading = true;
+  isUsingFallbackCards = false;
   languages = LANGUAGES;
-  lastSelection: Card|undefined;
+  lastSelection: Card | undefined;
   progress = 0;
-
-  // TIMER
   timeLeft = DEFAULT_TIMER;
-  timerInterval: any;
+  timerInterval?: ReturnType<typeof setInterval>;
+  isSoundOn = DEFAULT_SOUND;
 
-  // TEXT TO SPEECH
-  isSoundOn!: boolean;
+  private allCards: Card[] = [];
+  private currentRoundGroups: Card[][] = [];
 
   constructor(
     private readonly dataService: DataService,
     private readonly helperService: HelperService
   ) {
-    this.isTwoColumns = helperService.isSmallScreen || DESKTOP_VIEW_TWO_COLUMNS;
+    this.isTwoColumns = helperService.isSmallScreen || DEFAULT_TWO_COLUMNS;
     this.loadCards();
   }
 
-  loadCards() {
-    // Local storage
-    this.currentLanguage = localStorage.getItem(LOCAL_STORAGE.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
-    this.isFlipEffect = localStorage.getItem(LOCAL_STORAGE.FLIP_EFFECT) === 'true' ? true: localStorage.getItem(LOCAL_STORAGE.FLIP_EFFECT) === 'false' ? false: DEFAULT_FLIP_EFFECT;
-    this.isSoundOn = localStorage.getItem(LOCAL_STORAGE.SOUND) === 'true' ? true: localStorage.getItem(LOCAL_STORAGE.SOUND) === 'false' ? false: DEFAULT_SOUND;
+  loadCards(): void {
+    this.readPreferences();
+    this.isLoading = true;
 
-    this.progress = 0;
-    this.stopTimer();
-    this.startTimer();
-    this.dataService.getCards(LANGUAGES).subscribe( (cards: Card[]) => {
-      // Get PAIRS_AMOUNT random numbers to show only these elements instead the full array.
-      let randomNumbers: number[] = [];
-      const cardsForEachPair = LANGUAGES.length + 1;
-      this.cards = [];
-      for(let i = 0; i < PAIRS_AMOUNT; i++) {
-        // Only numbers with index%cardForEachPair === 0
-        let randomNumber = Math.floor(Math.random() * cards.length/cardsForEachPair) * cardsForEachPair;
-
-        if (randomNumbers.includes(randomNumber)) {
-          i--;
-        } else {
-          randomNumbers.push(randomNumber);
-          this.cards.push(cards[randomNumber]);
-          this.cards.push(cards[randomNumber+1]);
-          this.cards.push(cards[randomNumber+2]);
-          this.cards.push(cards[randomNumber+3]);
-          this.cards.push(cards[randomNumber+4]);
-        }
-      }
-
-      this.esCards = this.shuffleArray(this.cards.filter((card, index) => index%cardsForEachPair === 0));
-      this.deCards = this.shuffleArray(this.cards.filter((card, index) => (index+1)%cardsForEachPair === 0));
-      this.ptCards = this.shuffleArray(this.cards.filter((card, index) => (index+2)%cardsForEachPair === 0));
-      this.itCards = this.shuffleArray(this.cards.filter((card, index) => (index+3)%cardsForEachPair === 0));
-      this.gbCards = this.shuffleArray(this.cards.filter((card, index) => (index+4)%cardsForEachPair === 0));
-
-      let secondLang: Card[];
-      switch(this.currentLanguage) {
-        case 'gb':
-          secondLang = this.gbCards;
-          break;
-        case 'it':
-          secondLang = this.itCards;
-          break;
-        case 'pt':
-          secondLang = this.ptCards;
-          break;
-        case 'de':
-          secondLang = this.deCards;
-          break;
-        default:
-          secondLang = this.gbCards;
-      }
-
-      if(this.isTwoColumns) {
-        this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(secondLang));
-      } else {
-        this.cards = this.shuffleArray([...this.esCards, ...secondLang]);
-      }
+    this.dataService.getCards(LANGUAGES).subscribe((cards: Card[]) => {
+      this.isUsingFallbackCards = this.dataService.getCardsSource() === 'fallback';
+      this.allCards = cards.map((card) => this.cloneCard(card));
+      this.startNewGame();
+      this.isLoading = false;
     });
   }
 
-  selectLanguage(event: any) {
-    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, event.value ?? event);
-    this.loadCards();
+  selectLanguage(event: { value?: string } | string): void {
+    this.currentLanguage = typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE;
+    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, this.currentLanguage);
+    this.startNewGame();
   }
 
-  toggleSound() {
+  toggleSound(): void {
     this.isSoundOn = !this.isSoundOn;
     localStorage.setItem(LOCAL_STORAGE.SOUND, JSON.stringify(this.isSoundOn));
   }
 
-  toggleFlipEffect() {
+  toggleFlipEffect(): void {
     this.isFlipEffect = !this.isFlipEffect;
     localStorage.setItem(LOCAL_STORAGE.FLIP_EFFECT, JSON.stringify(this.isFlipEffect));
   }
 
-  toggleColumns() {
-    let secondLang: Card[];
-    switch(this.currentLanguage) {
-      case 'gb':
-        secondLang = this.gbCards;
-        break;
-      case 'it':
-        secondLang = this.itCards;
-        break;
-      case 'pt':
-        secondLang = this.ptCards;
-        break;
-      case 'de':
-        secondLang = this.deCards;
-        break;
-      default:
-        secondLang = this.gbCards;
-    }
-
+  toggleColumns(): void {
     this.isTwoColumns = !this.isTwoColumns;
-    if(this.isTwoColumns) {
-      this.cards = this.twoColumnsArray(this.shuffleArray(this.esCards), this.shuffleArray(secondLang));
-    } else {
-      this.cards = this.shuffleArray([...this.esCards, ...secondLang]);
-    }
+    this.rebuildBoard();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.stopTimer();
   }
 
-  @HostListener('window:scroll') onScroll() {
+  @HostListener('window:scroll')
+  onScroll(): void {
     this.isHeaderFixed = window.scrollY > STICKY_HEADER_FROM;
   }
 
   shuffleArray(array: Card[]): Card[] {
-    for (let i = array.length - 1; i > 0; i--) {
+    const shuffled = [...array];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
     }
-    return array;
+
+    return shuffled;
   }
 
   twoColumnsArray(esCards: Card[], otherCards: Card[]): Card[] {
-    return esCards.flatMap((card: Card, index) => {
-      return [card, otherCards[index]];
-    });
+    return esCards.flatMap((card: Card, index) => [card, otherCards[index]]);
   }
 
-  selectCard(card: Card) {
-    // When the card is already selected then unselect it
+  selectCard(card: Card): void {
     if (card.selected) {
       card.selected = false;
       this.isLastCardSelected = false;
+      this.lastSelection = undefined;
       return;
     }
 
-    // Speech
     if ('speechSynthesis' in window && this.isSoundOn) {
       const synth = window.speechSynthesis;
       const utterThis = new SpeechSynthesisUtterance();
       utterThis.lang = card.voice;
-
-      // Change voice
       utterThis.pitch = 1;
       utterThis.rate = 0.8;
-      // if (synth.getVoices().length > 0) {
-      //   utterThis.voice = synth.getVoices()[8];
-      // }
 
       synth.cancel();
       utterThis.text = card.value;
       synth.speak(utterThis);
     }
 
-    // When it's the first card then save it as last selection and set the selected indicator to true
-    if(!this.isLastCardSelected) {
+    if (!this.isLastCardSelected) {
       this.lastSelection = card;
       this.lastSelection.selected = true;
       this.isLastCardSelected = true;
       return;
     }
 
-    // Othercase check if there is a match
     this.checkMatch(card);
   }
 
-  // When there is a previous card selected, else save selected card
-  checkMatch(card: Card) {
-    // If the selection is blocked don't check the match
-    if (this.isSelectionBlocked) { return }
-
-    // Check match
-    if(this.lastSelection) {
-      if (this.isFlipEffect) {
-        this.isSelectionBlocked = true;
-      }
-
-      card.selected = true;
-      const isMatch = this.lastSelection.pairs.includes(card.id);
-      card.match = isMatch;
-      this.lastSelection.match = isMatch;
-
-      // Update progress bar
-      if (isMatch) {
-        this.progress = this.progress + 2*100/this.cards.length;
-
-        // Unselect both cards
-        this.isLastCardSelected = false;
-        this.lastSelection.selected = false;
-        card.selected = false;
-        this.isSelectionBlocked = false;
-      } else {
-        if (this.isFlipEffect) {
-          setTimeout(() => {
-            if(this.lastSelection) {
-              // Unselect both cards
-              this.isLastCardSelected = false;
-              this.lastSelection.selected = false;
-              card.selected = false;
-              this.isSelectionBlocked = false;
-            }
-          }, 500);
-        } else {
-          if(this.lastSelection) {
-            // Unselect both cards
-            this.isLastCardSelected = false;
-            this.lastSelection.selected = false;
-            card.selected = false;
-          }
-        }
-      }
+  checkMatch(card: Card): void {
+    if (this.isSelectionBlocked || !this.lastSelection) {
+      return;
     }
+
+    if (this.isFlipEffect) {
+      this.isSelectionBlocked = true;
+    }
+
+    card.selected = true;
+    const isMatch = this.lastSelection.pairs.includes(card.id);
+
+    card.match = isMatch;
+    this.lastSelection.match = isMatch;
+
+    if (isMatch) {
+      this.progress = this.progress + (2 * 100) / this.cards.length;
+      this.resetCurrentSelection(card);
+      this.progressBarCompleted();
+      return;
+    }
+
+    if (this.isFlipEffect) {
+      setTimeout(() => this.resetCurrentSelection(card), 500);
+      return;
+    }
+
+    this.resetCurrentSelection(card);
   }
 
-  progressBarCompleted() {
+  progressBarCompleted(): void {
     if (Math.round(this.progress) === 100) {
-      clearInterval(this.timerInterval);
+      this.stopTimer();
       this.openGameDialog(`Completed in ${DEFAULT_TIMER - this.timeLeft} seconds!`);
     }
   }
 
-  startTimer(timer: number = DEFAULT_TIMER) {
+  startTimer(timer: number = DEFAULT_TIMER): void {
     this.timeLeft = timer;
     this.timerInterval = setInterval(() => {
-      if(this.timeLeft > 0) {
+      if (this.timeLeft > 0) {
         this.timeLeft--;
       } else {
         this.openGameDialog('Time expired!');
-        clearInterval(this.timerInterval);
+        this.stopTimer();
       }
-    },1000)
+    }, 1000);
   }
 
-  stopTimer() {
-    clearInterval(this.timerInterval);
+  stopTimer(): void {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+      this.timerInterval = undefined;
+    }
   }
 
-  openGameDialog(message: string) {
+  openGameDialog(message: string): void {
     this.gameDialogMessage = message;
     this.isGameDialogVisible = true;
   }
 
-  closeGameDialog(reload = false) {
+  closeGameDialog(reload = false): void {
     this.isGameDialogVisible = false;
     this.gameDialogMessage = '';
 
     if (reload) {
-      this.loadCards();
+      this.startNewGame();
     }
+  }
+
+  private startNewGame(): void {
+    this.progress = 0;
+    this.lastSelection = undefined;
+    this.isLastCardSelected = false;
+    this.isSelectionBlocked = false;
+    this.stopTimer();
+    this.startTimer();
+    this.currentRoundGroups = this.getRandomCardGroups();
+    this.rebuildBoard();
+  }
+
+  private rebuildBoard(): void {
+    this.esCards = this.shuffleArray(this.getCardsForLanguage(BASE_LANGUAGE));
+    this.gbCards = this.shuffleArray(this.getCardsForLanguage('gb'));
+    this.itCards = this.shuffleArray(this.getCardsForLanguage('it'));
+    this.ptCards = this.shuffleArray(this.getCardsForLanguage('pt'));
+    this.deCards = this.shuffleArray(this.getCardsForLanguage('de'));
+
+    const secondLanguageCards = this.getSelectedLanguageCards();
+    this.cards = this.isTwoColumns
+      ? this.twoColumnsArray(this.esCards, secondLanguageCards)
+      : this.shuffleArray([...this.esCards, ...secondLanguageCards]);
+  }
+
+  private getCardsForLanguage(language: string): Card[] {
+    const languageIndex = [BASE_LANGUAGE, ...LANGUAGES].indexOf(language);
+    return this.currentRoundGroups.map((group) => group[languageIndex]);
+  }
+
+  private getSelectedLanguageCards(): Card[] {
+    switch (this.currentLanguage) {
+      case 'it':
+        return this.itCards;
+      case 'pt':
+        return this.ptCards;
+      case 'de':
+        return this.deCards;
+      case 'gb':
+      default:
+        return this.gbCards;
+    }
+  }
+
+  private getRandomCardGroups(): Card[][] {
+    if (!this.allCards.length) {
+      return [];
+    }
+
+    const groups: Card[][] = [];
+    const totalPairs = Math.floor(this.allCards.length / CARDS_PER_PAIR);
+    const desiredPairs = Math.min(PAIRS_AMOUNT, totalPairs);
+    const selectedIndexes = new Set<number>();
+
+    while (selectedIndexes.size < desiredPairs) {
+      selectedIndexes.add(Math.floor(Math.random() * totalPairs));
+    }
+
+    selectedIndexes.forEach((pairIndex) => {
+      const start = pairIndex * CARDS_PER_PAIR;
+      const group = this.allCards
+        .slice(start, start + CARDS_PER_PAIR)
+        .map((card) => this.cloneCard(card));
+
+      groups.push(group);
+    });
+
+    return groups;
+  }
+
+  private resetCurrentSelection(card: Card): void {
+    if (this.lastSelection) {
+      this.lastSelection.selected = false;
+    }
+
+    card.selected = false;
+    this.lastSelection = undefined;
+    this.isLastCardSelected = false;
+    this.isSelectionBlocked = false;
+  }
+
+  private readPreferences(): void {
+    this.currentLanguage = localStorage.getItem(LOCAL_STORAGE.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
+    this.isFlipEffect = this.getBooleanPreference(LOCAL_STORAGE.FLIP_EFFECT, DEFAULT_FLIP_EFFECT);
+    this.isSoundOn = this.getBooleanPreference(LOCAL_STORAGE.SOUND, DEFAULT_SOUND);
+  }
+
+  private getBooleanPreference(key: string, defaultValue: boolean): boolean {
+    const value = localStorage.getItem(key);
+
+    if (value === null) {
+      return defaultValue;
+    }
+
+    return value === 'true';
+  }
+
+  private cloneCard(card: Card): Card {
+    return {
+      ...card,
+      pairs: [...card.pairs],
+      match: false,
+      selected: false
+    };
   }
 }
