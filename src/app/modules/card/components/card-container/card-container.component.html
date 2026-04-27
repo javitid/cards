@@ -10,6 +10,7 @@
                     class="p-button-text p-button-sm board-header__info"
                     pTooltip="Empareja cada palabra con su traduccion"
                     tooltipPosition="bottom"
+                    [hideDelay]="2000"
                     aria-label="Game instructions">
                 </button>
             </div>
@@ -47,6 +48,18 @@
                 <div class="board-menu-backdrop" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
 
                 <div class="board-menu" *ngIf="isMenuOpen && isMenuShown">
+                    <div class="board-menu__header">
+                        <span class="board-menu__title">Options</span>
+                        <button
+                            pButton
+                            type="button"
+                            icon="pi pi-times"
+                            class="p-button-text p-button-sm board-menu__close"
+                            (click)="closeMenu()"
+                            aria-label="Close game options">
+                        </button>
+                    </div>
+
                     <div class="board-menu__section board-menu__section--mobile">
                         <span class="board-menu__section-title">Player</span>
                         <div class="board-menu__account">
@@ -116,27 +129,6 @@
         <div class="board-status__notice" *ngIf="cardsSourceReason">
             <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
             <span>{{ cardsSourceReason }}</span>
-        </div>
-        <div class="board-header__language-mobile">
-            <p-select
-                [options]="languages"
-                [(ngModel)]="currentLanguage"
-                [style]="{ width: '100%' }"
-                appendTo="body"
-                (onChange)="selectLanguage($event)">
-                <ng-template pTemplate="selectedItem">
-                    <span class="language-option">
-                        <span class="fi fi-{{currentLanguage}}"></span>
-                        <span>{{ currentLanguage | uppercase }}</span>
-                    </span>
-                </ng-template>
-                <ng-template let-lang pTemplate="item">
-                    <span class="language-option">
-                        <span class="fi fi-{{lang}}"></span>
-                        <span>{{ lang | uppercase }}</span>
-                    </span>
-                </ng-template>
-            </p-select>
         </div>
     </header>
 
