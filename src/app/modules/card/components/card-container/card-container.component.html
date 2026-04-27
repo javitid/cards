@@ -6,6 +6,20 @@
                 <h1>Empareja cada palabra con su traduccion</h1>
             </div>
 
+            <div class="board-header__mobile-summary">
+                <div class="board-status__timer board-status__timer--compact">
+                    <span class="timer-label">Time</span>
+                    <strong>{{ timeLeft }}s</strong>
+                </div>
+                <button
+                    pButton
+                    type="button"
+                    [label]="isMobilePanelOpen ? 'Hide panel' : 'Show panel'"
+                    class="p-button-outlined p-button-sm board-header__panel-button"
+                    (click)="toggleMobilePanel()">
+                </button>
+            </div>
+
             <div class="board-header__actions">
                 <div class="board-header__account">
                     <span class="board-header__username" *ngIf="username">{{ username }}</span>
@@ -88,6 +102,7 @@
             </div>
         </div>
 
+        <div class="board-header__details" [class.board-header__details--open]="isMobilePanelOpen">
         <div class="board-status">
             <div class="board-status__chips">
                 <span class="status-chip">
@@ -147,6 +162,7 @@
         <div class="board-status__notice" *ngIf="cardsSourceReason">
             <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
             <span>{{ cardsSourceReason }}</span>
+        </div>
         </div>
     </header>
 
