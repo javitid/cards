@@ -40,6 +40,8 @@
                     aria-label="Open game options">
                 </button>
 
+                <div class="board-menu-backdrop" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+
                 <div class="board-menu" *ngIf="isMenuOpen && isMenuShown">
                     <div class="board-menu__section board-menu__section--mobile">
                         <span class="board-menu__section-title">Player</span>

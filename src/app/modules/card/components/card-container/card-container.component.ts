@@ -323,7 +323,7 @@ export class CardContainerComponent implements OnDestroy {
     this.isSelectionBlocked = false;
   }
 
-  private closeMenu(): void {
+  closeMenu(): void {
     this.isMenuOpen = false;
   }
 
