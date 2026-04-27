@@ -45,7 +45,7 @@ export class DataService {
   httpError?: Error | HttpErrorResponse;
   private readonly cardsCache = new Map<string, Observable<Card[]>>();
   private cardsSource: 'firestore' | 'fallback' = 'firestore';
-  private cardsSourceReason = 'Connected to Firestore.';
+  private cardsSourceReason = 'Conectado a Firestore.';
   
   constructor(
     private readonly utilsService: UtilsService
@@ -75,7 +75,7 @@ export class DataService {
     if (!this.cardsCache.has(cacheKey)) {
       if (!this.hasFirebaseConfig()) {
         this.cardsSource = 'fallback';
-        this.cardsSourceReason = 'Firebase config uses placeholders. In local, use start:local; in GitHub Pages, check Actions secrets injection.';
+        this.cardsSourceReason = 'La configuracion de Firebase usa placeholders. En local usa start:local; en GitHub Pages revisa la inyeccion de secrets en Actions.';
         console.warn('[DataService] Falling back to local cards because Firebase config still has placeholders.');
 
         const fallbackCards$ = of(this.getFallbackCards(languages)).pipe(
@@ -94,14 +94,14 @@ export class DataService {
 
             if (!documents.length) {
               this.cardsSource = 'fallback';
-              this.cardsSourceReason = `Firestore collection "${level}" is empty.`;
+              this.cardsSourceReason = `La coleccion "${level}" de Firestore esta vacia.`;
               console.warn(`[DataService] Firestore collection "${level}" returned no documents. Using fallback cards.`);
               subscriber.next(this.getFallbackCards(languages));
               return;
             }
 
             this.cardsSource = 'firestore';
-            this.cardsSourceReason = `Loaded ${documents.length} records from Firestore collection "${level}".`;
+            this.cardsSourceReason = `Cargados ${documents.length} registros desde la coleccion "${level}" de Firestore.`;
             subscriber.next(this.utilsService.generateCards(documents, languages));
           },
           (error) => {
@@ -186,12 +186,12 @@ export class DataService {
   }
 
   private getFirestoreErrorMessage(level: string, error: Error): string {
-    const message = error.message || 'Unknown Firestore error.';
+    const message = error.message || 'Error desconocido de Firestore.';
 
     if (message.toLowerCase().includes('permission')) {
-      return `Firestore permissions blocked access to "${level}". Check security rules.`;
+      return `Los permisos de Firestore han bloqueado el acceso a "${level}". Revisa las reglas de seguridad.`;
     }
 
-    return `Firestore error while reading "${level}": ${message}`;
+    return `Error de Firestore al leer "${level}": ${message}`;
   }
 }

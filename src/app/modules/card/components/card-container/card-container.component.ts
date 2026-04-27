@@ -194,7 +194,7 @@ export class CardContainerComponent implements OnDestroy {
   progressBarCompleted(): void {
     if (Math.round(this.progress) === 100) {
       this.stopTimer();
-      this.openGameDialog(`Completed in ${DEFAULT_TIMER - this.timeLeft} seconds!`);
+      this.openGameDialog(`Completado en ${DEFAULT_TIMER - this.timeLeft} segundos`);
     }
   }
 
@@ -206,7 +206,7 @@ export class CardContainerComponent implements OnDestroy {
         if (this.timeLeft > 0) {
           this.timeLeft--;
         } else {
-          this.openGameDialog('Time expired!');
+          this.openGameDialog('Se acabó el tiempo');
           this.stopTimer();
         }
 

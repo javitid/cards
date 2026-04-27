@@ -2,7 +2,7 @@
     <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
         <div class="board-header__top">
             <div class="board-header__brand">
-                <span class="board-header__eyebrow">Language Match</span>
+                <span class="board-header__eyebrow">Empareja Idiomas</span>
                 <button
                     pButton
                     type="button"
@@ -11,13 +11,13 @@
                     pTooltip="Empareja cada palabra con su traduccion"
                     tooltipPosition="bottom"
                     [hideDelay]="2000"
-                    aria-label="Game instructions">
+                    aria-label="Instrucciones del juego">
                 </button>
             </div>
 
             <div class="board-header__mobile-summary">
                 <div class="board-status__timer board-status__timer--compact">
-                    <span class="timer-label">Time</span>
+                    <span class="timer-label">Tiempo</span>
                     <strong>{{ timeLeft }}s</strong>
                 </div>
             </div>
@@ -42,26 +42,26 @@
                     [label]="isMenuOpen ? 'Close' : 'Menu'"
                     class="p-button-text board-header__menu-button"
                     (click)="isMenuOpen = !isMenuOpen"
-                    aria-label="Open game options">
+                    aria-label="Abrir opciones del juego">
                 </button>
 
                 <div class="board-menu-backdrop" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
 
                 <div class="board-menu" *ngIf="isMenuOpen && isMenuShown">
                     <div class="board-menu__header">
-                        <span class="board-menu__title">Options</span>
+                        <span class="board-menu__title">Opciones</span>
                         <button
                             pButton
                             type="button"
                             icon="pi pi-times"
                             class="p-button-text p-button-sm board-menu__close"
                             (click)="closeMenu()"
-                            aria-label="Close game options">
+                            aria-label="Cerrar opciones del juego">
                         </button>
                     </div>
 
                     <div class="board-menu__section board-menu__section--mobile">
-                        <span class="board-menu__section-title">Player</span>
+                        <span class="board-menu__section-title">Jugador</span>
                         <div class="board-menu__account">
                             <span class="board-header__username" *ngIf="username">{{ username }}</span>
                             <button
@@ -76,7 +76,7 @@
                     </div>
 
                     <div class="board-menu__section">
-                        <span class="board-menu__section-title">Language</span>
+                        <span class="board-menu__section-title">Idioma</span>
                         <label class="language-picker language-picker--menu">
                             <p-select
                                 [options]="languages"
@@ -102,17 +102,17 @@
 
                     <button type="button" class="board-menu__item" (click)="toggleSound()">
                         <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
-                        <span>{{ isSoundOn ? 'Sound on' : 'Sound off' }}</span>
+                        <span>{{ isSoundOn ? 'Sonido activado' : 'Sonido desactivado' }}</span>
                     </button>
 
                     <button type="button" class="board-menu__item" (click)="toggleFlipEffect()">
                         <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
-                        <span>{{ isFlipEffect ? 'Hidden cards' : 'Visible cards' }}</span>
+                        <span>{{ isFlipEffect ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
                     </button>
 
                     <button type="button" class="board-menu__item" (click)="toggleColumns()">
                         <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
-                        <span>{{ isTwoColumns ? 'Two columns' : 'Mixed board' }}</span>
+                        <span>{{ isTwoColumns ? 'Dos columnas' : 'Tablero mezclado' }}</span>
                     </button>
                 </div>
             </div>
@@ -120,7 +120,7 @@
         <div class="board-status board-status--header">
             <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
-                    <span>Progress</span>
+                    <span>Progreso</span>
                     <strong>{{ progress | number:'1.0-0' }}%</strong>
                 </div>
                 <p-progressBar [value]="progress"></p-progressBar>
@@ -146,26 +146,26 @@
     <ng-template #loadingState>
         <div class="board-loading">
             <i class="pi pi-spin pi-spinner"></i>
-            <span>Loading cards...</span>
+            <span>Cargando cartas...</span>
         </div>
     </ng-template>
 
     <p-toolbar styleClass="game-toolbar">
         <ng-template pTemplate="start">
-            <span class="game-toolbar__title">More games</span>
+            <span class="game-toolbar__title">Más juegos</span>
         </ng-template>
         <ng-template pTemplate="end">
-            <span class="game-toolbar__item"><i class="pi pi-flag"></i> Languages</span>
-            <span class="game-toolbar__item"><i class="pi pi-users"></i> Kids</span>
-            <span class="game-toolbar__item"><i class="pi pi-calculator"></i> Maths</span>
-            <span class="game-toolbar__item"><i class="pi pi-user-plus"></i> Synonyms</span>
-            <span class="game-toolbar__item"><i class="pi pi-check-double"></i> Antonyms</span>
+            <span class="game-toolbar__item"><i class="pi pi-flag"></i> Idiomas</span>
+            <span class="game-toolbar__item"><i class="pi pi-users"></i> Infantil</span>
+            <span class="game-toolbar__item"><i class="pi pi-calculator"></i> Matemáticas</span>
+            <span class="game-toolbar__item"><i class="pi pi-user-plus"></i> Sinónimos</span>
+            <span class="game-toolbar__item"><i class="pi pi-check-double"></i> Antónimos</span>
         </ng-template>
     </p-toolbar>
 </section>
 
 <p-dialog
-    header="Game finished"
+    header="Partida terminada"
     [(visible)]="isGameDialogVisible"
     [modal]="true"
     [closable]="false"
@@ -175,7 +175,7 @@
     <div class="dialog-content">
         <span>{{ gameDialogMessage }}</span>
         <div class="dialog-content__actions">
-            <button pButton type="button" label="New game" (click)="closeGameDialog(true)"></button>
+            <button pButton type="button" label="Nueva partida" (click)="closeGameDialog(true)"></button>
         </div>
     </div>
 </p-dialog>
