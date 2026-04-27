@@ -76,3 +76,12 @@
 .card-value {
   word-break: break-word;
 }
+
+@media (max-width: 720px) {
+  .card {
+    min-height: 112px;
+    padding: 1.15rem 1rem;
+    border-radius: 1.1rem;
+    font-size: 1.02rem;
+  }
+}

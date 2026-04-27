@@ -59,6 +59,7 @@
   align-items: center;
   gap: 0.75rem;
   position: relative;
+  z-index: 3;
 }
 
 .board-header__account {
@@ -85,12 +86,38 @@
   position: absolute;
   top: calc(100% + 0.6rem);
   right: 0;
-  min-width: 220px;
+  z-index: 20;
+  min-width: 260px;
   padding: 0.5rem;
   border: 1px solid var(--app-border);
   border-radius: 1rem;
   background: rgba(255, 255, 255, 0.96);
   box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+}
+
+.board-menu__section {
+  padding: 0.4rem;
+}
+
+.board-menu__section--mobile {
+  display: none;
+}
+
+.board-menu__section-title {
+  display: block;
+  margin: 0 0 0.55rem;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.board-menu__account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .board-menu__item {
@@ -117,6 +144,20 @@
   gap: 1rem;
   align-items: end;
   margin-top: 1.25rem;
+}
+
+.board-status__notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  border-radius: 1rem;
+  background: rgba(255, 255, 255, 0.72);
+  color: #475569;
+  font-size: 0.92rem;
+  line-height: 1.4;
 }
 
 .board-status__chips {
@@ -148,6 +189,8 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  position: relative;
+  z-index: 1;
 }
 
 .progress-copy {
@@ -188,6 +231,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.45rem;
+}
+
+.language-picker--menu {
+  width: 100%;
 }
 
 .language-option {
@@ -282,36 +329,110 @@
 
 @media (max-width: 720px) {
   .board-shell {
-    padding: 1rem;
+    padding: 0.75rem;
   }
 
   .board-header {
-    padding: 1rem;
-    border-radius: 1.25rem;
+    padding: 0.9rem;
+    border-radius: 1.15rem;
+    margin-bottom: 1rem;
   }
 
-  .board-header__top,
-  .board-status {
-    grid-template-columns: 1fr;
-    display: grid;
+  .board-header__top {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
   }
 
   .board-header__actions {
-    justify-self: end;
+    margin-left: auto;
   }
 
   .board-header__account {
-    flex-wrap: wrap;
-    justify-content: flex-end;
+    display: none;
   }
 
   .board-header__username {
     max-width: 160px;
   }
 
+  .board-header__title {
+    min-width: 0;
+
+    h1 {
+      margin-top: 0.2rem;
+      font-size: 1.15rem;
+      line-height: 1.15;
+    }
+  }
+
+  .board-header__eyebrow {
+    font-size: 0.68rem;
+    padding: 0.28rem 0.6rem;
+  }
+
+  .board-header__menu-button {
+    white-space: nowrap;
+  }
+
+  .board-menu {
+    position: fixed;
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    min-width: 0;
+    padding: 0.65rem;
+    border-radius: 1.15rem;
+  }
+
+  .board-menu__section--mobile {
+    display: block;
+  }
+
+  .board-status {
+    grid-template-columns: 1fr auto;
+    gap: 0.85rem;
+    align-items: stretch;
+  }
+
+  .board-status__chips,
+  .language-picker {
+    display: none;
+  }
+
+  .board-status__progress {
+    order: 2;
+    grid-column: 1 / -1;
+    padding: 0.9rem 1rem;
+    border-radius: 1rem;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: inset 0 0 0 1px rgba(148, 163, 184, 0.14);
+  }
+
+  .board-status__timer {
+    order: 1;
+    min-width: 82px;
+    padding: 0.7rem 0.9rem;
+
+    strong {
+      font-size: 1.25rem;
+    }
+  }
+
+  .board-status__notice {
+    margin-top: 0.85rem;
+    padding: 0.75rem 0.85rem;
+    font-size: 0.86rem;
+  }
+
   .board-grid,
   .board-grid--columns {
     grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .game-toolbar {
+    display: none;
   }
 
   .game-toolbar__item {

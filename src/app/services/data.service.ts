@@ -5,7 +5,7 @@ import {
   doc,
   getDoc,
   getDocs,
-  getDocsFromServer,
+  onSnapshot,
   writeBatch,
 } from 'firebase/firestore';
 import { Observable, from, of } from 'rxjs';
@@ -20,6 +20,8 @@ const LEVEL = {
   EASY: 'easy',
   PRUEBA: 'prueba'
 };
+
+const FIREBASE_PLACEHOLDER_PREFIXES = ['YOUR_FIREBASE_', 'FIREBASE_'];
 
 const FALLBACK_PAIRS: Pair[] = [
   { icon: 'house', es: 'casa', gb: 'house', it: 'casa', pt: 'casa', de: 'Haus' },
@@ -40,9 +42,10 @@ const FALLBACK_PAIRS: Pair[] = [
   providedIn: 'root'
 })
 export class DataService {
-  httpError?: HttpErrorResponse;
+  httpError?: Error | HttpErrorResponse;
   private readonly cardsCache = new Map<string, Observable<Card[]>>();
   private cardsSource: 'firestore' | 'fallback' = 'firestore';
+  private cardsSourceReason = 'Connected to Firestore.';
   
   constructor(
     private readonly utilsService: UtilsService
@@ -70,23 +73,50 @@ export class DataService {
     const cacheKey = `${level}:${languages.join(',')}`;
 
     if (!this.cardsCache.has(cacheKey)) {
-      const cardsRequest$ = from(getDocsFromServer(collection(db, level))).pipe(
-        map((result) => result.docs.map((snapshot) => snapshot.data() as Pair)),
-        map((documents) => {
-          if (!documents.length) {
-            this.cardsSource = 'fallback';
-            return this.getFallbackCards(languages);
-          }
+      if (!this.hasFirebaseConfig()) {
+        this.cardsSource = 'fallback';
+        this.cardsSourceReason = 'Firebase config uses placeholders. In local, use start:local; in GitHub Pages, check Actions secrets injection.';
+        console.warn('[DataService] Falling back to local cards because Firebase config still has placeholders.');
 
-          this.cardsSource = 'firestore';
-          return this.utilsService.generateCards(documents, languages);
-        }),
-        catchError((error: HttpErrorResponse) => {
-          this.setHttpError(error);
-          this.cardsSource = 'fallback';
-          return of(this.getFallbackCards(languages));
-        }),
-        shareReplay(1)
+        const fallbackCards$ = of(this.getFallbackCards(languages)).pipe(
+          shareReplay({ bufferSize: 1, refCount: true })
+        );
+
+        this.cardsCache.set(cacheKey, fallbackCards$);
+        return fallbackCards$;
+      }
+
+      const cardsRequest$ = new Observable<Card[]>((subscriber) => {
+        const unsubscribe = onSnapshot(
+          collection(db, level),
+          (result) => {
+            const documents = result.docs.map((snapshot) => snapshot.data() as Pair);
+
+            if (!documents.length) {
+              this.cardsSource = 'fallback';
+              this.cardsSourceReason = `Firestore collection "${level}" is empty.`;
+              console.warn(`[DataService] Firestore collection "${level}" returned no documents. Using fallback cards.`);
+              subscriber.next(this.getFallbackCards(languages));
+              return;
+            }
+
+            this.cardsSource = 'firestore';
+            this.cardsSourceReason = `Loaded ${documents.length} records from Firestore collection "${level}".`;
+            subscriber.next(this.utilsService.generateCards(documents, languages));
+          },
+          (error) => {
+            this.setHttpError(error as Error);
+            this.cardsSource = 'fallback';
+            this.cardsSourceReason = this.getFirestoreErrorMessage(level, error as Error);
+            console.error('[DataService] Firestore request failed. Using fallback cards.', error);
+            subscriber.next(this.getFallbackCards(languages));
+            subscriber.complete();
+          }
+        );
+
+        return () => unsubscribe();
+      }).pipe(
+        shareReplay({ bufferSize: 1, refCount: true })
       );
 
       this.cardsCache.set(cacheKey, cardsRequest$);
@@ -133,7 +163,7 @@ export class DataService {
     );
   }
 
-  getHttpError(): HttpErrorResponse|undefined  {
+  getHttpError(): Error | HttpErrorResponse | undefined  {
     return this.httpError;
   }
 
@@ -141,7 +171,27 @@ export class DataService {
     return this.cardsSource;
   }
 
-  setHttpError(error: HttpErrorResponse): void {
+  getCardsSourceReason(): string {
+    return this.cardsSourceReason;
+  }
+
+  setHttpError(error: Error | HttpErrorResponse): void {
     this.httpError = error;
+  }
+
+  private hasFirebaseConfig(): boolean {
+    return !Object.values(environment.firebase).some((value) =>
+      FIREBASE_PLACEHOLDER_PREFIXES.some((prefix) => value.startsWith(prefix))
+    );
+  }
+
+  private getFirestoreErrorMessage(level: string, error: Error): string {
+    const message = error.message || 'Unknown Firestore error.';
+
+    if (message.toLowerCase().includes('permission')) {
+      return `Firestore permissions blocked access to "${level}". Check security rules.`;
+    }
+
+    return `Firestore error while reading "${level}": ${message}`;
   }
 }

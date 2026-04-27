@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnDestroy, Output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, NgZone, OnDestroy, Output, ViewEncapsulation } from '@angular/core';
 
 import { Card } from '../../interfaces/card';
 import { DataService } from '../../../../services/data.service';
@@ -49,6 +49,7 @@ export class CardContainerComponent implements OnDestroy {
   isTwoColumns: boolean;
   isLoading = true;
   isUsingFallbackCards = false;
+  cardsSourceReason = '';
   languages = LANGUAGES;
   lastSelection: Card | undefined;
   progress = 0;
@@ -61,7 +62,9 @@ export class CardContainerComponent implements OnDestroy {
 
   constructor(
     private readonly dataService: DataService,
-    private readonly helperService: HelperService
+    private readonly helperService: HelperService,
+    private readonly ngZone: NgZone,
+    private readonly cdr: ChangeDetectorRef
   ) {
     this.isTwoColumns = helperService.isSmallScreen || DEFAULT_TWO_COLUMNS;
     this.loadCards();
@@ -72,7 +75,7 @@ export class CardContainerComponent implements OnDestroy {
     this.isLoading = true;
 
     this.dataService.getCards(LANGUAGES).subscribe((cards: Card[]) => {
-      this.isUsingFallbackCards = this.dataService.getCardsSource() === 'fallback';
+      this.syncCardsSourceState();
       this.allCards = cards.map((card) => this.cloneCard(card));
       this.startNewGame();
       this.isLoading = false;
@@ -82,22 +85,26 @@ export class CardContainerComponent implements OnDestroy {
   selectLanguage(event: { value?: string } | string): void {
     this.currentLanguage = typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE;
     localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, this.currentLanguage);
+    this.closeMenu();
     this.startNewGame();
   }
 
   toggleSound(): void {
     this.isSoundOn = !this.isSoundOn;
     localStorage.setItem(LOCAL_STORAGE.SOUND, JSON.stringify(this.isSoundOn));
+    this.closeMenu();
   }
 
   toggleFlipEffect(): void {
     this.isFlipEffect = !this.isFlipEffect;
     localStorage.setItem(LOCAL_STORAGE.FLIP_EFFECT, JSON.stringify(this.isFlipEffect));
+    this.closeMenu();
   }
 
   toggleColumns(): void {
     this.isTwoColumns = !this.isTwoColumns;
     this.rebuildBoard();
+    this.closeMenu();
   }
 
   ngOnDestroy(): void {
@@ -192,14 +199,19 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   startTimer(timer: number = DEFAULT_TIMER): void {
+    this.stopTimer();
     this.timeLeft = timer;
     this.timerInterval = setInterval(() => {
-      if (this.timeLeft > 0) {
-        this.timeLeft--;
-      } else {
-        this.openGameDialog('Time expired!');
-        this.stopTimer();
-      }
+      this.ngZone.run(() => {
+        if (this.timeLeft > 0) {
+          this.timeLeft--;
+        } else {
+          this.openGameDialog('Time expired!');
+          this.stopTimer();
+        }
+
+        this.cdr.detectChanges();
+      });
     }, 1000);
   }
 
@@ -211,6 +223,7 @@ export class CardContainerComponent implements OnDestroy {
   }
 
   openGameDialog(message: string): void {
+    this.closeMenu();
     this.gameDialogMessage = message;
     this.isGameDialogVisible = true;
   }
@@ -304,10 +317,19 @@ export class CardContainerComponent implements OnDestroy {
     this.isSelectionBlocked = false;
   }
 
+  private closeMenu(): void {
+    this.isMenuOpen = false;
+  }
+
   private readPreferences(): void {
     this.currentLanguage = localStorage.getItem(LOCAL_STORAGE.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
     this.isFlipEffect = this.getBooleanPreference(LOCAL_STORAGE.FLIP_EFFECT, DEFAULT_FLIP_EFFECT);
     this.isSoundOn = this.getBooleanPreference(LOCAL_STORAGE.SOUND, DEFAULT_SOUND);
+  }
+
+  private syncCardsSourceState(): void {
+    this.isUsingFallbackCards = this.dataService.getCardsSource() === 'fallback';
+    this.cardsSourceReason = this.dataService.getCardsSourceReason();
   }
 
   private getBooleanPreference(key: string, defaultValue: boolean): boolean {
