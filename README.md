@@ -40,6 +40,22 @@ Create these collections/documents:
 
 If `config/openaiCredentials` does not exist, app falls back to `openAICredentials` in environment files.
 
+### 4. Firestore security rules
+The app reads cards from the browser, so Firestore rules must allow authenticated users to read `easy`.
+
+Recommended baseline:
+- `easy` and `prueba`: read for authenticated users
+- writes only for an admin email allowlist
+- `config/*`: admin only
+
+Rules are versioned in:
+- `firestore.rules`
+
+Important:
+- anonymous guest users are also authenticated in Firebase, so `request.auth != null` allows guest play
+- do not allow public writes to `easy`, because the `/generate` page writes directly from the browser
+- do not allow public reads to `config/openaiCredentials`, because that would expose API credentials to clients
+
 ### Local secrets
 Do not commit Firebase service account files or real local environment credentials.
 
