@@ -53,6 +53,9 @@
   width: 2rem;
   height: 2rem;
 }
+.board-header__language-mobile {
+  display: none;
+}
 .board-header__actions {
   display: flex;
   align-items: center;
@@ -390,6 +393,10 @@
     border: 0;
     background: transparent;
     font-size: 0.72rem;
+  }
+  .board-header__language-mobile {
+    display: block;
+    margin-top: 0.45rem;
   }
   .board-grid,
   .board-grid--columns {

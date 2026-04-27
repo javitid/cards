@@ -117,6 +117,27 @@
             <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
             <span>{{ cardsSourceReason }}</span>
         </div>
+        <div class="board-header__language-mobile">
+            <p-select
+                [options]="languages"
+                [(ngModel)]="currentLanguage"
+                [style]="{ width: '100%' }"
+                appendTo="body"
+                (onChange)="selectLanguage($event)">
+                <ng-template pTemplate="selectedItem">
+                    <span class="language-option">
+                        <span class="fi fi-{{currentLanguage}}"></span>
+                        <span>{{ currentLanguage | uppercase }}</span>
+                    </span>
+                </ng-template>
+                <ng-template let-lang pTemplate="item">
+                    <span class="language-option">
+                        <span class="fi fi-{{lang}}"></span>
+                        <span>{{ lang | uppercase }}</span>
+                    </span>
+                </ng-template>
+            </p-select>
+        </div>
     </header>
 
     <div class="board-grid" [class.board-grid--columns]="isTwoColumns" [class.board-grid--loading]="isLoading">
