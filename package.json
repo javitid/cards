@@ -10,6 +10,7 @@
     "build:pages": "ng build --configuration pages",
     "watch": "ng build --watch --configuration development",
     "test": "jest --runInBand",
+    "deploy:firestore-rules": "npx firebase-tools deploy --only firestore:rules --project cards-429a4",
     "deploy": "npm run deploy:github",
     "deploy:github": "npm run build:github && gh-pages -d dist/cards",
     "migrate:validate": "node scripts/validate-migration.js",

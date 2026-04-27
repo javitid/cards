@@ -9,7 +9,7 @@ service cloud.firestore {
       return signedIn()
         && request.auth.token.email != null
         && request.auth.token.email in [
-          'admin@example.com'
+          'javitid@gmail.com'
         ];
     }
 

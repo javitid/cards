@@ -56,6 +56,9 @@ Important:
 - do not allow public writes to `easy`, because the `/generate` page writes directly from the browser
 - do not allow public reads to `config/openaiCredentials`, because that would expose API credentials to clients
 
+Deploy rules:
+- `npm run deploy:firestore-rules`
+
 ### Local secrets
 Do not commit Firebase service account files or real local environment credentials.
 
