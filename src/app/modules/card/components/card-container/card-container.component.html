@@ -1,10 +1,7 @@
 <section class="board-shell">
     <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
         <div class="board-header__top">
-            <div class="board-header__title">
-                <span class="board-header__eyebrow">Language Match</span>
-                <h1>Empareja cada palabra con su traduccion</h1>
-            </div>
+            <span class="board-header__eyebrow">Language Match</span>
 
             <div class="board-header__mobile-summary">
                 <div class="board-status__timer board-status__timer--compact">
@@ -100,6 +97,9 @@
                     </button>
                 </div>
             </div>
+        </div>
+        <div class="board-header__headline">
+            <h1>Empareja cada palabra con su traduccion</h1>
         </div>
 
         <div class="board-header__details" [class.board-header__details--open]="isMobilePanelOpen">
