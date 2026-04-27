@@ -1,20 +1,24 @@
 <section class="board-shell">
     <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
         <div class="board-header__top">
-            <span class="board-header__eyebrow">Language Match</span>
+            <div class="board-header__brand">
+                <span class="board-header__eyebrow">Language Match</span>
+                <button
+                    pButton
+                    type="button"
+                    icon="pi pi-info-circle"
+                    class="p-button-text p-button-sm board-header__info"
+                    pTooltip="Empareja cada palabra con su traduccion"
+                    tooltipPosition="bottom"
+                    aria-label="Game instructions">
+                </button>
+            </div>
 
             <div class="board-header__mobile-summary">
                 <div class="board-status__timer board-status__timer--compact">
                     <span class="timer-label">Time</span>
                     <strong>{{ timeLeft }}s</strong>
                 </div>
-                <button
-                    pButton
-                    type="button"
-                    [label]="isMobilePanelOpen ? 'Hide panel' : 'Show panel'"
-                    class="p-button-outlined p-button-sm board-header__panel-button"
-                    (click)="toggleMobilePanel()">
-                </button>
             </div>
 
             <div class="board-header__actions">
@@ -100,71 +104,18 @@
                 </div>
             </div>
         </div>
-        <div class="board-header__headline">
-            <h1>Empareja cada palabra con su traduccion</h1>
-        </div>
-
-        <div class="board-header__details" [class.board-header__details--open]="isMobilePanelOpen">
-        <div class="board-status">
-            <div class="board-status__chips">
-                <span class="status-chip">
-                    <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
-                    <span>{{ isSoundOn ? 'Audio' : 'Mute' }}</span>
-                </span>
-                <span class="status-chip">
-                    <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
-                    <span>{{ isFlipEffect ? 'Flip' : 'Open' }}</span>
-                </span>
-                <span class="status-chip">
-                    <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
-                    <span>{{ isTwoColumns ? 'Columns' : 'Mixed' }}</span>
-                </span>
-                <span class="status-chip" [class.status-chip--warning]="isUsingFallbackCards">
-                    <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-exclamation-triangle' : 'pi-cloud-download'"></i>
-                    <span>{{ isUsingFallbackCards ? 'Fallback local data' : 'Firestore data' }}</span>
-                </span>
-            </div>
-
-            <div class="board-status__progress">
+        <div class="board-status board-status--header">
+            <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
                     <span>Progress</span>
                     <strong>{{ progress | number:'1.0-0' }}%</strong>
                 </div>
                 <p-progressBar [value]="progress"></p-progressBar>
             </div>
-
-            <div class="board-status__timer">
-                <span class="timer-label">Time</span>
-                <strong>{{ timeLeft }}s</strong>
-            </div>
-
-            <label class="language-picker">
-                <span>Language</span>
-                <p-select
-                    [options]="languages"
-                    [(ngModel)]="currentLanguage"
-                    [style]="{ width: '140px' }"
-                    (onChange)="selectLanguage($event)">
-                    <ng-template pTemplate="selectedItem">
-                        <span class="language-option">
-                            <span class="fi fi-{{currentLanguage}}"></span>
-                            <span>{{ currentLanguage | uppercase }}</span>
-                        </span>
-                    </ng-template>
-                    <ng-template let-lang pTemplate="item">
-                        <span class="language-option">
-                            <span class="fi fi-{{lang}}"></span>
-                            <span>{{ lang | uppercase }}</span>
-                        </span>
-                    </ng-template>
-                </p-select>
-            </label>
         </div>
-
         <div class="board-status__notice" *ngIf="cardsSourceReason">
             <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
             <span>{{ cardsSourceReason }}</span>
-        </div>
         </div>
     </header>
 

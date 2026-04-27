@@ -45,7 +45,6 @@ export class CardContainerComponent implements OnDestroy {
   isFlipEffect = DEFAULT_FLIP_EFFECT;
   isHeaderFixed = false;
   isLastCardSelected = false;
-  isMobilePanelOpen = false;
   isSelectionBlocked = false;
   isTwoColumns: boolean;
   isLoading = true;
@@ -68,7 +67,6 @@ export class CardContainerComponent implements OnDestroy {
     private readonly cdr: ChangeDetectorRef
   ) {
     this.isTwoColumns = helperService.isSmallScreen || DEFAULT_TWO_COLUMNS;
-    this.isMobilePanelOpen = !helperService.isSmallScreen;
     this.loadCards();
   }
 
@@ -107,10 +105,6 @@ export class CardContainerComponent implements OnDestroy {
     this.isTwoColumns = !this.isTwoColumns;
     this.rebuildBoard();
     this.closeMenu();
-  }
-
-  toggleMobilePanel(): void {
-    this.isMobilePanelOpen = !this.isMobilePanelOpen;
   }
 
   ngOnDestroy(): void {
