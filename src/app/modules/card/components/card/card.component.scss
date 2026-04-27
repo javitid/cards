@@ -79,9 +79,10 @@
 
 @media (max-width: 720px) {
   .card {
-    min-height: 112px;
-    padding: 1.15rem 1rem;
-    border-radius: 1.1rem;
-    font-size: 1.02rem;
+    min-height: 64px;
+    padding: 0.55rem 0.45rem;
+    border-radius: 0.9rem;
+    font-size: 0.82rem;
+    line-height: 1.1;
   }
 }
