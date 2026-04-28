@@ -84,7 +84,7 @@ export class AuthService {
     const password = loginModel.password;
 
     if (!email || !password) {
-      return throwError(() => new Error('Email and password are required'));
+      return throwError(() => new Error('Se necesitan correo y contraseña.'));
     }
 
     return from(signInWithEmailAndPassword(auth, email, password));

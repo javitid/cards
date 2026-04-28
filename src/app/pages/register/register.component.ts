@@ -40,8 +40,8 @@ export class RegisterComponent {
           next: () => {
             this.messageService.add({
               severity: 'success',
-              summary: 'User created',
-              detail: 'The account was created successfully',
+              summary: 'Usuario creado',
+              detail: 'La cuenta se ha creado correctamente',
               life: 5000,
             });
             this.router.navigate(['/login']);
@@ -50,7 +50,7 @@ export class RegisterComponent {
             const firebaseError = error as FirebaseError;
             this.messageService.add({
               severity: 'error',
-              summary: 'Firebase error',
+              summary: 'Error de Firebase',
               detail: firebaseError.message,
               life: 10000,
             });
@@ -59,8 +59,8 @@ export class RegisterComponent {
       } catch (err) {
         this.messageService.add({
           severity: 'error',
-          summary: 'Register error',
-          detail: 'Error with Email or Password',
+          summary: 'Error de registro',
+          detail: 'Error con el correo electrónico o la contraseña',
           life: 5000,
         });
       }

@@ -1,23 +1,26 @@
-<h1 class="p-12">Generate JSON with new cards</h1>
+<h1 class="p-12">Generar JSON con nuevas cartas</h1>
 
 <section class="px-12">
     <div class="flex flex-col justify-between items-center">
         <form [formGroup]="form" class="w-full">
             <p-floatlabel>
-                <textarea pTextarea id="generate-json" formControlName="content" class="w-full !h-96" placeholder="Ex. [{ icon: 'home', es: 'Casa', en: 'House' }]" required></textarea>
+                <textarea pTextarea id="generate-json" formControlName="content" class="w-full !h-96" placeholder="Ej. [{ icon: 'home', es: 'Casa', gb: 'House' }]" required></textarea>
                 <label for="generate-json">JSON</label>
             </p-floatlabel>
             <div class="mt-4 flex flex-wrap gap-3">
-                <button *ngIf="openAICredentials" pButton type="button" label="Generate Cards with AI" (click)="generateCardsWithAI()"></button>
-                <button pButton type="button" severity="secondary" label="Upload Cards" (click)="uploadCards()"></button>
+                @if (openAICredentials) {
+                    <button pButton type="button" label="Generar cartas con IA" (click)="generateCardsWithAI()"></button>
+                }
+                <button pButton type="button" severity="secondary" label="Subir cartas" (click)="uploadCards()"></button>
             </div>
-            <a routerLink="/game" class="text-blue-800">Game</a>
+            <a routerLink="/game" class="text-blue-800">Partida</a>
         </form>
     </div>
     <div class="mt-12">
-        <p-progressSpinner *ngIf="isLoading; else notLoading" strokeWidth="4"></p-progressSpinner>
-        <ng-template #notLoading>
+        @if (isLoading) {
+            <p-progressSpinner strokeWidth="4"></p-progressSpinner>
+        } @else {
             {{ generatedString }}
-        </ng-template>
+        }
     </div>
 </section>

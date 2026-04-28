@@ -22,7 +22,7 @@ export class LoginComponent {
   ) {}
 
   form = this.fb.group({
-    username: ['', Validators.email],
+    username: ['', [Validators.required, Validators.email]],
     password: ['', Validators.required],
   });
 
@@ -33,13 +33,13 @@ export class LoginComponent {
           this.router.navigate(['/game']);
         },
         error: (error: any) => {
-          console.error('Login error:', error);
-          console.error('Error code:', error?.code);
-          console.error('Error message:', error?.message);
+          console.error('Error de acceso:', error);
+          console.error('Código de error:', error?.code);
+          console.error('Mensaje de error:', error?.message);
           this.messageService.add({
             severity: 'error',
-            summary: 'Login error',
-            detail: error?.message || 'Error with Username or Password',
+            summary: 'Error de acceso',
+            detail: error?.message || 'No se ha podido iniciar sesión con correo y contraseña.',
             life: 5000,
           });
         },
@@ -53,13 +53,13 @@ export class LoginComponent {
         this.router.navigate(['/game']);
       },
       error: (error: any) => {
-        console.error('Google login error:', error);
-        console.error('Error code:', error?.code);
-        console.error('Error message:', error?.message);
+        console.error('Error de acceso con Google:', error);
+        console.error('Código de error:', error?.code);
+        console.error('Mensaje de error:', error?.message);
         this.messageService.add({
           severity: 'error',
-          summary: 'Google login error',
-          detail: error?.message || 'Error with Google login',
+          summary: 'Error con Google',
+          detail: error?.message || 'No se ha podido iniciar sesión con Google.',
           life: 5000,
         });
       },
@@ -72,13 +72,13 @@ export class LoginComponent {
         this.router.navigate(['/game']);
       },
       error: (error: any) => {
-        console.error('Guest login error:', error);
-        console.error('Error code:', error?.code);
-        console.error('Error message:', error?.message);
+        console.error('Error de acceso como invitado:', error);
+        console.error('Código de error:', error?.code);
+        console.error('Mensaje de error:', error?.message);
         this.messageService.add({
           severity: 'error',
-          summary: 'Guest login error',
-          detail: error?.message || 'Error with guest login',
+          summary: 'Error de acceso invitado',
+          detail: error?.message || 'No se ha podido entrar como invitado.',
           life: 5000,
         });
       },

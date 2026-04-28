@@ -1,27 +1,35 @@
-<div class="auth-stack">
-  <p-card>
-    <ng-template pTemplate="header">
-      <h2 class="mb-0">Log In</h2>
-    </ng-template>
-    
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="auth-form">
-      <div class="form-group">
-        <p-floatlabel>
-          <input 
-            pInputText 
-            id="login-email" 
+<div class="login-shell">
+  <p-card styleClass="login-card">
+    <div class="login-header">
+      <span class="login-eyebrow">Acceso rápido</span>
+      <h1>Entra en Cards</h1>
+      <p>
+        Elige cómo quieres entrar. También puedes probar la app como invitado,
+        sin registrarte.
+      </p>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="field">
+        <p-floatlabel variant="on">
+          <input
+            pInputText
+            id="login-email"
             type="email"
-            formControlName="username" 
+            formControlName="username"
+            autocomplete="email"
             [class.ng-invalid]="form.controls.username.invalid && form.controls.username.touched" />
-          <label for="login-email">Email</label>
+          <label for="login-email">Correo electrónico</label>
         </p-floatlabel>
-        <small class="error-text" *ngIf="form.controls.username.invalid && form.controls.username.touched">
-          Please provide a valid email address
-        </small>
+        @if (form.controls.username.invalid && form.controls.username.touched) {
+          <small class="error-text">
+            Introduce un correo electrónico válido
+          </small>
+        }
       </div>
 
-      <div class="form-group">
-        <p-floatlabel>
+      <div class="field">
+        <p-floatlabel variant="on">
           <p-password
             inputId="login-password"
             formControlName="password"
@@ -29,53 +37,52 @@
             [toggleMask]="true"
             [class.ng-invalid]="form.controls.password.invalid && form.controls.password.touched">
           </p-password>
-          <label for="login-password">Password</label>
+          <label for="login-password">Contraseña</label>
         </p-floatlabel>
-        <small class="error-text" *ngIf="form.controls.password.invalid && form.controls.password.touched">
-          Please provide a valid password
-        </small>
+        @if (form.controls.password.invalid && form.controls.password.touched) {
+          <small class="error-text">
+            Introduce una contraseña válida
+          </small>
+        }
       </div>
 
-      <div class="auth-actions">
-        <button 
-          pButton 
-          type="submit" 
-          label="Login" 
-          class="w-full"
-          [disabled]="!form.valid"></button>
-        <a routerLink="/register" class="register-link">Register</a>
-      </div>
+      <button
+        pButton
+        type="submit"
+        label="Entrar"
+        icon="pi pi-sign-in"
+        class="login-primary"
+        [disabled]="!form.valid"></button>
+
+      <a routerLink="/register" class="register-link">Crear cuenta</a>
     </form>
-  </p-card>
 
-  <p-card>
-    <ng-template pTemplate="header">
-      <h2 class="mb-0">Login With Google</h2>
-    </ng-template>
-    
-    <div class="google-login-container">
-      <button 
-        pButton 
-        type="button" 
-        severity="contrast" 
-        label="Continue with Google" 
-        class="w-full"
-        (click)="loginWithGoogle()"></button>
+    <div class="login-divider">
+      <span>o continúa con</span>
     </div>
-  </p-card>
 
-  <p-card>
-    <ng-template pTemplate="header">
-      <h2 class="mb-0">Guest Access</h2>
-    </ng-template>
-
-    <div class="google-login-container">
+    <div class="login-actions">
       <button
         pButton
         type="button"
-        label="Continue as Guest"
-        class="w-full"
+        severity="contrast"
+        label="Continuar con Google"
+        icon="pi pi-google"
+        class="login-action"
+        (click)="loginWithGoogle()"></button>
+
+      <button
+        pButton
+        type="button"
+        severity="help"
+        label="Entrar como invitado"
+        icon="pi pi-user"
+        class="login-action guest-action"
         (click)="loginAsGuest()"></button>
+
+      <p class="guest-note">
+        Accede sin cuenta para probar la aplicación al instante.
+      </p>
     </div>
   </p-card>
 </div>

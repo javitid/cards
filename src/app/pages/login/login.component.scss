@@ -1,82 +1,133 @@
-.auth-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 0 1rem;
-
-  p-card {
-    width: 100%;
-  }
-
-  h2 {
-    margin: 0 0 1.5rem 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--app-text);
-  }
+:host {
+  display: block;
+  min-height: 100dvh;
 }
 
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .auth-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 0.5rem;
-
-    button {
-      cursor: pointer;
-
-      &:disabled {
-        cursor: not-allowed;
-        opacity: 0.6;
-      }
-    }
-  }
-
-  .register-link {
-    display: block;
-    text-align: center;
-    color: var(--app-primary);
-    text-decoration: none;
-    font-weight: 500;
-    transition: color 0.2s ease;
-
-    &:hover {
-      color: var(--app-primary-strong);
-      text-decoration: underline;
-    }
-  }
-}
-
-.google-login-container {
+.login-shell {
+  align-items: center;
   display: flex;
   justify-content: center;
-  padding: 1rem 0;
+  min-height: 100dvh;
+  padding: 0.75rem;
+}
 
-  button {
-    cursor: pointer;
+.login-card {
+  max-width: 420px;
+  width: 100%;
+}
 
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.6;
-    }
+.login-header {
+  margin-bottom: 1rem;
+  text-align: center;
+
+  h1 {
+    color: var(--app-text);
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.1;
+    margin: 0.2rem 0 0.4rem;
   }
+
+  p {
+    color: var(--app-text-muted, #5f6878);
+    font-size: 0.95rem;
+    line-height: 1.35;
+    margin: 0;
+  }
+}
+
+.login-eyebrow {
+  color: var(--app-primary);
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-form {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.login-primary,
+.login-action {
+  width: 100%;
+}
+
+.register-link {
+  color: var(--app-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  justify-self: center;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.login-divider {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  margin: 1rem 0 0.85rem;
+
+  &::before,
+  &::after {
+    background: rgba(0, 0, 0, 0.12);
+    content: '';
+    flex: 1;
+    height: 1px;
+  }
+
+  span {
+    color: var(--app-text-muted, #5f6878);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+}
+
+.login-actions {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.guest-action {
+  box-shadow: inset 0 0 0 1px rgba(64, 140, 255, 0.18);
+}
+
+.guest-note {
+  color: var(--app-text-muted, #5f6878);
+  font-size: 0.88rem;
+  line-height: 1.3;
+  margin: 0.1rem 0 0;
+  text-align: center;
+}
+
+.error-text {
+  color: var(--red-500, #d32f2f);
+  font-size: 0.8rem;
+  line-height: 1.2;
 }
 
 ::ng-deep {
-  .p-floatlabel {
+  .login-card .p-card-body {
+    padding: 1rem;
+  }
+
+  .login-card .p-card-content {
+    padding: 0;
+  }
+
+  .login-card .p-floatlabel {
+    display: block;
     width: 100%;
 
     > input,
@@ -85,39 +136,43 @@
     }
   }
 
-  .w-full {
+  .login-card .p-inputtext {
+    display: block;
     width: 100%;
   }
 
-  .mb-0 {
-    margin-bottom: 0;
+  .login-card .p-inputtext,
+  .login-card .p-password input {
+    padding-block: 0.7rem;
+  }
+
+  .login-card .p-button {
+    min-height: 2.6rem;
   }
 }
 
-:host ::ng-deep .p-card {
-  max-width: 400px;
-  margin: 2em auto;
-  text-align: center;
-}
+@media (max-width: 480px) {
+  .login-shell {
+    padding: 0.5rem;
+  }
 
-.auth-form {
-  display: grid;
-  gap: 1rem;
-}
+  .login-card {
+    max-width: none;
+  }
 
-.auth-actions {
-  align-items: center;
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
+  .login-header {
+    margin-bottom: 0.75rem;
 
-.btn-facebook,
-.btn-facebook:hover,
-.btn-facebook:first-child:active {
-  background: #3b5998;
-  border-color: #3b5998;
-  color: #fff;
-  width: 300px;
-  height: 50px;
+    p {
+      font-size: 0.9rem;
+    }
+  }
+
+  .login-form {
+    gap: 0.7rem;
+  }
+
+  .login-divider {
+    margin: 0.8rem 0 0.65rem;
+  }
 }

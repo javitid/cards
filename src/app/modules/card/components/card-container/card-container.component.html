@@ -8,7 +8,7 @@
                     type="button"
                     icon="pi pi-info-circle"
                     class="p-button-text p-button-sm board-header__info"
-                    pTooltip="Empareja cada palabra con su traduccion"
+                    pTooltip="Empareja cada palabra con su traducción"
                     tooltipPosition="bottom"
                     [hideDelay]="2000"
                     aria-label="Instrucciones del juego">
@@ -24,11 +24,13 @@
 
             <div class="board-header__actions">
                 <div class="board-header__account">
-                    <span class="board-header__username" *ngIf="username">{{ username }}</span>
+                    @if (username) {
+                        <span class="board-header__username">{{ username }}</span>
+                    }
                     <button
                         pButton
                         type="button"
-                        label="Logout"
+                        label="Cerrar sesión"
                         icon="pi pi-sign-out"
                         class="p-button-outlined p-button-sm"
                         (click)="logoutRequested.emit()">
@@ -39,82 +41,88 @@
                     pButton
                     type="button"
                     icon="pi pi-bars"
-                    [label]="isMenuOpen ? 'Close' : 'Menu'"
+                    [label]="isMenuOpen ? 'Cerrar' : 'Menú'"
                     class="p-button-text board-header__menu-button"
                     (click)="isMenuOpen = !isMenuOpen"
                     aria-label="Abrir opciones del juego">
                 </button>
 
-                <div class="board-menu-backdrop" *ngIf="isMenuOpen" (click)="closeMenu()"></div>
+                @if (isMenuOpen) {
+                    <div class="board-menu-backdrop" (click)="closeMenu()"></div>
+                }
 
-                <div class="board-menu" *ngIf="isMenuOpen && isMenuShown">
-                    <div class="board-menu__header">
-                        <span class="board-menu__title">Opciones</span>
-                        <button
-                            pButton
-                            type="button"
-                            icon="pi pi-times"
-                            class="p-button-text p-button-sm board-menu__close"
-                            (click)="closeMenu()"
-                            aria-label="Cerrar opciones del juego">
-                        </button>
-                    </div>
-
-                    <div class="board-menu__section board-menu__section--mobile">
-                        <span class="board-menu__section-title">Jugador</span>
-                        <div class="board-menu__account">
-                            <span class="board-header__username" *ngIf="username">{{ username }}</span>
+                @if (isMenuOpen && isMenuShown) {
+                    <div class="board-menu">
+                        <div class="board-menu__header">
+                            <span class="board-menu__title">Opciones</span>
                             <button
                                 pButton
                                 type="button"
-                                label="Logout"
-                                icon="pi pi-sign-out"
-                                class="p-button-outlined p-button-sm"
-                                (click)="isMenuOpen = false; logoutRequested.emit()">
+                                icon="pi pi-times"
+                                class="p-button-text p-button-sm board-menu__close"
+                                (click)="closeMenu()"
+                                aria-label="Cerrar opciones del juego">
                             </button>
                         </div>
+
+                        <div class="board-menu__section board-menu__section--mobile">
+                            <span class="board-menu__section-title">Jugador</span>
+                            <div class="board-menu__account">
+                                @if (username) {
+                                    <span class="board-header__username">{{ username }}</span>
+                                }
+                                <button
+                                    pButton
+                                    type="button"
+                                    label="Cerrar sesión"
+                                    icon="pi pi-sign-out"
+                                    class="p-button-outlined p-button-sm"
+                                    (click)="isMenuOpen = false; logoutRequested.emit()">
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="board-menu__section">
+                            <span class="board-menu__section-title">Idioma</span>
+                            <label class="language-picker language-picker--menu">
+                                <p-select
+                                    [options]="languages"
+                                    [(ngModel)]="currentLanguage"
+                                    [style]="{ width: '100%' }"
+                                    appendTo="body"
+                                    (onChange)="selectLanguage($event)">
+                                    <ng-template pTemplate="selectedItem">
+                                        <span class="language-option">
+                                            <span class="fi fi-{{currentLanguage}}"></span>
+                                            <span>{{ currentLanguage | uppercase }}</span>
+                                        </span>
+                                    </ng-template>
+                                    <ng-template let-lang pTemplate="item">
+                                        <span class="language-option">
+                                            <span class="fi fi-{{lang}}"></span>
+                                            <span>{{ lang | uppercase }}</span>
+                                        </span>
+                                    </ng-template>
+                                </p-select>
+                            </label>
+                        </div>
+
+                        <button type="button" class="board-menu__item" (click)="toggleSound()">
+                            <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
+                            <span>{{ isSoundOn ? 'Sonido activado' : 'Sonido desactivado' }}</span>
+                        </button>
+
+                        <button type="button" class="board-menu__item" (click)="toggleFlipEffect()">
+                            <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
+                            <span>{{ isFlipEffect ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
+                        </button>
+
+                        <button type="button" class="board-menu__item" (click)="toggleColumns()">
+                            <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
+                            <span>{{ isTwoColumns ? 'Dos columnas' : 'Tablero mezclado' }}</span>
+                        </button>
                     </div>
-
-                    <div class="board-menu__section">
-                        <span class="board-menu__section-title">Idioma</span>
-                        <label class="language-picker language-picker--menu">
-                            <p-select
-                                [options]="languages"
-                                [(ngModel)]="currentLanguage"
-                                [style]="{ width: '100%' }"
-                                appendTo="body"
-                                (onChange)="selectLanguage($event)">
-                                <ng-template pTemplate="selectedItem">
-                                    <span class="language-option">
-                                        <span class="fi fi-{{currentLanguage}}"></span>
-                                        <span>{{ currentLanguage | uppercase }}</span>
-                                    </span>
-                                </ng-template>
-                                <ng-template let-lang pTemplate="item">
-                                    <span class="language-option">
-                                        <span class="fi fi-{{lang}}"></span>
-                                        <span>{{ lang | uppercase }}</span>
-                                    </span>
-                                </ng-template>
-                            </p-select>
-                        </label>
-                    </div>
-
-                    <button type="button" class="board-menu__item" (click)="toggleSound()">
-                        <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
-                        <span>{{ isSoundOn ? 'Sonido activado' : 'Sonido desactivado' }}</span>
-                    </button>
-
-                    <button type="button" class="board-menu__item" (click)="toggleFlipEffect()">
-                        <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
-                        <span>{{ isFlipEffect ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
-                    </button>
-
-                    <button type="button" class="board-menu__item" (click)="toggleColumns()">
-                        <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
-                        <span>{{ isTwoColumns ? 'Dos columnas' : 'Tablero mezclado' }}</span>
-                    </button>
-                </div>
+                }
             </div>
         </div>
         <div class="board-status board-status--header">
@@ -126,29 +134,30 @@
                 <p-progressBar [value]="progress"></p-progressBar>
             </div>
         </div>
-        <div class="board-status__notice" *ngIf="cardsSourceReason">
-            <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
-            <span>{{ cardsSourceReason }}</span>
-        </div>
+        @if (cardsSourceReason) {
+            <div class="board-status__notice">
+                <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
+                <span>{{ cardsSourceReason }}</span>
+            </div>
+        }
     </header>
 
     <div class="board-grid" [class.board-grid--columns]="isTwoColumns" [class.board-grid--loading]="isLoading">
-        <ng-container *ngIf="!isLoading; else loadingState">
-            <app-card
-                *ngFor="let card of cards"
-                [card]="card"
-                [isFlipEffect]="isFlipEffect"
-                (selectCard)="selectCard($event)">
-            </app-card>
-        </ng-container>
+        @if (!isLoading) {
+            @for (card of cards; track card.id) {
+                <app-card
+                    [card]="card"
+                    [isFlipEffect]="isFlipEffect"
+                    (selectCard)="selectCard($event)">
+                </app-card>
+            }
+        } @else {
+            <div class="board-loading">
+                <i class="pi pi-spin pi-spinner"></i>
+                <span>Cargando cartas...</span>
+            </div>
+        }
     </div>
-
-    <ng-template #loadingState>
-        <div class="board-loading">
-            <i class="pi pi-spin pi-spinner"></i>
-            <span>Cargando cartas...</span>
-        </div>
-    </ng-template>
 
     <p-toolbar styleClass="game-toolbar">
         <ng-template pTemplate="start">

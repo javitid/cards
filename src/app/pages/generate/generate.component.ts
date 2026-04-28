@@ -159,7 +159,7 @@ export class GenerateComponent {
     this.dataService.getOpenAICredentials().subscribe(result => this.openAICredentials = result);
   }
 
-  // Generate cards using AI
+  // Genera cartas usando IA
   generateCardsWithAI() {
     this.isLoading = true;
 
@@ -174,13 +174,13 @@ export class GenerateComponent {
         messages: [
           {
             role: "system",
-            content: "Perform function requests for the user"
+            content: "Responde a las solicitudes de generación del usuario"
           },
           {
             role: "user",
             content: `Genera un array de 10 elementos, cada uno de ellos con 4 parámetros, el primer parámetro 'es' debe ser una palabra en castellano,
-            el segundo parámetro 'en' debe ser esa misma palabra en traducida a inglés, el tercer parámetro 'it' debe ser esa misma palabra en traducida al italiano
-            y el cuarto parámetro 'icon' debe ser un string vacio.
+            el segundo parámetro 'en' debe ser esa misma palabra traducida al inglés, el tercer parámetro 'it' debe ser esa misma palabra traducida al italiano
+            y el cuarto parámetro 'icon' debe ser una cadena vacía.
             En utf-8 y formato JSON sin escapar los carácteres, por ejemplo: 
               [
                 {
@@ -216,7 +216,7 @@ export class GenerateComponent {
     }
   }
 
-  // Upload JSON of cards to Firestore
+  // Sube el JSON de cartas a Firestore
   uploadCards() {
     this.isLoading = true;
     this.dataService.deleteCards().pipe(
