@@ -40,7 +40,7 @@ export class GameFacade {
   private currentRoundGroups: Card[][] = [];
   private timerInterval?: ReturnType<typeof setInterval>;
   private cardsSubscription?: Subscription;
-  private lastSelection: Card | undefined;
+  private lastSelectionId: number | undefined;
   private isLastCardSelected = false;
   private isSelectionBlocked = false;
 
@@ -96,10 +96,9 @@ export class GameFacade {
 
   selectCard(card: Card): void {
     if (card.selected) {
-      card.selected = false;
+      this.patchCards([card.id], { selected: false });
       this.isLastCardSelected = false;
-      this.lastSelection = undefined;
-      this.touchCards();
+      this.lastSelectionId = undefined;
       return;
     }
 
@@ -116,10 +115,9 @@ export class GameFacade {
     }
 
     if (!this.isLastCardSelected) {
-      this.lastSelection = card;
-      this.lastSelection.selected = true;
+      this.lastSelectionId = card.id;
+      this.patchCards([card.id], { selected: true });
       this.isLastCardSelected = true;
-      this.touchCards();
       return;
     }
 
@@ -143,7 +141,7 @@ export class GameFacade {
   }
 
   private checkMatch(card: Card): void {
-    if (this.isSelectionBlocked || !this.lastSelection) {
+    if (this.isSelectionBlocked || this.lastSelectionId === undefined) {
       return;
     }
 
@@ -151,26 +149,27 @@ export class GameFacade {
       this.isSelectionBlocked = true;
     }
 
-    card.selected = true;
-    const isMatch = this.lastSelection.pairs.includes(card.id);
+    const firstSelectionId = this.lastSelectionId;
+    const isMatch = card.pairs.includes(firstSelectionId);
 
-    card.match = isMatch;
-    this.lastSelection.match = isMatch;
-    this.touchCards();
+    this.patchCards([firstSelectionId, card.id], {
+      selected: true,
+      match: isMatch
+    });
 
     if (isMatch) {
       this.progress.set(this.progress() + (2 * 100) / this.cards().length);
-      this.resetCurrentSelection(card);
+      this.resetCurrentSelection([firstSelectionId, card.id]);
       this.progressBarCompleted();
       return;
     }
 
     if (this.isFlipEffect()) {
-      setTimeout(() => this.resetCurrentSelection(card), 500);
+      setTimeout(() => this.resetCurrentSelection([firstSelectionId, card.id]), 500);
       return;
     }
 
-    this.resetCurrentSelection(card);
+    this.resetCurrentSelection([firstSelectionId, card.id]);
   }
 
   private progressBarCompleted(): void {
@@ -207,7 +206,7 @@ export class GameFacade {
 
   private startNewGame(): void {
     this.progress.set(0);
-    this.lastSelection = undefined;
+    this.lastSelectionId = undefined;
     this.isLastCardSelected = false;
     this.isSelectionBlocked = false;
     this.stopTimer();
@@ -271,16 +270,11 @@ export class GameFacade {
     return groups;
   }
 
-  private resetCurrentSelection(card: Card): void {
-    if (this.lastSelection) {
-      this.lastSelection.selected = false;
-    }
-
-    card.selected = false;
-    this.lastSelection = undefined;
+  private resetCurrentSelection(cardIds: number[]): void {
+    this.patchCards(cardIds, { selected: false });
+    this.lastSelectionId = undefined;
     this.isLastCardSelected = false;
     this.isSelectionBlocked = false;
-    this.touchCards();
   }
 
   private readPreferences(): void {
@@ -328,7 +322,19 @@ export class GameFacade {
     return esCards.flatMap((card: Card, index) => [card, otherCards[index]]);
   }
 
-  private touchCards(): void {
-    this.cards.set([...this.cards()]);
+  private patchCards(cardIds: number[], patch: Partial<Card>): void {
+    const ids = new Set(cardIds);
+
+    this.cards.set(
+      this.cards().map((currentCard) =>
+        ids.has(currentCard.id)
+          ? {
+              ...currentCard,
+              ...patch,
+              pairs: [...currentCard.pairs]
+            }
+          : currentCard
+      )
+    );
   }
 }
