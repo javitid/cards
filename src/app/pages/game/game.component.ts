@@ -1,23 +1,18 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-game',
   standalone: false,
   templateUrl: './game.component.html',
-  styleUrls: ['./game.component.scss']
+  styleUrls: ['./game.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GameComponent {
-  username$: Observable<string>;
-
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.username$ = this.authService.getUsername();
-  }
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  readonly username = this.authService.username;
 
   logout(): void {
     this.authService.logout();

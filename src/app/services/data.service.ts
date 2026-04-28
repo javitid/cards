@@ -15,6 +15,7 @@ import { Card, Credentials, Pair } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 import { db } from '../utils/firebase';
+import { LoggerService } from './logger.service';
 
 const LEVEL = {
   EASY: 'easy',
@@ -48,7 +49,8 @@ export class DataService {
   private cardsSourceReason = 'Conectado a Firestore.';
   
   constructor(
-    private readonly utilsService: UtilsService
+    private readonly utilsService: UtilsService,
+    private readonly logger: LoggerService
   ) { }
 
   private getFallbackCards(languages: string[]): Card[] {
@@ -76,7 +78,7 @@ export class DataService {
       if (!this.hasFirebaseConfig()) {
         this.cardsSource = 'fallback';
         this.cardsSourceReason = 'La configuracion de Firebase usa placeholders. En local usa start:local; en GitHub Pages revisa la inyeccion de secrets en Actions.';
-        console.warn('[DataService] Falling back to local cards because Firebase config still has placeholders.');
+        this.logger.warn('Falling back to local cards because Firebase config still has placeholders.');
 
         const fallbackCards$ = of(this.getFallbackCards(languages)).pipe(
           shareReplay({ bufferSize: 1, refCount: true })
@@ -95,7 +97,7 @@ export class DataService {
             if (!documents.length) {
               this.cardsSource = 'fallback';
               this.cardsSourceReason = `La coleccion "${level}" de Firestore esta vacia.`;
-              console.warn(`[DataService] Firestore collection "${level}" returned no documents. Using fallback cards.`);
+              this.logger.warn(`Firestore collection "${level}" returned no documents. Using fallback cards.`);
               subscriber.next(this.getFallbackCards(languages));
               return;
             }
@@ -108,7 +110,7 @@ export class DataService {
             this.setHttpError(error as Error);
             this.cardsSource = 'fallback';
             this.cardsSourceReason = this.getFirestoreErrorMessage(level, error as Error);
-            console.error('[DataService] Firestore request failed. Using fallback cards.', error);
+            this.logger.error('Firestore request failed. Using fallback cards.', error);
             subscriber.next(this.getFallbackCards(languages));
             subscriber.complete();
           }

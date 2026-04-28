@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import {
   GoogleAuthProvider,
   UserCredential,
@@ -12,37 +12,37 @@ import {
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
-import { BehaviorSubject, Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, of, throwError } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
 
 import { auth } from '../utils/firebase';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  private loginStatus = new BehaviorSubject<boolean>(this.loggedIn());
-  private username = new BehaviorSubject<string>(
-    sessionStorage.getItem('username')!
-  );
+  readonly loginStatus = signal<boolean>(this.loggedIn());
+  readonly username = signal<string>(sessionStorage.getItem('username') || '');
 
-  constructor() {
+  constructor(private readonly logger: LoggerService) {
     setPersistence(auth, browserSessionPersistence).catch((error) => {
-      console.error('Could not set Firebase session persistence', error);
+      this.logger.error('Could not set Firebase session persistence', error);
     });
 
     onIdTokenChanged(auth, async (user) => {
       if (!user) {
         this.saveToken('');
         this.saveUsername('');
-        this.setLoginStatus(false);
+        this.loginStatus.set(false);
         return;
       }
 
       const token = await user.getIdToken();
       this.saveToken(token);
       this.saveUsername(user.email || (user.isAnonymous ? 'Invitado' : ''));
-      this.setLoginStatus(true);
+      this.loginStatus.set(true);
     });
   }
 
@@ -59,11 +59,15 @@ export class AuthService {
   };
 
   getUsername(): Observable<string> {
-    return this.username.asObservable();
+    return toObservable(this.username);
   }
 
   getLoginStatus(): Observable<boolean> {
-    return this.loginStatus.asObservable();
+    return toObservable(this.loginStatus);
+  }
+
+  isLoggedIn(): boolean {
+    return this.loginStatus();
   }
 
   LoginWithGoogle(): Observable<UserCredential> {
@@ -112,6 +116,7 @@ export class AuthService {
 
   saveUsername(username: string) {
     sessionStorage.setItem('username', username);
+    this.username.set(username);
   }
 
   loggedIn(): boolean {
@@ -122,10 +127,10 @@ export class AuthService {
   }
 
   setLoginStatus(val: any) {
-    this.loginStatus.next(val);
+    this.loginStatus.set(Boolean(val));
   }
 
   setUsername(val: any) {
-    this.username.next(val);
+    this.username.set(String(val || ''));
   }
 }

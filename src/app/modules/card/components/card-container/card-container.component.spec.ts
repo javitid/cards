@@ -1,10 +1,9 @@
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { signal } from '@angular/core';
 
 import { CardContainerComponent } from './card-container.component';
-import { DataService } from '../../../../services/data.service';
-import { HelperService } from '../../../../utils/helper.service';
+import { GameFacade } from '../../services/game-facade.service';
 import { Card } from '../../interfaces/card';
 
 describe('CardContainerComponent', () => {
@@ -22,21 +21,44 @@ describe('CardContainerComponent', () => {
         { id: baseId + 4, value: `de-${pairIndex}`, voice: 'de-DE', pairs: [baseId, baseId + 1, baseId + 2, baseId + 3], selected: false, match: false, icon: '' }
       ];
     }).flat();
-  const dataServiceMock = {
-    getCards: jest.fn(() => of(createCardDeck()))
-  };
-  const helperServiceMock = {
-    isSmallScreen: false
+  const gameFacadeMock = {
+    cards: signal<Card[]>(createCardDeck()),
+    isLoading: signal(false),
+    currentLanguage: signal('gb'),
+    progress: signal(0),
+    timeLeft: signal(60),
+    isFlipEffect: signal(true),
+    isSoundOn: signal(true),
+    isTwoColumns: signal(true),
+    isUsingFallbackCards: signal(false),
+    cardsSourceReason: signal(''),
+    isGameDialogVisible: signal(false),
+    gameDialogMessage: signal(''),
+    languages: ['gb', 'it', 'pt', 'de'],
+    loadCards: jest.fn(),
+    dispose: jest.fn(),
+    selectLanguage: jest.fn(),
+    toggleSound: jest.fn(),
+    toggleFlipEffect: jest.fn(),
+    toggleColumns: jest.fn(),
+    selectCard: jest.fn(),
+    closeGameDialog: jest.fn()
   };
 
   beforeEach(async () => {
-    dataServiceMock.getCards.mockClear();
+    gameFacadeMock.loadCards.mockClear();
+    gameFacadeMock.dispose.mockClear();
+    gameFacadeMock.selectLanguage.mockClear();
+    gameFacadeMock.toggleSound.mockClear();
+    gameFacadeMock.toggleFlipEffect.mockClear();
+    gameFacadeMock.toggleColumns.mockClear();
+    gameFacadeMock.selectCard.mockClear();
+    gameFacadeMock.closeGameDialog.mockClear();
 
     await TestBed.configureTestingModule({
       declarations: [CardContainerComponent],
       providers: [
-        { provide: DataService, useValue: dataServiceMock },
-        { provide: HelperService, useValue: helperServiceMock }
+        { provide: GameFacade, useValue: gameFacadeMock }
       ],
       schemas: [NO_ERRORS_SCHEMA]
     })
@@ -55,14 +77,13 @@ describe('CardContainerComponent', () => {
   });
 
   it('should fetch cards once on load', () => {
-    expect(dataServiceMock.getCards).toHaveBeenCalledTimes(1);
+    expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
   });
 
   it('should switch language without fetching again', () => {
     component.selectLanguage('it');
 
-    expect(component.currentLanguage).toBe('it');
-    expect(dataServiceMock.getCards).toHaveBeenCalledTimes(1);
-    expect(component.progress).toBe(0);
+    expect(gameFacadeMock.selectLanguage).toHaveBeenCalledWith('it');
+    expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
   });
 });

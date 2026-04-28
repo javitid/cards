@@ -1,16 +1,18 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { AbstractControl, FormBuilder, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { FirebaseError } from 'firebase/app';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
 import { AuthService } from '../../services/auth.service';
+import { LoggerService } from '../../services/logger.service';
 
 @Component({
   selector: 'app-register',
   standalone: false,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RegisterComponent {
   public form: any;
@@ -21,7 +23,8 @@ export class RegisterComponent {
     private router: Router,
     private authService: AuthService,
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private logger: LoggerService
   ) {
     this.form = this.fb.group({
       email: ['', Validators.email],
@@ -48,6 +51,7 @@ export class RegisterComponent {
           },
           error: (error: unknown) => {
             const firebaseError = error as FirebaseError;
+            this.logger.error('Error de Firebase en el registro', firebaseError);
             this.messageService.add({
               severity: 'error',
               summary: 'Error de Firebase',
@@ -57,6 +61,7 @@ export class RegisterComponent {
           }
         });
       } catch (err) {
+        this.logger.error('Error de registro', err);
         this.messageService.add({
           severity: 'error',
           summary: 'Error de registro',

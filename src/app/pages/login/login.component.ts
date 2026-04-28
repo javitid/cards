@@ -1,15 +1,17 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 
 import { AuthService } from '../../services/auth.service';
+import { LoggerService } from '../../services/logger.service';
 
 @Component({
   selector: 'app-login',
   standalone: false,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LoginComponent {
   public isPwdHidden = true;
@@ -18,7 +20,8 @@ export class LoginComponent {
     private readonly authService: AuthService,
     private readonly fb: FormBuilder,
     private readonly router: Router,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
+    private readonly logger: LoggerService
   ) {}
 
   form = this.fb.group({
@@ -33,9 +36,7 @@ export class LoginComponent {
           this.router.navigate(['/game']);
         },
         error: (error: any) => {
-          console.error('Error de acceso:', error);
-          console.error('Código de error:', error?.code);
-          console.error('Mensaje de error:', error?.message);
+          this.logger.error('Error de acceso', error);
           this.messageService.add({
             severity: 'error',
             summary: 'Error de acceso',
@@ -53,9 +54,7 @@ export class LoginComponent {
         this.router.navigate(['/game']);
       },
       error: (error: any) => {
-        console.error('Error de acceso con Google:', error);
-        console.error('Código de error:', error?.code);
-        console.error('Mensaje de error:', error?.message);
+        this.logger.error('Error de acceso con Google', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error con Google',
@@ -72,9 +71,7 @@ export class LoginComponent {
         this.router.navigate(['/game']);
       },
       error: (error: any) => {
-        console.error('Error de acceso como invitado:', error);
-        console.error('Código de error:', error?.code);
-        console.error('Mensaje de error:', error?.message);
+        this.logger.error('Error de acceso como invitado', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Error de acceso invitado',

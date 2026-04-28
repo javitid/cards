@@ -18,7 +18,7 @@
             <div class="board-header__mobile-summary">
                 <div class="board-status__timer board-status__timer--compact">
                     <span class="timer-label">Tiempo</span>
-                    <strong>{{ timeLeft }}s</strong>
+                    <strong>{{ facade.timeLeft() }}s</strong>
                 </div>
             </div>
 
@@ -87,14 +87,14 @@
                             <label class="language-picker language-picker--menu">
                                 <p-select
                                     [options]="languages"
-                                    [(ngModel)]="currentLanguage"
+                                    [ngModel]="facade.currentLanguage()"
+                                    (ngModelChange)="selectLanguage($event)"
                                     [style]="{ width: '100%' }"
-                                    appendTo="body"
-                                    (onChange)="selectLanguage($event)">
+                                    appendTo="body">
                                     <ng-template pTemplate="selectedItem">
                                         <span class="language-option">
-                                            <span class="fi fi-{{currentLanguage}}"></span>
-                                            <span>{{ currentLanguage | uppercase }}</span>
+                                            <span class="fi fi-{{facade.currentLanguage()}}"></span>
+                                            <span>{{ facade.currentLanguage() | uppercase }}</span>
                                         </span>
                                     </ng-template>
                                     <ng-template let-lang pTemplate="item">
@@ -108,18 +108,18 @@
                         </div>
 
                         <button type="button" class="board-menu__item" (click)="toggleSound()">
-                            <i class="pi" [ngClass]="isSoundOn ? 'pi-volume-up' : 'pi-volume-off'"></i>
-                            <span>{{ isSoundOn ? 'Sonido activado' : 'Sonido desactivado' }}</span>
+                            <i class="pi" [ngClass]="facade.isSoundOn() ? 'pi-volume-up' : 'pi-volume-off'"></i>
+                            <span>{{ facade.isSoundOn() ? 'Sonido activado' : 'Sonido desactivado' }}</span>
                         </button>
 
                         <button type="button" class="board-menu__item" (click)="toggleFlipEffect()">
-                            <i class="pi" [ngClass]="isFlipEffect ? 'pi-eye-slash' : 'pi-eye'"></i>
-                            <span>{{ isFlipEffect ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
+                            <i class="pi" [ngClass]="facade.isFlipEffect() ? 'pi-eye-slash' : 'pi-eye'"></i>
+                            <span>{{ facade.isFlipEffect() ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
                         </button>
 
                         <button type="button" class="board-menu__item" (click)="toggleColumns()">
-                            <i class="pi" [ngClass]="isTwoColumns ? 'pi-table' : 'pi-th-large'"></i>
-                            <span>{{ isTwoColumns ? 'Dos columnas' : 'Tablero mezclado' }}</span>
+                            <i class="pi" [ngClass]="facade.isTwoColumns() ? 'pi-table' : 'pi-th-large'"></i>
+                            <span>{{ facade.isTwoColumns() ? 'Dos columnas' : 'Tablero mezclado' }}</span>
                         </button>
                     </div>
                 }
@@ -129,25 +129,25 @@
             <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
                     <span>Progreso</span>
-                    <strong>{{ progress | number:'1.0-0' }}%</strong>
+                    <strong>{{ facade.progress() | number:'1.0-0' }}%</strong>
                 </div>
-                <p-progressBar [value]="progress"></p-progressBar>
+                <p-progressBar [value]="facade.progress()"></p-progressBar>
             </div>
         </div>
-        @if (cardsSourceReason) {
+        @if (facade.cardsSourceReason()) {
             <div class="board-status__notice">
-                <i class="pi" [ngClass]="isUsingFallbackCards ? 'pi-info-circle' : 'pi-check-circle'"></i>
-                <span>{{ cardsSourceReason }}</span>
+                <i class="pi" [ngClass]="facade.isUsingFallbackCards() ? 'pi-info-circle' : 'pi-check-circle'"></i>
+                <span>{{ facade.cardsSourceReason() }}</span>
             </div>
         }
     </header>
 
-    <div class="board-grid" [class.board-grid--columns]="isTwoColumns" [class.board-grid--loading]="isLoading">
-        @if (!isLoading) {
-            @for (card of cards; track card.id) {
+    <div class="board-grid" [class.board-grid--columns]="facade.isTwoColumns()" [class.board-grid--loading]="facade.isLoading()">
+        @if (!facade.isLoading()) {
+            @for (card of facade.cards(); track card.id) {
                 <app-card
                     [card]="card"
-                    [isFlipEffect]="isFlipEffect"
+                    [isFlipEffect]="facade.isFlipEffect()"
                     (selectCard)="selectCard($event)">
                 </app-card>
             }
@@ -175,14 +175,15 @@
 
 <p-dialog
     header="Partida terminada"
-    [(visible)]="isGameDialogVisible"
+    [visible]="facade.isGameDialogVisible()"
+    (visibleChange)="facade.setGameDialogVisible($event)"
     [modal]="true"
     [closable]="false"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '24rem' }">
     <div class="dialog-content">
-        <span>{{ gameDialogMessage }}</span>
+        <span>{{ facade.gameDialogMessage() }}</span>
         <div class="dialog-content__actions">
             <button pButton type="button" label="Nueva partida" (click)="closeGameDialog(true)"></button>
         </div>

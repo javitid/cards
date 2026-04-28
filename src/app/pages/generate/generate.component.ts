@@ -1,9 +1,11 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, inject } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { concatMap, of } from 'rxjs';
 import { OpenAI } from "openai";
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
+import { LoggerService } from '../../services/logger.service';
 import { Credentials, Pair } from '../../modules/card/interfaces/card';
 
 // Fill from screen input and upload generated cards into Firestore
@@ -141,22 +143,31 @@ const pairs: Pair[] = [
   selector: 'app-generate',
   standalone: false,
   templateUrl: './generate.component.html',
-  styleUrls: ['./generate.component.scss']
+  styleUrls: ['./generate.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GenerateComponent {
   chatCompletion: any;
   generatedString = '';
   isLoading = false;
   openAICredentials!: Credentials;
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
   form = this.fb.group({
     content: [JSON.stringify(pairs), Validators.required],
   });
 
   constructor(
     private readonly dataService: DataService,
-    private readonly fb: FormBuilder
+    private readonly fb: FormBuilder,
+    private readonly logger: LoggerService
   ) {
-    this.dataService.getOpenAICredentials().subscribe(result => this.openAICredentials = result);
+    this.dataService.getOpenAICredentials()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(result => {
+        this.openAICredentials = result;
+        this.cdr.markForCheck();
+      });
   }
 
   // Genera cartas usando IA
@@ -204,14 +215,14 @@ export class GenerateComponent {
         this.isLoading = false;
         this.generatedString = result.choices[0].message.content;
         this.form.controls.content.reset();
+        this.cdr.markForCheck();
       });
 
     } catch (error: any) {
       if (error.response) {
-        console.log(error.response.status);
-        console.log(error.response.data);
+        this.logger.error('OpenAI response error', error.response.status, error.response.data);
       } else {
-        console.log(error.message);
+        this.logger.error('OpenAI generation error', error.message);
       }
     }
   }

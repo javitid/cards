@@ -15,10 +15,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
 import { ToolbarModule } from 'primeng/toolbar';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
-
-import { HelperService } from '../utils/helper.service';
-import { UtilsService } from '../utils/utils.service';
 
 const UI = [
   CommonModule,
@@ -42,10 +38,6 @@ const UI = [
 @NgModule({
   exports: [UI],
   imports: [UI],
-  providers: [
-    HelperService,
-    UtilsService,
-    MessageService,
-  ],
+  providers: [],
 })
 export class SharedModule {}

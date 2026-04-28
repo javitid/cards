@@ -1,7 +1,7 @@
 <div class="game-container">
   <div class="game-content">
     <app-card-container
-      [username]="(username$ | async) || ''"
+      [username]="username()"
       (logoutRequested)="logout()">
     </app-card-container>
   </div>

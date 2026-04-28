@@ -10,7 +10,9 @@ const LANGUAGE_VOICES: Record<string, string> = {
   de: 'de-DE',
 };
 
-@Injectable()
+@Injectable({
+  providedIn: 'root',
+})
 export class UtilsService {
   generateCards(pairs: Pair[], languages: string[]): Card[] {
     const supportedLanguages = [BASE_LANGUAGE, ...languages];

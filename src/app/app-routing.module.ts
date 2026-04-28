@@ -1,12 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { TokenGuard } from './guards/token.guard';
-import { GameComponent } from './pages/game/game.component';
-import { GenerateComponent } from './pages/generate/generate.component';
-import { LoginComponent } from './pages/login/login.component';
-import { RegisterComponent } from './pages/register/register.component';
-
 const routes: Routes = [
   {
     path: '',
@@ -18,21 +12,19 @@ const routes: Routes = [
       },
       {
         path: 'login',
-        component: LoginComponent
+        loadChildren: () => import('./pages/login/login.module').then((m) => m.LoginModule),
       },
       {
         path: 'game',
-        component: GameComponent,
-        canActivate: [TokenGuard]
+        loadChildren: () => import('./pages/game/game.module').then((m) => m.GameModule),
       },
       {
         path: 'generate',
-        component: GenerateComponent,
-        canActivate: [TokenGuard]
+        loadChildren: () => import('./pages/generate/generate.module').then((m) => m.GenerateModule),
       },
       {
         path: 'register',
-        component: RegisterComponent
+        loadChildren: () => import('./pages/register/register.module').then((m) => m.RegisterModule),
       }
     ],
   },
