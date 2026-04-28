@@ -6,6 +6,7 @@
     "start": "ng serve --configuration local",
     "start:local": "ng serve --configuration local",
     "build": "ng build",
+    "build:latarce": "bash scripts/build-latarce.sh",
     "build:github": "ng build --configuration production",
     "build:pages": "ng build --configuration pages",
     "watch": "ng build --watch --configuration development",
@@ -13,6 +14,8 @@
     "deploy:firestore-rules": "npx firebase-tools deploy --only firestore:rules --project cards-429a4",
     "deploy": "npm run deploy:github",
     "deploy:github": "npm run build:github && gh-pages -d dist/cards",
+    "deploy:latarce": "bash scripts/deploy-ftps.sh",
+    "deploy:latarce:build": "bash scripts/deploy-latarce.sh",
     "migrate:validate": "node scripts/validate-migration.js",
     "migrate:mongodb-to-firestore": "node scripts/migrate-mongodb-to-firestore.js",
     "migrate:atlas-to-firestore": "node scripts/migrate-atlas-to-firestore.js"

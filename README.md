@@ -70,6 +70,40 @@ Build for GitHub Pages: `npm run build:github`
 Deploy to GitHub Pages: `npm run deploy:github`
 The project already uses `<base href="./">` in `src/index.html`, which is compatible with GitHub Pages.
 
+## Build y despliegue en latarce.es
+1. Crear los ficheros locales:
+
+```bash
+mkdir -p .local
+cp scripts/latarce-firebase-prod.env.example .local/latarce-firebase-prod.env
+cp scripts/latarce-ftps.env.example .local/latarce-ftps.env
+```
+
+2. Rellenar `.local/latarce-firebase-prod.env` con las claves reales de Firebase.
+
+3. Rellenar `.local/latarce-ftps.env` con las credenciales FTPS y la ruta remota.
+
+4. Generar build de produccion para latarce:
+
+```bash
+npm run build:latarce
+```
+
+5. Desplegar por FTPS limpiando antes el destino remoto:
+
+```bash
+npm run deploy:latarce:build
+```
+
+Notas:
+
+- `environment.prod.ts` permanece sin secretos en git.
+- Los scripts generan temporalmente ese fichero desde `.local/latarce-firebase-prod.env` y lo restauran al terminar.
+- `.local/` no entra en commits.
+- Para login con Google, el dominio final debe estar autorizado en Firebase Auth.
+  - Añadir `latarce.es` y, si aplica, `www.latarce.es` en Authorized domains.
+  - Si no se hace, Google fallara con `auth/unauthorized-domain`.
+
 ## Development server
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
