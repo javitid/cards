@@ -18,7 +18,8 @@
     "deploy:latarce:build": "bash scripts/deploy-latarce.sh",
     "migrate:validate": "node scripts/validate-migration.js",
     "migrate:mongodb-to-firestore": "node scripts/migrate-mongodb-to-firestore.js",
-    "migrate:atlas-to-firestore": "node scripts/migrate-atlas-to-firestore.js"
+    "migrate:atlas-to-firestore": "node scripts/migrate-atlas-to-firestore.js",
+    "seed:firestore-levels": "node scripts/seed-firestore-levels.js"
   },
   "private": true,
   "dependencies": {

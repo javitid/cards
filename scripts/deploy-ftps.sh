@@ -24,11 +24,6 @@ for variable_name in "${required_vars[@]}"; do
   fi
 done
 
-if [[ "${REMOTE_PATH}" == "/" && "${ALLOW_REMOTE_ROOT_CLEAN:-no}" != "yes" ]]; then
-  echo "REMOTE_PATH='/' requiere ALLOW_REMOTE_ROOT_CLEAN='yes' para evitar borrados accidentales." >&2
-  exit 1
-fi
-
 if [[ ! -d "${DIST_DIR}" ]]; then
   echo "No existe el directorio a desplegar: ${DIST_DIR}" >&2
   exit 1
@@ -69,42 +64,25 @@ remote_list() {
   curl_ftps --list-only "$(remote_url "${remote_path}")" | trim_cr
 }
 
+remote_size() {
+  local remote_path="$1"
+  local response=""
+
+  response="$(curl_ftps --quote "SIZE ${remote_path}" "$(remote_url "/")" 2>/dev/null | trim_cr || true)"
+
+  if [[ "${response}" =~ ^213[[:space:]]+([0-9]+)$ ]]; then
+    printf '%s\n' "${BASH_REMATCH[1]}"
+    return 0
+  fi
+
+  return 1
+}
+
 remote_directory_exists() {
   local remote_path="$1"
   local listing
   listing="$(curl_ftps --list-only "$(remote_url "${remote_path%/}/")" 2>/dev/null | trim_cr || true)"
   [[ -n "${listing}" ]] || curl_ftps "$(remote_url "${remote_path%/}/")" >/dev/null 2>&1
-}
-
-remote_delete_recursive() {
-  local remote_path="$1"
-  local normalized_path="${remote_path%/}"
-  local entries=()
-  local entry=""
-  local child_path=""
-
-  while IFS= read -r entry; do
-    [[ -z "${entry}" ]] && continue
-    [[ "${entry}" == "." || "${entry}" == ".." ]] && continue
-    entries+=("${entry}")
-  done < <(remote_list "${normalized_path}/" || true)
-
-  if [[ ${#entries[@]} -eq 0 ]]; then
-    return 0
-  fi
-
-  for entry in "${entries[@]}"; do
-    child_path="${normalized_path}/${entry}"
-
-    if remote_directory_exists "${child_path}"; then
-      remote_delete_recursive "${child_path}"
-      echo "Removing remote directory ${child_path}"
-      curl_ftps --quote "RMD ${child_path}" "$(remote_url "/")" >/dev/null
-    else
-      echo "Removing remote file ${child_path}"
-      curl_ftps --quote "DELE ${child_path}" "$(remote_url "/")" >/dev/null
-    fi
-  done
 }
 
 ensure_remote_directory() {
@@ -116,10 +94,19 @@ upload_dist() {
   local local_file=""
   local relative_file=""
   local remote_file=""
+  local local_size=""
+  local current_remote_size=""
 
   while IFS= read -r local_file; do
     relative_file="${local_file#"${DIST_DIR}/"}"
     remote_file="${REMOTE_PATH%/}/${relative_file}"
+    local_size="$(wc -c < "${local_file}" | tr -d '[:space:]')"
+
+    if current_remote_size="$(remote_size "${remote_file}")" && [[ "${current_remote_size}" == "${local_size}" ]]; then
+      echo "Skipping ${relative_file}"
+      continue
+    fi
+
     echo "Uploading ${relative_file}"
     curl_ftps \
       --ftp-create-dirs \
@@ -131,6 +118,5 @@ upload_dist() {
 
 echo "Preparing remote directory ${REMOTE_PATH}"
 ensure_remote_directory "${REMOTE_PATH}"
-remote_delete_recursive "${REMOTE_PATH}"
 upload_dist
 echo "FTPS deployment finished."

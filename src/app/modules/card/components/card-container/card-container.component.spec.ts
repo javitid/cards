@@ -25,6 +25,7 @@ describe('CardContainerComponent', () => {
     cards: signal<Card[]>(createCardDeck()),
     isLoading: signal(false),
     currentLanguage: signal('gb'),
+    currentLevel: signal('easy'),
     progress: signal(0),
     timeLeft: signal(60),
     isFlipEffect: signal(true),
@@ -43,9 +44,15 @@ describe('CardContainerComponent', () => {
     scoreSaveMessage: signal(''),
     canSaveScore: signal(false),
     languages: ['gb', 'it', 'pt', 'de'],
+    levels: [
+      { id: 'easy', label: 'Facil', pairs: 5, timerSeconds: 60 },
+      { id: 'medium', label: 'Medio', pairs: 7, timerSeconds: 75 },
+      { id: 'hard', label: 'Dificil', pairs: 9, timerSeconds: 90 }
+    ],
     loadCards: jest.fn(),
     dispose: jest.fn(),
     selectLanguage: jest.fn(),
+    selectLevel: jest.fn(),
     toggleSound: jest.fn(),
     toggleFlipEffect: jest.fn(),
     toggleColumns: jest.fn(),
@@ -53,6 +60,8 @@ describe('CardContainerComponent', () => {
     closeGameDialog: jest.fn(),
     saveCompletedGame: jest.fn(),
     setPlayerName: jest.fn(),
+    currentLevelLabel: jest.fn(() => 'Facil'),
+    displayProgress: jest.fn(() => 0),
     boardColumnCount: jest.fn(() => 2),
     boardRowCount: jest.fn(() => 5)
   };
@@ -61,6 +70,7 @@ describe('CardContainerComponent', () => {
     gameFacadeMock.loadCards.mockClear();
     gameFacadeMock.dispose.mockClear();
     gameFacadeMock.selectLanguage.mockClear();
+    gameFacadeMock.selectLevel.mockClear();
     gameFacadeMock.toggleSound.mockClear();
     gameFacadeMock.toggleFlipEffect.mockClear();
     gameFacadeMock.toggleColumns.mockClear();
@@ -98,6 +108,13 @@ describe('CardContainerComponent', () => {
     component.selectLanguage('it');
 
     expect(gameFacadeMock.selectLanguage).toHaveBeenCalledWith('it');
+    expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
+  });
+
+  it('should switch level without fetching twice from the component', () => {
+    component.selectLevel('medium');
+
+    expect(gameFacadeMock.selectLevel).toHaveBeenCalledWith('medium');
     expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
   });
 });

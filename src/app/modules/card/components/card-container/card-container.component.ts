@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation, inject } from '@angular/core';
 
-import { Card } from '../../interfaces/card';
+import { Card, GameLevelId } from '../../interfaces/card';
 import { GameFacade } from '../../services/game-facade.service';
 
 const STICKY_HEADER_FROM = 30;
@@ -19,6 +19,7 @@ export class CardContainerComponent implements OnInit, OnDestroy {
 
   readonly facade = inject(GameFacade);
   readonly languages = this.facade.languages;
+  readonly levels = this.facade.levels;
 
   isGameDialogVisible = false;
   isLeaderboardDialogVisible = false;
@@ -45,6 +46,11 @@ export class CardContainerComponent implements OnInit, OnDestroy {
 
   selectLanguage(event: { value?: string } | string): void {
     this.facade.selectLanguage(event);
+    this.closeMenu();
+  }
+
+  selectLevel(event: { value?: GameLevelId } | GameLevelId): void {
+    this.facade.selectLevel(event);
     this.closeMenu();
   }
 

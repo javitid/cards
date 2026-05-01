@@ -17,11 +17,21 @@ export interface Credentials {
   organization: string;
 }
 
+export type GameLevelId = 'easy' | 'medium' | 'hard';
+
+export interface GameLevelOption {
+  id: GameLevelId;
+  label: string;
+  pairs: number;
+  timerSeconds: number;
+}
+
 export interface ScoreEntry {
   id: string;
   playerName: string;
   durationSeconds: number;
   language: string;
+  level: GameLevelId;
   createdAt: number;
   userId: string | null;
   isAnonymous: boolean;
@@ -31,6 +41,7 @@ export interface ScoreSubmission {
   playerName: string;
   durationSeconds: number;
   language: string;
+  level: GameLevelId;
   userId: string | null;
   isAnonymous: boolean;
 }

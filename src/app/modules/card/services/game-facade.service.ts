@@ -3,30 +3,20 @@ import { Subscription } from 'rxjs';
 
 import { DataService } from '../../../services/data.service';
 import { HelperService } from '../../../utils/helper.service';
-import { Card } from '../interfaces/card';
+import { Card, GameLevelId } from '../interfaces/card';
+import { DEFAULT_CURRENT_LANGUAGE, DEFAULT_FLIP_EFFECT, DEFAULT_LEVEL, DEFAULT_SOUND, DEFAULT_TWO_COLUMNS, GAME_LEVELS, LANGUAGES, LOCAL_STORAGE_KEYS } from './game-config';
 import { GameLeaderboardService } from './game-leaderboard.service';
 import { GameTimerService } from './game-timer.service';
 
 const BASE_LANGUAGE = 'es';
-const DEFAULT_CURRENT_LANGUAGE = 'gb';
-const DEFAULT_FLIP_EFFECT = true;
-const DEFAULT_SOUND = true;
-const DEFAULT_TIMER = 60;
-const DEFAULT_TWO_COLUMNS = true;
-const LANGUAGES = ['gb', 'it', 'pt', 'de'];
-const PAIRS_AMOUNT = 5;
 const CARDS_PER_PAIR = LANGUAGES.length + 1;
-const LOCAL_STORAGE = {
-  CURRENT_LANGUAGE: 'currentLanguage',
-  SOUND: 'sound',
-  FLIP_EFFECT: 'flipEffect'
-};
 
 @Injectable()
 export class GameFacade {
   readonly cards = signal<Card[]>([]);
   readonly isLoading = signal(true);
   readonly currentLanguage = signal(DEFAULT_CURRENT_LANGUAGE);
+  readonly currentLevel = signal<GameLevelId>(DEFAULT_LEVEL);
   readonly progress = signal(0);
   readonly isFlipEffect = signal(DEFAULT_FLIP_EFFECT);
   readonly isSoundOn = signal(DEFAULT_SOUND);
@@ -34,6 +24,7 @@ export class GameFacade {
   readonly isUsingFallbackCards = signal(false);
   readonly cardsSourceReason = signal('');
   readonly languages = LANGUAGES;
+  readonly levels = GAME_LEVELS;
   readonly timeLeft = this.timerService.timeLeft;
   readonly isGameDialogVisible = this.leaderboardService.isGameDialogVisible;
   readonly gameDialogMessage = this.leaderboardService.gameDialogMessage;
@@ -64,11 +55,11 @@ export class GameFacade {
 
   loadCards(): void {
     this.readPreferences();
-    this.leaderboardService.initialize(this.currentLanguage());
+    this.leaderboardService.initialize(this.currentLanguage(), this.currentLevel());
     this.isLoading.set(true);
     this.cardsSubscription?.unsubscribe();
 
-    this.cardsSubscription = this.dataService.getCards(LANGUAGES).subscribe((cards: Card[]) => {
+    this.cardsSubscription = this.dataService.getCards(LANGUAGES, this.currentLevel()).subscribe((cards: Card[]) => {
       this.syncCardsSourceState();
       this.allCards = cards.map((card) => this.cloneCard(card));
       this.startNewGame();
@@ -86,21 +77,33 @@ export class GameFacade {
   selectLanguage(event: { value?: string } | string): void {
     const nextLanguage = typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE;
     this.currentLanguage.set(nextLanguage);
-    localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, nextLanguage);
-    this.leaderboardService.loadLeaderboard(nextLanguage);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, nextLanguage);
+    this.leaderboardService.loadLeaderboard(nextLanguage, this.currentLevel());
     this.startNewGame();
+  }
+
+  selectLevel(event: { value?: GameLevelId } | GameLevelId): void {
+    const nextLevel = typeof event === 'string' ? event : event.value || DEFAULT_LEVEL;
+
+    if (nextLevel === this.currentLevel()) {
+      return;
+    }
+
+    this.currentLevel.set(nextLevel);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL, nextLevel);
+    this.loadCards();
   }
 
   toggleSound(): void {
     const nextValue = !this.isSoundOn();
     this.isSoundOn.set(nextValue);
-    localStorage.setItem(LOCAL_STORAGE.SOUND, JSON.stringify(nextValue));
+    localStorage.setItem(LOCAL_STORAGE_KEYS.SOUND, JSON.stringify(nextValue));
   }
 
   toggleFlipEffect(): void {
     const nextValue = !this.isFlipEffect();
     this.isFlipEffect.set(nextValue);
-    localStorage.setItem(LOCAL_STORAGE.FLIP_EFFECT, JSON.stringify(nextValue));
+    localStorage.setItem(LOCAL_STORAGE_KEYS.FLIP_EFFECT, JSON.stringify(nextValue));
   }
 
   toggleColumns(): void {
@@ -176,6 +179,14 @@ export class GameFacade {
     return Math.max(1, Math.ceil(this.cards().length / columns));
   }
 
+  displayProgress(): number {
+    return Math.round(this.progress());
+  }
+
+  currentLevelLabel(): string {
+    return this.getCurrentLevelConfig().label;
+  }
+
   private checkMatch(card: Card): void {
     if (this.isSelectionBlocked || this.lastSelectionId === undefined) {
       return;
@@ -194,7 +205,7 @@ export class GameFacade {
     });
 
     if (isMatch) {
-      this.progress.set(this.progress() + (2 * 100) / this.cards().length);
+      this.progress.set(Math.round(this.progress() + (2 * 100) / this.cards().length));
       this.resetCurrentSelection([firstSelectionId, card.id]);
       this.progressBarCompleted();
       return;
@@ -210,9 +221,10 @@ export class GameFacade {
 
   private progressBarCompleted(): void {
     if (Math.round(this.progress()) === 100) {
-      const completionTime = DEFAULT_TIMER - this.timeLeft();
+      const timerSeconds = this.getCurrentLevelConfig().timerSeconds;
+      const normalizedCompletionTime = timerSeconds - this.timeLeft();
       this.timerService.stop();
-      this.leaderboardService.openCompletedDialog(completionTime, this.currentLanguage());
+      this.leaderboardService.openCompletedDialog(normalizedCompletionTime, this.currentLanguage(), this.currentLevel());
     }
   }
 
@@ -222,7 +234,7 @@ export class GameFacade {
     this.isLastCardSelected = false;
     this.isSelectionBlocked = false;
     this.leaderboardService.resetRoundState();
-    this.timerService.start(DEFAULT_TIMER, () => this.leaderboardService.openTimeoutDialog());
+    this.timerService.start(this.getCurrentLevelConfig().timerSeconds, () => this.leaderboardService.openTimeoutDialog());
     this.currentRoundGroups = this.getRandomCardGroups();
     this.rebuildBoard();
   }
@@ -263,7 +275,7 @@ export class GameFacade {
 
     const groups: Card[][] = [];
     const totalPairs = Math.floor(this.allCards.length / CARDS_PER_PAIR);
-    const desiredPairs = Math.min(PAIRS_AMOUNT, totalPairs);
+    const desiredPairs = Math.min(this.getCurrentLevelConfig().pairs, totalPairs);
     const selectedIndexes = new Set<number>();
 
     while (selectedIndexes.size < desiredPairs) {
@@ -290,9 +302,10 @@ export class GameFacade {
   }
 
   private readPreferences(): void {
-    this.currentLanguage.set(localStorage.getItem(LOCAL_STORAGE.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE);
-    this.isFlipEffect.set(this.getBooleanPreference(LOCAL_STORAGE.FLIP_EFFECT, DEFAULT_FLIP_EFFECT));
-    this.isSoundOn.set(this.getBooleanPreference(LOCAL_STORAGE.SOUND, DEFAULT_SOUND));
+    this.currentLanguage.set(localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE);
+    this.currentLevel.set(this.getSavedLevel());
+    this.isFlipEffect.set(this.getBooleanPreference(LOCAL_STORAGE_KEYS.FLIP_EFFECT, DEFAULT_FLIP_EFFECT));
+    this.isSoundOn.set(this.getBooleanPreference(LOCAL_STORAGE_KEYS.SOUND, DEFAULT_SOUND));
   }
 
   private syncCardsSourceState(): void {
@@ -308,6 +321,15 @@ export class GameFacade {
     }
 
     return value === 'true';
+  }
+
+  private getSavedLevel(): GameLevelId {
+    const rawLevel = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL);
+    return GAME_LEVELS.some((level) => level.id === rawLevel) ? (rawLevel as GameLevelId) : DEFAULT_LEVEL;
+  }
+
+  private getCurrentLevelConfig() {
+    return GAME_LEVELS.find((level) => level.id === this.currentLevel()) || GAME_LEVELS[0];
   }
 
   private cloneCard(card: Card): Card {

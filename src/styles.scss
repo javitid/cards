@@ -2,8 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('flag-icons/css/flag-icons.min.css');
 @import url('primeicons/primeicons.css');
+@import './styles/flags';
 
 :root,
 .light-theme {

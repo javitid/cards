@@ -1,0 +1,49 @@
+.fi {
+  position: relative;
+  display: inline-block;
+  width: 1.333333em;
+  line-height: 1em;
+  background-size: contain;
+  background-position: 50%;
+  background-repeat: no-repeat;
+}
+
+.fi::before {
+  content: "\00a0";
+}
+
+.fi.fis {
+  width: 1em;
+}
+
+.fi-gb {
+  background-image: url('../assets/flags/4x3/gb.svg');
+}
+
+.fi-it {
+  background-image: url('../assets/flags/4x3/it.svg');
+}
+
+.fi-pt {
+  background-image: url('../assets/flags/4x3/pt.svg');
+}
+
+.fi-de {
+  background-image: url('../assets/flags/4x3/de.svg');
+}
+
+.fi-gb.fis {
+  background-image: url('../assets/flags/1x1/gb.svg');
+}
+
+.fi-it.fis {
+  background-image: url('../assets/flags/1x1/it.svg');
+}
+
+.fi-pt.fis {
+  background-image: url('../assets/flags/1x1/pt.svg');
+}
+
+.fi-de.fis {
+  background-image: url('../assets/flags/1x1/de.svg');
+}

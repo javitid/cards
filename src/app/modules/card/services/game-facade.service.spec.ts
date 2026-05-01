@@ -126,7 +126,14 @@ describe('GameFacade', () => {
 
     facade.saveCompletedGame();
 
-    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'gb');
+    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'gb', 'easy');
     expect(leaderboardServiceMock.saveCompletedGame).toHaveBeenCalled();
+  });
+
+  it('reloads cards when changing the level', () => {
+    facade.selectLevel('medium');
+
+    expect(dataServiceMock.getCards).toHaveBeenLastCalledWith(['gb', 'it', 'pt', 'de'], 'medium');
+    expect(leaderboardServiceMock.initialize).toHaveBeenLastCalledWith('gb', 'medium');
   });
 });

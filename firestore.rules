@@ -18,6 +18,16 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /medium/{document=**} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
+    match /hard/{document=**} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
     match /prueba/{document=**} {
       allow read: if signedIn();
       allow write: if isAdmin();
@@ -27,7 +37,7 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
-    match /leaderboards/{language}/times/{document=**} {
+    match /leaderboards/{language}/levels/{level}/times/{document=**} {
       allow read, write: if signedIn();
     }
 

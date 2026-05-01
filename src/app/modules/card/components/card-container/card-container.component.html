@@ -123,6 +123,21 @@
                             </label>
                         </div>
 
+                        <div class="board-menu__section">
+                            <span class="board-menu__section-title">Dificultad</span>
+                            <label class="level-picker level-picker--menu">
+                                <p-select
+                                    [options]="levels"
+                                    optionLabel="label"
+                                    optionValue="id"
+                                    [ngModel]="facade.currentLevel()"
+                                    (ngModelChange)="selectLevel($event)"
+                                    [style]="{ width: '100%' }"
+                                    appendTo="body">
+                                </p-select>
+                            </label>
+                        </div>
+
                         <button type="button" class="board-menu__item" (click)="toggleSound()">
                             <i class="pi" [ngClass]="facade.isSoundOn() ? 'pi-volume-up' : 'pi-volume-off'"></i>
                             <span>{{ facade.isSoundOn() ? 'Sonido activado' : 'Sonido desactivado' }}</span>
@@ -155,17 +170,11 @@
             <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
                     <span>Progreso</span>
-                    <strong>{{ facade.progress() | number:'1.0-0' }}%</strong>
+                    <strong>{{ facade.displayProgress() }}%</strong>
                 </div>
-                <p-progressBar [value]="facade.progress()"></p-progressBar>
+                <p-progressBar [value]="facade.displayProgress()"></p-progressBar>
             </div>
         </div>
-        @if (facade.cardsSourceReason()) {
-            <div class="board-status__notice">
-                <i class="pi" [ngClass]="facade.isUsingFallbackCards() ? 'pi-info-circle' : 'pi-check-circle'"></i>
-                <span>{{ facade.cardsSourceReason() }}</span>
-            </div>
-        }
     </header>
 
     <div
@@ -195,6 +204,17 @@
             <span class="game-toolbar__title">Más juegos</span>
         </ng-template>
         <ng-template pTemplate="end">
+            @if (facade.cardsSourceReason()) {
+                <button
+                    pButton
+                    type="button"
+                    [icon]="facade.isUsingFallbackCards() ? 'pi pi-info-circle' : 'pi pi-check-circle'"
+                    class="p-button-text p-button-sm game-toolbar__meta-button"
+                    [pTooltip]="facade.cardsSourceReason()"
+                    tooltipPosition="top"
+                    aria-label="Estado de los datos">
+                </button>
+            }
             <span class="game-toolbar__item"><i class="pi pi-flag"></i> Idiomas</span>
             <span class="game-toolbar__item"><i class="pi pi-users"></i> Infantil</span>
             <span class="game-toolbar__item"><i class="pi pi-calculator"></i> Matemáticas</span>
@@ -262,7 +282,7 @@
     <div class="leaderboard-dialog">
         <div class="leaderboard__header">
             <span class="leaderboard__title">Ranking actual</span>
-            <span class="leaderboard__badge">{{ facade.currentLanguage() | uppercase }}</span>
+            <span class="leaderboard__badge">{{ facade.currentLevelLabel() }} · {{ facade.currentLanguage() | uppercase }}</span>
         </div>
 
         @if (facade.leaderboard().length) {

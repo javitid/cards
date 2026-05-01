@@ -15,14 +15,16 @@ import {
 import { Observable, from, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
-import { Card, Credentials, Pair, ScoreEntry, ScoreSubmission } from '../modules/card/interfaces/card';
+import { Card, Credentials, GameLevelId, Pair, ScoreEntry, ScoreSubmission } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 import { db } from '../utils/firebase';
 import { LoggerService } from './logger.service';
 
 const LEVEL = {
-  EASY: 'easy',
+  EASY: 'easy' as GameLevelId,
+  MEDIUM: 'medium' as GameLevelId,
+  HARD: 'hard' as GameLevelId,
   PRUEBA: 'prueba'
 };
 const LEADERBOARD_COLLECTION = 'leaderboards';
@@ -77,7 +79,7 @@ export class DataService {
     );
   }
 
-  getCards(languages: string[], level = LEVEL.EASY): Observable<Card[]>{
+  getCards(languages: string[], level: GameLevelId = LEVEL.EASY): Observable<Card[]>{
     const cacheKey = `${level}:${languages.join(',')}`;
 
     if (!this.cardsCache.has(cacheKey)) {
@@ -133,9 +135,9 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Pair[]): Observable<Pair[]> {
+  setCards(cards: Pair[], level: GameLevelId = LEVEL.EASY): Observable<Pair[]> {
     const batch = writeBatch(db);
-    const cardsCollection = collection(db, LEVEL.EASY);
+    const cardsCollection = collection(db, level);
 
     cards.forEach((card) => {
       batch.set(doc(cardsCollection), card);
@@ -151,8 +153,8 @@ export class DataService {
     );
   }
 
-  deleteCards() {
-    const cardsCollection = collection(db, LEVEL.EASY);
+  deleteCards(level: GameLevelId = LEVEL.EASY) {
+    const cardsCollection = collection(db, level);
 
     return from(getDocs(cardsCollection)).pipe(
       switchMap((snapshots) => {
@@ -171,8 +173,8 @@ export class DataService {
     );
   }
 
-  getTopScores(language: string, amount = 5): Observable<ScoreEntry[]> {
-    const cacheKey = `${language}:${amount}`;
+  getTopScores(language: string, level: GameLevelId, amount = 5): Observable<ScoreEntry[]> {
+    const cacheKey = `${language}:${level}:${amount}`;
 
     if (!this.leaderboardCache.has(cacheKey)) {
       if (!this.hasFirebaseConfig()) {
@@ -186,7 +188,7 @@ export class DataService {
 
       const scoresRequest$ = new Observable<ScoreEntry[]>((subscriber) => {
         const scoresQuery = query(
-          collection(db, LEADERBOARD_COLLECTION, language, 'times'),
+          collection(db, LEADERBOARD_COLLECTION, language, 'levels', level, 'times'),
           orderBy('durationSeconds', 'asc'),
           limit(amount)
         );
@@ -195,10 +197,15 @@ export class DataService {
           scoresQuery,
           (result) => {
             subscriber.next(result.docs
-              .map((snapshot) => ({
+              .map((snapshot) => {
+                const data = snapshot.data() as Omit<ScoreEntry, 'id'>;
+
+                return {
                 id: snapshot.id,
-                ...(snapshot.data() as Omit<ScoreEntry, 'id'>)
-              }))
+                ...data,
+                level: data.level || level
+              };
+              })
               .sort((left, right) => {
                 if (left.durationSeconds !== right.durationSeconds) {
                   return left.durationSeconds - right.durationSeconds;
@@ -230,7 +237,7 @@ export class DataService {
       return throwError(() => new Error('El ranking no esta disponible mientras Firebase use placeholders.'));
     }
 
-    return from(addDoc(collection(db, LEADERBOARD_COLLECTION, score.language, 'times'), {
+    return from(addDoc(collection(db, LEADERBOARD_COLLECTION, score.language, 'levels', score.level, 'times'), {
       ...score,
       createdAt: Date.now()
     })).pipe(
