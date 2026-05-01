@@ -4,7 +4,8 @@
 
 .card {
   width: 100%;
-  min-height: 96px;
+  min-height: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -80,6 +81,7 @@
 @media (max-width: 720px) {
   .card {
     min-height: 64px;
+    height: auto;
     padding: 0.55rem 0.45rem;
     border-radius: 0.9rem;
     font-size: 0.82rem;

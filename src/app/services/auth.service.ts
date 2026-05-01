@@ -114,6 +114,14 @@ export class AuthService {
     return sessionStorage.getItem('token') || '';
   }
 
+  getCurrentUserId(): string | null {
+    return auth.currentUser?.uid || null;
+  }
+
+  isAnonymousUser(): boolean {
+    return Boolean(auth.currentUser?.isAnonymous);
+  }
+
   saveUsername(username: string) {
     sessionStorage.setItem('username', username);
     this.username.set(username);

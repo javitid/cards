@@ -8,14 +8,15 @@
 
   .game-content {
     flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     background: var(--app-bg);
+    min-height: 0;
 
     app-card-container {
       flex: 1;
+      min-height: 0;
     }
   }
 }

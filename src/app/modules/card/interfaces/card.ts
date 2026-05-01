@@ -17,6 +17,24 @@ export interface Credentials {
   organization: string;
 }
 
+export interface ScoreEntry {
+  id: string;
+  playerName: string;
+  durationSeconds: number;
+  language: string;
+  createdAt: number;
+  userId: string | null;
+  isAnonymous: boolean;
+}
+
+export interface ScoreSubmission {
+  playerName: string;
+  durationSeconds: number;
+  language: string;
+  userId: string | null;
+  isAnonymous: boolean;
+}
+
 // Helper to generate Cards
 export interface Pair {
   icon: string;

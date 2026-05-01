@@ -4,6 +4,8 @@ import { Subscription } from 'rxjs';
 import { DataService } from '../../../services/data.service';
 import { HelperService } from '../../../utils/helper.service';
 import { Card } from '../interfaces/card';
+import { GameLeaderboardService } from './game-leaderboard.service';
+import { GameTimerService } from './game-timer.service';
 
 const BASE_LANGUAGE = 'es';
 const DEFAULT_CURRENT_LANGUAGE = 'gb';
@@ -26,19 +28,26 @@ export class GameFacade {
   readonly isLoading = signal(true);
   readonly currentLanguage = signal(DEFAULT_CURRENT_LANGUAGE);
   readonly progress = signal(0);
-  readonly timeLeft = signal(DEFAULT_TIMER);
   readonly isFlipEffect = signal(DEFAULT_FLIP_EFFECT);
   readonly isSoundOn = signal(DEFAULT_SOUND);
   readonly isTwoColumns = signal(DEFAULT_TWO_COLUMNS);
   readonly isUsingFallbackCards = signal(false);
   readonly cardsSourceReason = signal('');
-  readonly isGameDialogVisible = signal(false);
-  readonly gameDialogMessage = signal('');
   readonly languages = LANGUAGES;
+  readonly timeLeft = this.timerService.timeLeft;
+  readonly isGameDialogVisible = this.leaderboardService.isGameDialogVisible;
+  readonly gameDialogMessage = this.leaderboardService.gameDialogMessage;
+  readonly leaderboard = this.leaderboardService.leaderboard;
+  readonly leaderboardMessage = this.leaderboardService.leaderboardMessage;
+  readonly leaderboardAvailable = this.leaderboardService.leaderboardAvailable;
+  readonly playerName = this.leaderboardService.playerName;
+  readonly isSavingScore = this.leaderboardService.isSavingScore;
+  readonly hasSavedScore = this.leaderboardService.hasSavedScore;
+  readonly scoreSaveMessage = this.leaderboardService.scoreSaveMessage;
+  readonly canSaveScore = this.leaderboardService.canSaveScore;
 
   private allCards: Card[] = [];
   private currentRoundGroups: Card[][] = [];
-  private timerInterval?: ReturnType<typeof setInterval>;
   private cardsSubscription?: Subscription;
   private lastSelectionId: number | undefined;
   private isLastCardSelected = false;
@@ -46,13 +55,16 @@ export class GameFacade {
 
   constructor(
     private readonly dataService: DataService,
-    private readonly helperService: HelperService
+    private readonly helperService: HelperService,
+    private readonly timerService: GameTimerService,
+    private readonly leaderboardService: GameLeaderboardService
   ) {
     this.isTwoColumns.set(this.helperService.isSmallScreen || DEFAULT_TWO_COLUMNS);
   }
 
   loadCards(): void {
     this.readPreferences();
+    this.leaderboardService.initialize(this.currentLanguage());
     this.isLoading.set(true);
     this.cardsSubscription?.unsubscribe();
 
@@ -67,13 +79,15 @@ export class GameFacade {
   dispose(): void {
     this.cardsSubscription?.unsubscribe();
     this.cardsSubscription = undefined;
-    this.stopTimer();
+    this.leaderboardService.dispose();
+    this.timerService.stop();
   }
 
   selectLanguage(event: { value?: string } | string): void {
     const nextLanguage = typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE;
     this.currentLanguage.set(nextLanguage);
     localStorage.setItem(LOCAL_STORAGE.CURRENT_LANGUAGE, nextLanguage);
+    this.leaderboardService.loadLeaderboard(nextLanguage);
     this.startNewGame();
   }
 
@@ -126,6 +140,7 @@ export class GameFacade {
 
   closeGameDialog(reload = false): void {
     this.setGameDialogVisible(false);
+    this.leaderboardService.resetRoundState();
 
     if (reload) {
       this.startNewGame();
@@ -133,11 +148,32 @@ export class GameFacade {
   }
 
   setGameDialogVisible(visible: boolean): void {
-    this.isGameDialogVisible.set(visible);
+    this.leaderboardService.setGameDialogVisible(visible);
+  }
 
-    if (!visible) {
-      this.gameDialogMessage.set('');
+  setPlayerName(name: string): void {
+    this.leaderboardService.setPlayerName(name);
+  }
+
+  saveCompletedGame(): void {
+    this.leaderboardService.saveCompletedGame();
+  }
+
+  startNewGameFromUi(): void {
+    this.startNewGame();
+  }
+
+  boardColumnCount(): number {
+    if (this.helperService.isSmallScreen) {
+      return 2;
     }
+
+    return this.isTwoColumns() ? 2 : Math.min(5, Math.max(this.cards().length / 2, 1));
+  }
+
+  boardRowCount(): number {
+    const columns = this.boardColumnCount();
+    return Math.max(1, Math.ceil(this.cards().length / columns));
   }
 
   private checkMatch(card: Card): void {
@@ -174,34 +210,10 @@ export class GameFacade {
 
   private progressBarCompleted(): void {
     if (Math.round(this.progress()) === 100) {
-      this.stopTimer();
-      this.openGameDialog(`Completado en ${DEFAULT_TIMER - this.timeLeft()} segundos`);
+      const completionTime = DEFAULT_TIMER - this.timeLeft();
+      this.timerService.stop();
+      this.leaderboardService.openCompletedDialog(completionTime, this.currentLanguage());
     }
-  }
-
-  private startTimer(timer: number = DEFAULT_TIMER): void {
-    this.stopTimer();
-    this.timeLeft.set(timer);
-    this.timerInterval = setInterval(() => {
-      if (this.timeLeft() > 0) {
-        this.timeLeft.set(this.timeLeft() - 1);
-      } else {
-        this.openGameDialog('Se acabó el tiempo');
-        this.stopTimer();
-      }
-    }, 1000);
-  }
-
-  private stopTimer(): void {
-    if (this.timerInterval) {
-      clearInterval(this.timerInterval);
-      this.timerInterval = undefined;
-    }
-  }
-
-  private openGameDialog(message: string): void {
-    this.gameDialogMessage.set(message);
-    this.isGameDialogVisible.set(true);
   }
 
   private startNewGame(): void {
@@ -209,8 +221,8 @@ export class GameFacade {
     this.lastSelectionId = undefined;
     this.isLastCardSelected = false;
     this.isSelectionBlocked = false;
-    this.stopTimer();
-    this.startTimer();
+    this.leaderboardService.resetRoundState();
+    this.timerService.start(DEFAULT_TIMER, () => this.leaderboardService.openTimeoutDialog());
     this.currentRoundGroups = this.getRandomCardGroups();
     this.rebuildBoard();
   }

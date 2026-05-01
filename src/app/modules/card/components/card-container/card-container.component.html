@@ -30,6 +30,22 @@
                     <button
                         pButton
                         type="button"
+                        label="Nueva partida"
+                        icon="pi pi-refresh"
+                        class="p-button-sm"
+                        (click)="startNewGame()">
+                    </button>
+                    <button
+                        pButton
+                        type="button"
+                        label="Mejores tiempos"
+                        icon="pi pi-trophy"
+                        class="p-button-outlined p-button-sm"
+                        (click)="openLeaderboard()">
+                    </button>
+                    <button
+                        pButton
+                        type="button"
                         label="Cerrar sesión"
                         icon="pi pi-sign-out"
                         class="p-button-outlined p-button-sm"
@@ -121,6 +137,16 @@
                             <i class="pi" [ngClass]="facade.isTwoColumns() ? 'pi-table' : 'pi-th-large'"></i>
                             <span>{{ facade.isTwoColumns() ? 'Dos columnas' : 'Tablero mezclado' }}</span>
                         </button>
+
+                        <button type="button" class="board-menu__item" (click)="startNewGame()">
+                            <i class="pi pi-refresh"></i>
+                            <span>Nueva partida</span>
+                        </button>
+
+                        <button type="button" class="board-menu__item" (click)="openLeaderboard()">
+                            <i class="pi pi-trophy"></i>
+                            <span>Mejores tiempos</span>
+                        </button>
                     </div>
                 }
             </div>
@@ -142,7 +168,12 @@
         }
     </header>
 
-    <div class="board-grid" [class.board-grid--columns]="facade.isTwoColumns()" [class.board-grid--loading]="facade.isLoading()">
+    <div
+        class="board-grid"
+        [class.board-grid--columns]="facade.isTwoColumns()"
+        [class.board-grid--loading]="facade.isLoading()"
+        [style.--board-column-count]="facade.boardColumnCount()"
+        [style.--board-row-count]="facade.boardRowCount()">
         @if (!facade.isLoading()) {
             @for (card of facade.cards(); track card.id) {
                 <app-card
@@ -178,14 +209,74 @@
     [visible]="facade.isGameDialogVisible()"
     (visibleChange)="facade.setGameDialogVisible($event)"
     [modal]="true"
-    [closable]="false"
+    [closable]="true"
+    [dismissableMask]="true"
     [draggable]="false"
     [resizable]="false"
     [style]="{ width: '24rem' }">
     <div class="dialog-content">
         <span>{{ facade.gameDialogMessage() }}</span>
+
+        @if (facade.canSaveScore()) {
+            <label class="dialog-content__field">
+                <span>Nombre</span>
+                <input
+                    pInputText
+                    type="text"
+                    [ngModel]="facade.playerName()"
+                    (ngModelChange)="updatePlayerName($event)"
+                    maxlength="40"
+                    placeholder="Tu nombre">
+            </label>
+
+            <button
+                pButton
+                type="button"
+                label="Guardar tiempo"
+                [loading]="facade.isSavingScore()"
+                [disabled]="facade.hasSavedScore() || !facade.playerName().trim()"
+                (click)="saveCompletedGame()">
+            </button>
+
+            @if (facade.scoreSaveMessage()) {
+                <small class="dialog-content__feedback">{{ facade.scoreSaveMessage() }}</small>
+            }
+        }
+
         <div class="dialog-content__actions">
+            <button pButton type="button" label="Cerrar" severity="secondary" (click)="closeGameDialog(false)"></button>
             <button pButton type="button" label="Nueva partida" (click)="closeGameDialog(true)"></button>
         </div>
+    </div>
+</p-dialog>
+
+<p-dialog
+    header="Mejores tiempos"
+    [(visible)]="isLeaderboardDialogVisible"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    [draggable]="false"
+    [resizable]="false"
+    [style]="{ width: '26rem', maxWidth: '92vw' }">
+    <div class="leaderboard-dialog">
+        <div class="leaderboard__header">
+            <span class="leaderboard__title">Ranking actual</span>
+            <span class="leaderboard__badge">{{ facade.currentLanguage() | uppercase }}</span>
+        </div>
+
+        @if (facade.leaderboard().length) {
+            <ol class="leaderboard__list">
+                @for (score of facade.leaderboard(); track score.id) {
+                    <li class="leaderboard__item">
+                        <span class="leaderboard__position">{{ $index + 1 }}</span>
+                        <span class="leaderboard__name">{{ score.playerName }}</span>
+                        <strong class="leaderboard__time">{{ score.durationSeconds }}s</strong>
+                    </li>
+                }
+            </ol>
+        } @else {
+            <p class="leaderboard__empty">{{ facade.leaderboardMessage() }}</p>
+        }
     </div>
 </p-dialog>

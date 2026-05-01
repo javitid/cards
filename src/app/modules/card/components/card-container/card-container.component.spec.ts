@@ -34,6 +34,14 @@ describe('CardContainerComponent', () => {
     cardsSourceReason: signal(''),
     isGameDialogVisible: signal(false),
     gameDialogMessage: signal(''),
+    leaderboard: signal([]),
+    leaderboardMessage: signal(''),
+    leaderboardAvailable: signal(true),
+    playerName: signal('Invitado'),
+    isSavingScore: signal(false),
+    hasSavedScore: signal(false),
+    scoreSaveMessage: signal(''),
+    canSaveScore: signal(false),
     languages: ['gb', 'it', 'pt', 'de'],
     loadCards: jest.fn(),
     dispose: jest.fn(),
@@ -42,7 +50,11 @@ describe('CardContainerComponent', () => {
     toggleFlipEffect: jest.fn(),
     toggleColumns: jest.fn(),
     selectCard: jest.fn(),
-    closeGameDialog: jest.fn()
+    closeGameDialog: jest.fn(),
+    saveCompletedGame: jest.fn(),
+    setPlayerName: jest.fn(),
+    boardColumnCount: jest.fn(() => 2),
+    boardRowCount: jest.fn(() => 5)
   };
 
   beforeEach(async () => {
@@ -54,6 +66,8 @@ describe('CardContainerComponent', () => {
     gameFacadeMock.toggleColumns.mockClear();
     gameFacadeMock.selectCard.mockClear();
     gameFacadeMock.closeGameDialog.mockClear();
+    gameFacadeMock.saveCompletedGame.mockClear();
+    gameFacadeMock.setPlayerName.mockClear();
 
     await TestBed.configureTestingModule({
       declarations: [CardContainerComponent],

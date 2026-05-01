@@ -1,10 +1,13 @@
 import { TestBed } from '@angular/core/testing';
+import { signal } from '@angular/core';
 import { of } from 'rxjs';
 
 import { DataService } from '../../../services/data.service';
 import { HelperService } from '../../../utils/helper.service';
 import { Card } from '../interfaces/card';
 import { GameFacade } from './game-facade.service';
+import { GameLeaderboardService } from './game-leaderboard.service';
+import { GameTimerService } from './game-timer.service';
 
 describe('GameFacade', () => {
   let facade: GameFacade;
@@ -32,6 +35,34 @@ describe('GameFacade', () => {
     isSmallScreen: false
   };
 
+  const timerServiceMock = {
+    timeLeft: signal(60),
+    start: jest.fn((_seconds: number, _onFinished: () => void) => undefined),
+    stop: jest.fn()
+  };
+
+  const leaderboardServiceMock = {
+    isGameDialogVisible: signal(false),
+    gameDialogMessage: signal(''),
+    leaderboard: signal([]),
+    leaderboardMessage: signal(''),
+    leaderboardAvailable: signal(true),
+    playerName: signal('Jugador demo'),
+    isSavingScore: signal(false),
+    hasSavedScore: signal(false),
+    scoreSaveMessage: signal(''),
+    canSaveScore: signal(false),
+    initialize: jest.fn(),
+    dispose: jest.fn(),
+    loadLeaderboard: jest.fn(),
+    resetRoundState: jest.fn(),
+    openCompletedDialog: jest.fn(),
+    openTimeoutDialog: jest.fn(),
+    setGameDialogVisible: jest.fn(),
+    setPlayerName: jest.fn(),
+    saveCompletedGame: jest.fn()
+  };
+
   beforeEach(async () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
@@ -42,7 +73,9 @@ describe('GameFacade', () => {
       providers: [
         GameFacade,
         { provide: DataService, useValue: dataServiceMock },
-        { provide: HelperService, useValue: helperServiceMock }
+        { provide: HelperService, useValue: helperServiceMock },
+        { provide: GameTimerService, useValue: timerServiceMock },
+        { provide: GameLeaderboardService, useValue: leaderboardServiceMock }
       ]
     }).compileComponents();
 
@@ -74,5 +107,26 @@ describe('GameFacade', () => {
     expect(facade.cards().find((card) => card.id === 5)?.selected).toBe(false);
     expect(facade.cards().find((card) => card.id === 0)?.match).toBe(false);
     expect(facade.cards().find((card) => card.id === 5)?.match).toBe(false);
+  });
+
+  it('stores the completed time when the puzzle is solved', () => {
+    timerServiceMock.timeLeft.set(37);
+    leaderboardServiceMock.canSaveScore.set(true);
+
+    while (Math.round(facade.progress()) < 100) {
+      const unmatchedCard = facade.cards().find((card) => !card.match);
+      const matchingCard = facade.cards().find((card) => unmatchedCard?.pairs.includes(card.id));
+
+      expect(unmatchedCard).toBeTruthy();
+      expect(matchingCard).toBeTruthy();
+
+      facade.selectCard(unmatchedCard!);
+      facade.selectCard(matchingCard!);
+    }
+
+    facade.saveCompletedGame();
+
+    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'gb');
+    expect(leaderboardServiceMock.saveCompletedGame).toHaveBeenCalled();
   });
 });

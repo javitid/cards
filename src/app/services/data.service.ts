@@ -1,17 +1,21 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import {
+  addDoc,
   collection,
   doc,
   getDoc,
   getDocs,
+  limit,
   onSnapshot,
+  orderBy,
+  query,
   writeBatch,
 } from 'firebase/firestore';
-import { Observable, from, of } from 'rxjs';
+import { Observable, from, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
-import { Card, Credentials, Pair } from '../modules/card/interfaces/card';
+import { Card, Credentials, Pair, ScoreEntry, ScoreSubmission } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 import { db } from '../utils/firebase';
@@ -21,6 +25,7 @@ const LEVEL = {
   EASY: 'easy',
   PRUEBA: 'prueba'
 };
+const LEADERBOARD_COLLECTION = 'leaderboards';
 
 const FIREBASE_PLACEHOLDER_PREFIXES = ['YOUR_FIREBASE_', 'FIREBASE_'];
 
@@ -45,6 +50,7 @@ const FALLBACK_PAIRS: Pair[] = [
 export class DataService {
   httpError?: Error | HttpErrorResponse;
   private readonly cardsCache = new Map<string, Observable<Card[]>>();
+  private readonly leaderboardCache = new Map<string, Observable<ScoreEntry[]>>();
   private cardsSource: 'firestore' | 'fallback' = 'firestore';
   private cardsSourceReason = 'Conectado a Firestore.';
   
@@ -162,6 +168,73 @@ export class DataService {
         );
       }),
       shareReplay(1)
+    );
+  }
+
+  getTopScores(language: string, amount = 5): Observable<ScoreEntry[]> {
+    const cacheKey = `${language}:${amount}`;
+
+    if (!this.leaderboardCache.has(cacheKey)) {
+      if (!this.hasFirebaseConfig()) {
+        const fallbackScores$ = of([] as ScoreEntry[]).pipe(
+          shareReplay({ bufferSize: 1, refCount: true })
+        );
+
+        this.leaderboardCache.set(cacheKey, fallbackScores$);
+        return fallbackScores$;
+      }
+
+      const scoresRequest$ = new Observable<ScoreEntry[]>((subscriber) => {
+        const scoresQuery = query(
+          collection(db, LEADERBOARD_COLLECTION, language, 'times'),
+          orderBy('durationSeconds', 'asc'),
+          limit(amount)
+        );
+
+        const unsubscribe = onSnapshot(
+          scoresQuery,
+          (result) => {
+            subscriber.next(result.docs
+              .map((snapshot) => ({
+                id: snapshot.id,
+                ...(snapshot.data() as Omit<ScoreEntry, 'id'>)
+              }))
+              .sort((left, right) => {
+                if (left.durationSeconds !== right.durationSeconds) {
+                  return left.durationSeconds - right.durationSeconds;
+                }
+
+                return left.createdAt - right.createdAt;
+              }));
+          },
+          (error) => {
+            this.logger.error('Firestore leaderboard request failed.', error);
+            subscriber.next([]);
+            subscriber.complete();
+          }
+        );
+
+        return () => unsubscribe();
+      }).pipe(
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+
+      this.leaderboardCache.set(cacheKey, scoresRequest$);
+    }
+
+    return this.leaderboardCache.get(cacheKey)!;
+  }
+
+  saveScore(score: ScoreSubmission): Observable<void> {
+    if (!this.hasFirebaseConfig()) {
+      return throwError(() => new Error('El ranking no esta disponible mientras Firebase use placeholders.'));
+    }
+
+    return from(addDoc(collection(db, LEADERBOARD_COLLECTION, score.language, 'times'), {
+      ...score,
+      createdAt: Date.now()
+    })).pipe(
+      map(() => undefined)
     );
   }
 

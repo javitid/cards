@@ -21,6 +21,7 @@ export class CardContainerComponent implements OnInit, OnDestroy {
   readonly languages = this.facade.languages;
 
   isGameDialogVisible = false;
+  isLeaderboardDialogVisible = false;
   isMenuOpen = false;
   isHeaderFixed = false;
   isMenuShown = true;
@@ -64,6 +65,24 @@ export class CardContainerComponent implements OnInit, OnDestroy {
 
   selectCard(card: Card): void {
     this.facade.selectCard(card);
+  }
+
+  saveCompletedGame(): void {
+    this.facade.saveCompletedGame();
+  }
+
+  startNewGame(): void {
+    this.facade.startNewGameFromUi();
+    this.closeMenu();
+  }
+
+  openLeaderboard(): void {
+    this.isLeaderboardDialogVisible = true;
+    this.closeMenu();
+  }
+
+  updatePlayerName(name: string): void {
+    this.facade.setPlayerName(name);
   }
 
   closeGameDialog(reload = false): void {
