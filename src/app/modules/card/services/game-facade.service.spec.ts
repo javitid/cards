@@ -12,8 +12,8 @@ import { GameTimerService } from './game-timer.service';
 describe('GameFacade', () => {
   let facade: GameFacade;
 
-  const createCardDeck = (): Card[] =>
-    Array.from({ length: 2 }, (_, pairIndex) => {
+  const createCardDeck = (pairCount = 10): Card[] =>
+    Array.from({ length: pairCount }, (_, pairIndex) => {
       const baseId = pairIndex * 5;
 
       return [
@@ -67,6 +67,8 @@ describe('GameFacade', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     localStorage.clear();
+    timerServiceMock.timeLeft.set(60);
+    leaderboardServiceMock.canSaveScore.set(false);
     dataServiceMock.getCards.mockReturnValue(of(createCardDeck()));
 
     await TestBed.configureTestingModule({
@@ -89,8 +91,8 @@ describe('GameFacade', () => {
   });
 
   it('hides two unmatched cards again after the flip timeout', () => {
-    const firstCard = facade.cards().find((card) => card.id === 0);
-    const secondCard = facade.cards().find((card) => card.id === 5);
+    const firstCard = facade.cards()[0];
+    const secondCard = facade.cards().find((card) => card.id !== firstCard.id && !firstCard.pairs.includes(card.id));
 
     expect(firstCard).toBeTruthy();
     expect(secondCard).toBeTruthy();
@@ -98,15 +100,15 @@ describe('GameFacade', () => {
     facade.selectCard(firstCard!);
     facade.selectCard(secondCard!);
 
-    expect(facade.cards().find((card) => card.id === 0)?.selected).toBe(true);
-    expect(facade.cards().find((card) => card.id === 5)?.selected).toBe(true);
+    expect(facade.cards().find((card) => card.id === firstCard!.id)?.selected).toBe(true);
+    expect(facade.cards().find((card) => card.id === secondCard!.id)?.selected).toBe(true);
 
     jest.advanceTimersByTime(500);
 
-    expect(facade.cards().find((card) => card.id === 0)?.selected).toBe(false);
-    expect(facade.cards().find((card) => card.id === 5)?.selected).toBe(false);
-    expect(facade.cards().find((card) => card.id === 0)?.match).toBe(false);
-    expect(facade.cards().find((card) => card.id === 5)?.match).toBe(false);
+    expect(facade.cards().find((card) => card.id === firstCard!.id)?.selected).toBe(false);
+    expect(facade.cards().find((card) => card.id === secondCard!.id)?.selected).toBe(false);
+    expect(facade.cards().find((card) => card.id === firstCard!.id)?.match).toBe(false);
+    expect(facade.cards().find((card) => card.id === secondCard!.id)?.match).toBe(false);
   });
 
   it('stores the completed time when the puzzle is solved', () => {
@@ -128,6 +130,25 @@ describe('GameFacade', () => {
 
     expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'gb', 'easy');
     expect(leaderboardServiceMock.saveCompletedGame).toHaveBeenCalled();
+  });
+
+  it('reaches 100 progress for medium difficulty when all pairs are matched', () => {
+    facade.selectLevel('medium');
+
+    while (facade.progress() < 100) {
+      const unmatchedCard = facade.cards().find((card) => !card.match);
+      const matchingCard = facade.cards().find((card) => unmatchedCard?.pairs.includes(card.id));
+
+      expect(unmatchedCard).toBeTruthy();
+      expect(matchingCard).toBeTruthy();
+
+      facade.selectCard(unmatchedCard!);
+      facade.selectCard(matchingCard!);
+    }
+
+    expect(facade.progress()).toBe(100);
+    expect(facade.displayProgress()).toBe(100);
+    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(15, 'gb', 'medium');
   });
 
   it('reloads cards when changing the level', () => {

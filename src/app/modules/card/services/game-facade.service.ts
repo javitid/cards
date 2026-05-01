@@ -205,7 +205,7 @@ export class GameFacade {
     });
 
     if (isMatch) {
-      this.progress.set(Math.round(this.progress() + (2 * 100) / this.cards().length));
+      this.updateProgress();
       this.resetCurrentSelection([firstSelectionId, card.id]);
       this.progressBarCompleted();
       return;
@@ -220,7 +220,8 @@ export class GameFacade {
   }
 
   private progressBarCompleted(): void {
-    if (Math.round(this.progress()) === 100) {
+    if (this.cards().length > 0 && this.getMatchedCardsCount() === this.cards().length) {
+      this.progress.set(100);
       const timerSeconds = this.getCurrentLevelConfig().timerSeconds;
       const normalizedCompletionTime = timerSeconds - this.timeLeft();
       this.timerService.stop();
@@ -370,5 +371,20 @@ export class GameFacade {
           : currentCard
       )
     );
+  }
+
+  private updateProgress(): void {
+    const totalCards = this.cards().length;
+
+    if (totalCards === 0) {
+      this.progress.set(0);
+      return;
+    }
+
+    this.progress.set((this.getMatchedCardsCount() / totalCards) * 100);
+  }
+
+  private getMatchedCardsCount(): number {
+    return this.cards().filter((card) => card.match).length;
   }
 }
