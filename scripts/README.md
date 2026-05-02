@@ -1,39 +1,100 @@
-# Migration Scripts (MongoDB -> Firestore)
+# Scripts
 
-These scripts are reused from `awstests` and adapted for `cards`.
+Este directorio contiene utilidades operativas para Firestore, migraciones y despliegues auxiliares.
 
-## Scripts
+## Scripts disponibles
+
+### Validacion y migracion
 
 - `npm run migrate:validate`
-  - Validates Firebase service key + MongoDB Realm/Data API access.
+  - Valida acceso a Firebase y al origen de datos de migracion.
 - `npm run migrate:mongodb-to-firestore`
-  - Migrates collections from MongoDB Realm/Data API to Firestore.
+  - Migra colecciones desde MongoDB Realm/Data API a Firestore.
 - `npm run migrate:atlas-to-firestore`
-  - Migrates directly from MongoDB Atlas using `mongodb+srv`.
+  - Migra directamente desde MongoDB Atlas.
 
-## Prerequisites
+### Seeds de datos
 
-1. Place Firebase service account key in:
-   - `scripts/firebase-service-key.json`
-   - Or set `FIREBASE_SERVICE_KEY=/absolute/path/key.json`
-2. Install dependencies:
-   - `npm install`
+- `npm run seed:firestore-levels`
+  - Copia documentos desde una coleccion legacy origen a otras colecciones legacy.
+  - Uso tipico: replicar `easy` en `medium` y `hard`.
 
-## Common environment variables
+- `npm run seed:firestore-games`
+  - Reemplaza el contenido de:
+    - `games/synonyms/levels/easy|medium|hard/cards`
+    - `games/antonyms/levels/easy|medium|hard/cards`
+  - Sube actualmente:
+    - `102` pares de sinonimos por nivel
+    - `101` pares de antonimos por nivel
+
+## Prerrequisitos
+
+1. Tener dependencias instaladas:
+
+```bash
+npm install
+```
+
+2. Autenticacion con Firebase usando una de estas opciones:
+- `firebase login`
+- o `FIREBASE_SERVICE_KEY=/ruta/absoluta/key.json`
+
+3. Si se usa service account local, puede colocarse en:
+- `scripts/firebase-service-key.json`
+
+## Variables de entorno comunes
 
 - `FIREBASE_SERVICE_KEY`
 - `FIREBASE_PROJECT_ID`
-- `MONGODB_DATABASE` (default: `cards`)
-- `MONGO_COLLECTIONS` (default: `easy,prueba`)
 
-### For Realm/Data API migration
+## Uso de `seed:firestore-levels`
 
-- `MONGODB_REALM_API_KEY` (required)
+Variables soportadas:
+- `SOURCE_COLLECTION`
+- `TARGET_COLLECTIONS`
+- `DOCS_PER_LEVEL`
+- `FIREBASE_PROJECT_ID`
+
+Ejemplo:
+
+```bash
+SOURCE_COLLECTION=easy \
+TARGET_COLLECTIONS=medium,hard \
+DOCS_PER_LEVEL=100 \
+FIREBASE_PROJECT_ID=cards-429a4 \
+npm run seed:firestore-levels
+```
+
+## Uso de `seed:firestore-games`
+
+Variables soportadas:
+- `TARGET_LEVELS`
+- `FIREBASE_PROJECT_ID`
+
+Ejemplo:
+
+```bash
+TARGET_LEVELS=easy,medium,hard \
+FIREBASE_PROJECT_ID=cards-429a4 \
+npm run seed:firestore-games
+```
+
+Comportamiento:
+- borra los documentos existentes de las colecciones objetivo
+- escribe documentos nuevos con IDs estables
+- usa Admin SDK si hay service account y, si no, usa REST con el token de `firebase-tools`
+
+## Migracion desde MongoDB Realm/Data API
+
+Variables relevantes:
+- `MONGODB_REALM_API_KEY`
 - `MONGODB_REALM_BEARER_URL`
 - `MONGODB_REALM_FIND_URL`
-- `MONGODB_DATASOURCE` (default: `Cluster0`)
+- `MONGODB_DATASOURCE`
+- `MONGODB_DATABASE`
+- `MONGO_COLLECTIONS`
 
-Example:
+Ejemplo:
 
 ```bash
 MONGODB_REALM_API_KEY='your_key' \
@@ -41,9 +102,9 @@ FIREBASE_PROJECT_ID='cards-429a4' \
 npm run migrate:mongodb-to-firestore
 ```
 
-### For Atlas direct migration
+## Migracion directa desde MongoDB Atlas
 
-Option A:
+Opcion A:
 
 ```bash
 MONGODB_URI='mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority' \
@@ -52,7 +113,7 @@ FIREBASE_PROJECT_ID='cards-429a4' \
 npm run migrate:atlas-to-firestore
 ```
 
-Option B:
+Opcion B:
 
 ```bash
 MONGODB_USER='user' \
@@ -62,3 +123,9 @@ MONGODB_OPTIONS='retryWrites=true&w=majority' \
 FIREBASE_PROJECT_ID='cards-429a4' \
 npm run migrate:atlas-to-firestore
 ```
+
+## Notas operativas
+
+- No versionar service accounts ni secretos reales.
+- `.local/` y `environment.local.ts` deben permanecer fuera de git.
+- Los seeds de `synonyms` y `antonyms` estan pensados para poder relanzarse sin duplicados.

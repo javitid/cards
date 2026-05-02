@@ -1,5 +1,6 @@
 export interface Card {
   id: number;
+  groupId: number;
   icon: string;
   voice: string;
   pairs: number[];
@@ -9,7 +10,7 @@ export interface Card {
 }
 
 export interface CardResponse {
-  documents: Pair[];
+  documents: Array<LanguagePair | SynonymPair | AntonymPair>;
 }
 
 export interface Credentials {
@@ -17,7 +18,18 @@ export interface Credentials {
   organization: string;
 }
 
+export type AppGameId = 'languages' | 'synonyms' | 'antonyms';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
+export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
+
+export interface GameOption {
+  id: AppGameId;
+  label: string;
+  description: string;
+  instructions: string;
+  supportsLanguageSelection: boolean;
+  defaultLanguage: LanguageCode;
+}
 
 export interface GameLevelOption {
   id: GameLevelId;
@@ -28,6 +40,7 @@ export interface GameLevelOption {
 
 export interface ScoreEntry {
   id: string;
+  gameId: AppGameId;
   playerName: string;
   durationSeconds: number;
   language: string;
@@ -38,6 +51,7 @@ export interface ScoreEntry {
 }
 
 export interface ScoreSubmission {
+  gameId: AppGameId;
   playerName: string;
   durationSeconds: number;
   language: string;
@@ -46,12 +60,23 @@ export interface ScoreSubmission {
   isAnonymous: boolean;
 }
 
-// Helper to generate Cards
-export interface Pair {
+export interface LanguagePair {
   icon: string;
   es: string;
   gb: string;
   it: string;
   pt: string;
   de: string;
+}
+
+export interface SynonymPair {
+  icon: string;
+  left: string;
+  right: string;
+}
+
+export interface AntonymPair {
+  icon: string;
+  left: string;
+  right: string;
 }

@@ -33,11 +33,20 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    match /games/{gameId}/levels/{level}/cards/{document=**} {
+      allow read: if signedIn();
+      allow write: if isAdmin();
+    }
+
     match /config/{document=**} {
       allow read, write: if isAdmin();
     }
 
     match /leaderboards/{language}/levels/{level}/times/{document=**} {
+      allow read, write: if signedIn();
+    }
+
+    match /leaderboardsByGame/{gameId}/languages/{language}/levels/{level}/times/{document=**} {
       allow read, write: if signedIn();
     }
 

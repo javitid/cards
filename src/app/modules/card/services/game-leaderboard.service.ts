@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 
 import { AuthService } from '../../../services/auth.service';
 import { DataService } from '../../../services/data.service';
-import { GameLevelId, ScoreEntry } from '../interfaces/card';
+import { AppGameId, GameLevelId, ScoreEntry } from '../interfaces/card';
 
 const LEADERBOARD_LIMIT = 5;
 
@@ -22,6 +22,7 @@ export class GameLeaderboardService {
 
   private leaderboardSubscription?: Subscription;
   private completedTimeSeconds?: number;
+  private currentGame: AppGameId = 'languages';
   private currentLanguage = 'gb';
   private currentLevel: GameLevelId = 'easy';
 
@@ -30,9 +31,9 @@ export class GameLeaderboardService {
     private readonly authService: AuthService
   ) {}
 
-  initialize(language: string, level: GameLevelId): void {
+  initialize(gameId: AppGameId, language: string, level: GameLevelId): void {
     this.playerName.set(this.getDefaultPlayerName());
-    this.loadLeaderboard(language, level);
+    this.loadLeaderboard(gameId, language, level);
   }
 
   dispose(): void {
@@ -40,14 +41,15 @@ export class GameLeaderboardService {
     this.leaderboardSubscription = undefined;
   }
 
-  loadLeaderboard(language: string, level: GameLevelId): void {
+  loadLeaderboard(gameId: AppGameId, language: string, level: GameLevelId): void {
+    this.currentGame = gameId;
     this.currentLanguage = language;
     this.currentLevel = level;
     this.leaderboardMessage.set('Cargando mejores tiempos...');
     this.leaderboardAvailable.set(true);
     this.leaderboardSubscription?.unsubscribe();
 
-    this.leaderboardSubscription = this.dataService.getTopScores(language, level, LEADERBOARD_LIMIT).subscribe({
+    this.leaderboardSubscription = this.dataService.getTopScores(gameId, language, level, LEADERBOARD_LIMIT).subscribe({
       next: (scores) => {
         this.leaderboard.set(scores);
         this.leaderboardMessage.set(scores.length ? '' : 'Todavia no hay tiempos guardados.');
@@ -69,7 +71,8 @@ export class GameLeaderboardService {
     this.playerName.set(this.getDefaultPlayerName());
   }
 
-  openCompletedDialog(durationSeconds: number, language: string, level: GameLevelId): void {
+  openCompletedDialog(durationSeconds: number, gameId: AppGameId, language: string, level: GameLevelId): void {
+    this.currentGame = gameId;
     this.currentLanguage = language;
     this.currentLevel = level;
     this.completedTimeSeconds = durationSeconds;
@@ -114,6 +117,7 @@ export class GameLeaderboardService {
     this.scoreSaveMessage.set('');
 
     this.dataService.saveScore({
+      gameId: this.currentGame,
       playerName,
       durationSeconds: this.completedTimeSeconds,
       language: this.currentLanguage,

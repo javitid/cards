@@ -2,13 +2,13 @@
     <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
         <div class="board-header__top">
             <div class="board-header__brand">
-                <span class="board-header__eyebrow">Empareja Idiomas</span>
+                <span class="board-header__eyebrow">{{ facade.currentGameLabel() }}</span>
                 <button
                     pButton
                     type="button"
                     icon="pi pi-info-circle"
                     class="p-button-text p-button-sm board-header__info"
-                    pTooltip="Empareja cada palabra con su traducción"
+                    [pTooltip]="facade.currentGameInstructions()"
                     tooltipPosition="bottom"
                     [hideDelay]="2000"
                     aria-label="Instrucciones del juego">
@@ -99,6 +99,22 @@
                         </div>
 
                         <div class="board-menu__section">
+                            <span class="board-menu__section-title">Juego</span>
+                            <label class="level-picker level-picker--menu">
+                                <p-select
+                                    [options]="games"
+                                    optionLabel="label"
+                                    optionValue="id"
+                                    [ngModel]="facade.currentGame()"
+                                    (ngModelChange)="selectGame($event)"
+                                    [style]="{ width: '100%' }"
+                                    appendTo="body">
+                                </p-select>
+                            </label>
+                        </div>
+
+                        @if (facade.supportsLanguageSelection()) {
+                            <div class="board-menu__section">
                             <span class="board-menu__section-title">Idioma</span>
                             <label class="language-picker language-picker--menu">
                                 <p-select
@@ -121,7 +137,8 @@
                                     </ng-template>
                                 </p-select>
                             </label>
-                        </div>
+                            </div>
+                        }
 
                         <div class="board-menu__section">
                             <span class="board-menu__section-title">Dificultad</span>
@@ -215,11 +232,16 @@
                     aria-label="Estado de los datos">
                 </button>
             }
-            <span class="game-toolbar__item"><i class="pi pi-flag"></i> Idiomas</span>
-            <span class="game-toolbar__item"><i class="pi pi-users"></i> Infantil</span>
-            <span class="game-toolbar__item"><i class="pi pi-calculator"></i> Matemáticas</span>
-            <span class="game-toolbar__item"><i class="pi pi-user-plus"></i> Sinónimos</span>
-            <span class="game-toolbar__item"><i class="pi pi-check-double"></i> Antónimos</span>
+            @for (game of games; track game.id) {
+                <button
+                    pButton
+                    type="button"
+                    class="p-button-text p-button-sm game-toolbar__game-button"
+                    [label]="game.label"
+                    [severity]="facade.currentGame() === game.id ? 'primary' : 'secondary'"
+                    (click)="selectGame(game.id)">
+                </button>
+            }
         </ng-template>
     </p-toolbar>
 </section>

@@ -1,9 +1,21 @@
 # Arquitectura de la aplicacion
 
 ## Resumen
-La aplicacion es un juego de emparejar cartas construido con Angular. La UI vive en componentes de pagina y de modulo, mientras que la logica del juego se concentra en una capa `Facade` y servicios especializados. Firebase se usa para autenticacion, lectura de cartas y almacenamiento del ranking de tiempos.
+
+La aplicacion es un juego de emparejar cartas construido con Angular. Desde mayo de 2026 soporta varios juegos dentro de la misma web:
+- `Idiomas`
+- `Sinonimos`
+- `Antonimos`
+
+Todos comparten la misma mecanica base de tablero, temporizador y ranking, pero no necesariamente la misma estructura de datos en Firestore.
+
+Firebase se usa para:
+- autenticacion
+- lectura de cartas
+- almacenamiento del ranking
 
 ## Vista general
+
 ```mermaid
 flowchart LR
     U[Usuario] --> UI[Angular UI]
@@ -20,29 +32,50 @@ flowchart LR
 
 ## Capas principales
 
-### 1. Capa de presentacion
-- `GameComponent` monta la pantalla del juego.
-- `CardContainerComponent` compone la cabecera, tablero, dialogos y acciones de usuario.
-- `CardComponent` renderiza cada carta individual.
+### 1. Presentacion
 
-La presentacion consume estado expuesto por `GameFacade` y delega eventos como:
-- seleccionar carta
+- `GameComponent` monta la pantalla del juego.
+- `CardContainerComponent` compone cabecera, selector de juego, selector de nivel, tablero, dialogos y acciones.
+- `CardComponent` renderiza una carta individual.
+
+La UI consume estado expuesto por `GameFacade` y emite eventos como:
+- seleccionar juego
 - cambiar idioma
-- iniciar nueva partida
-- guardar puntuacion
-- abrir ranking
+- cambiar dificultad
+- seleccionar carta
+- reiniciar partida
+- guardar tiempo
+
+### 2. Coordinacion del dominio
+
+`GameFacade` es el punto de entrada de la pantalla. Orquesta:
+- preferencias en `localStorage`
+- carga de cartas para el juego actual
+- seleccion y emparejamiento de cartas
+- progreso
+- temporizador
+- ranking
+
+### 3. Servicios especializados
+
+- `GameTimerService`: cuenta atras y expiracion
+- `GameLeaderboardService`: carga y guardado de tiempos
+- `DataService`: acceso a Firestore y fallbacks
+- `AuthService`: login, usuario actual e invitado
+- `UtilsService`: construccion del mazo jugable a partir de pares persistidos
 
 ## Flujo de una partida
+
 ```mermaid
 flowchart TD
     A[Entrar en /game] --> B[GameComponent]
     B --> C[CardContainerComponent.ngOnInit]
     C --> D[GameFacade.loadCards]
     D --> E[DataService.getCards]
-    E --> F[Firestore coleccion easy]
+    E --> F[Firestore o fallback local]
     D --> G[GameLeaderboardService.initialize]
-    D --> H[Start new game]
-    H --> I[Seleccion aleatoria de pares]
+    D --> H[startNewGame]
+    H --> I[Seleccion aleatoria de grupos]
     H --> J[GameTimerService.start]
     I --> K[Render de cartas]
     K --> L[Usuario selecciona cartas]
@@ -56,60 +89,101 @@ flowchart TD
     P --> K
 ```
 
+## Variantes de juego
+
+### `Idiomas`
+
+Modelo persistido:
+- un documento contiene una palabra en castellano y sus traducciones
+
+Modelo jugable:
+- por cada par seleccionado se generan 2 cartas visibles en tablero:
+  - `es`
+  - idioma objetivo elegido por el usuario (`gb`, `it`, `pt`, `de`)
+
+Persistencia:
+- colecciones legacy por nivel: `easy`, `medium`, `hard`
+
+### `Sinonimos`
+
+Modelo persistido:
+- documento binario con `left` y `right`
+
+Modelo jugable:
+- dos cartas por grupo
+- ambas en castellano
+
+Persistencia:
+- `games/synonyms/levels/{level}/cards`
+
+### `Antonimos`
+
+Modelo persistido:
+- documento binario con `left` y `right`
+
+Modelo jugable:
+- dos cartas por grupo
+- ambas en castellano
+
+Persistencia:
+- `games/antonyms/levels/{level}/cards`
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
+
 Archivo: [src/app/modules/card/services/game-facade.service.ts](/Users/javiergarcia/git/cards/src/app/modules/card/services/game-facade.service.ts:1)
 
-Es la capa de coordinacion entre UI y dominio del juego.
-
 Responsabilidades:
-- cargar cartas y preferencias
-- mantener el estado reactivo principal del tablero
-- gestionar seleccion de cartas y matches
-- reconstruir el layout del tablero segun idioma y columnas
+- leer preferencias guardadas
+- exponer el juego actual, idioma, nivel y opciones disponibles
+- pedir cartas al `DataService`
+- transformar la partida cargada en un tablero aleatorio
 - coordinar temporizador y ranking
-
-No accede directamente a Firebase Auth ni maneja internamente el timer.
+- aplicar las reglas de seleccion y match
 
 ### `GameTimerService`
+
 Archivo: [src/app/modules/card/services/game-timer.service.ts](/Users/javiergarcia/git/cards/src/app/modules/card/services/game-timer.service.ts:1)
 
 Responsabilidades:
-- iniciar una cuenta atras
-- exponer `timeLeft` como signal
+- iniciar cuenta atras
+- exponer `timeLeft`
 - detener el temporizador
-- ejecutar callback al finalizar el tiempo
+- ejecutar callback al agotarse el tiempo
 
 ### `GameLeaderboardService`
+
 Archivo: [src/app/modules/card/services/game-leaderboard.service.ts](/Users/javiergarcia/git/cards/src/app/modules/card/services/game-leaderboard.service.ts:1)
 
 Responsabilidades:
-- cargar mejores tiempos por idioma
-- abrir/cerrar el dialogo de fin de partida
-- preparar nombre por defecto
-- guardar la puntuacion del usuario
-- exponer el estado del ranking a la UI
+- cargar mejores tiempos por juego, idioma y nivel
+- abrir/cerrar el dialogo final
+- guardar puntuacion del usuario
+- exponer mensajes y estado de guardado
 
 ### `DataService`
+
 Archivo: [src/app/services/data.service.ts](/Users/javiergarcia/git/cards/src/app/services/data.service.ts:1)
 
 Responsabilidades:
+- resolver la coleccion adecuada segun juego y dificultad
 - leer cartas desde Firestore
-- usar fallback local si Firebase no esta disponible
-- leer top scores del ranking
-- guardar nuevas puntuaciones
+- construir el mazo jugable con `UtilsService`
+- hacer fallback local si Firestore no esta disponible
+- leer y guardar rankings
 
-### `AuthService`
-Archivo: [src/app/services/auth.service.ts](/Users/javiergarcia/git/cards/src/app/services/auth.service.ts:1)
+### `UtilsService`
+
+Archivo: [src/app/utils/utils.service.ts](/Users/javiergarcia/git/cards/src/app/utils/utils.service.ts:1)
 
 Responsabilidades:
-- login con Google, email/password o invitado
-- persistencia de sesion
-- exponer `username`
-- facilitar `uid` y si el usuario es anonimo
+- generar cartas para `Idiomas`
+- generar cartas para juegos binarios como `Sinonimos` y `Antonimos`
+- asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
 
 ## Flujo de guardado de puntuacion
+
 ```mermaid
 sequenceDiagram
     participant U as Usuario
@@ -122,13 +196,13 @@ sequenceDiagram
 
     U->>UI: Completa el puzzle
     UI->>G: selectCard(...)
-    G->>L: openCompletedDialog(tiempo, idioma)
+    G->>L: openCompletedDialog(tiempo, juego, idioma, nivel)
     U->>UI: Guardar tiempo
     UI->>G: saveCompletedGame()
     G->>L: saveCompletedGame()
     L->>A: getCurrentUserId() / isAnonymousUser()
     L->>D: saveScore(...)
-    D->>F: addDoc(leaderboards/{language}/times)
+    D->>F: addDoc(...)
     F-->>D: ok
     D-->>L: ok
     L-->>UI: scoreSaveMessage = "Tiempo guardado..."
@@ -136,22 +210,38 @@ sequenceDiagram
 
 ## Estructura de datos en Firebase
 
-### Firestore
-- `easy/`
-  - documentos con pares de cartas: `icon`, `es`, `gb`, `it`, `pt`, `de`
-- `prueba/`
-  - misma estructura que `easy`
-- `leaderboards/{language}/times/`
-  - `playerName`
-  - `durationSeconds`
-  - `language`
-  - `createdAt`
-  - `userId`
-  - `isAnonymous`
+### Cartas
+
+- `easy/`, `medium/`, `hard/`
+  - schema de `Idiomas`: `icon`, `es`, `gb`, `it`, `pt`, `de`
+- `games/synonyms/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/antonyms/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+
+### Ranking
+
+- `leaderboards/{language}/levels/{level}/times`
+  - ranking legacy para `Idiomas`
+- `leaderboardsByGame/{gameId}/languages/{language}/levels/{level}/times`
+  - ranking para juegos multi-juego
+
+Campos de score:
+- `gameId`
+- `playerName`
+- `durationSeconds`
+- `language`
+- `level`
+- `createdAt`
+- `userId`
+- `isAnonymous`
+
+### Configuracion
+
 - `config/openaiCredentials`
-  - credenciales auxiliares si se usan desde la pagina `/generate`
 
 ## Diagrama de modulos frontend
+
 ```mermaid
 flowchart TB
     App[AppModule] --> GameModule
@@ -169,25 +259,34 @@ flowchart TB
     GameFacade --> GameTimerService
     GameFacade --> GameLeaderboardService
     GameFacade --> DataService
+    DataService --> UtilsService
 ```
 
 ## Decisiones de arquitectura
 
-### Signals para estado de UI
-Se usan `signal()` de Angular para exponer estado ligero y reactivo sin sobrecargar la app con mas infraestructura.
+### Multi-juego con compatibilidad hacia atras
 
-### Facade como punto de entrada de la pantalla
-La vista no conoce detalles de Firebase, temporizador o persistencia. Todo pasa por `GameFacade`, lo que simplifica componentes y testing.
+Se ha mantenido `Idiomas` sobre sus colecciones legacy para no romper datos existentes, mientras que los juegos nuevos viven bajo `games/{gameId}/...`.
 
-### Separacion por responsabilidad
-La logica que tiende a crecer de forma independiente se ha sacado a servicios propios:
-- timer
-- leaderboard
+### Facade como punto de entrada
 
-Esto reduce el tamaño del `Facade` y prepara mejor la app para nuevas funcionalidades.
+La vista no conoce detalles de Firebase, temporizador, ranking o semillas de datos. Todo pasa por `GameFacade`.
 
-## Posibles mejoras futuras
-- extraer un `GameEngineService` para encapsular toda la logica de emparejamiento y barajado
-- añadir pruebas de integracion para el flujo completo de partida
-- versionar y limitar el ranking por dificultad, idioma o modo de juego
-- registrar eventos analiticos de inicio, fin y abandono de partida
+### Dos formas de construir el mazo
+
+`UtilsService` separa:
+- generacion de cartas por idioma
+- generacion de cartas binarias
+
+Esto permite reutilizar la mecanica del tablero sin acoplarla al tipo de contenido.
+
+### Ranking separado por juego
+
+Los tiempos de `Idiomas`, `Sinonimos` y `Antonimos` no se mezclan. Esto evita comparativas inconsistentes entre mecanicas o vocabularios distintos.
+
+## Mejoras futuras
+
+- permitir iconos reales en `Sinonimos` y `Antonimos`
+- añadir mas juegos binarios reutilizando la misma estructura
+- mover seeds a JSON externos si el catalogo sigue creciendo
+- unificar completamente la persistencia de `Idiomas` en `games/languages/...` cuando deje de hacer falta compatibilidad legacy

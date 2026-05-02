@@ -1,6 +1,6 @@
 # Informe de principios Angular
 
-Fecha de revisión: 2026-04-28
+Fecha de revisión: 2026-05-02
 
 ## Resumen
 
@@ -15,11 +15,12 @@ Estado actual: parcial.
 Puntos a favor:
 - Hay separación por carpetas de `pages`, `services`, `modules` y `utils`.
 - La lógica de acceso a Firebase está concentrada en servicios y no repartida por las vistas.
+- La aplicación ya introdujo una separación más clara entre presentación y dominio del juego mediante `GameFacade`, `GameLeaderboardService` y `GameTimerService`.
 
 Problemas o mejoras:
-- El enrutado está montado en un `AppRoutingModule` monolítico y las páginas se cargan de forma eager, no por carga diferida. Ver [app-routing.module.ts](../src/app/app-routing.module.ts:10) y [app.module.ts](../src/app/app.module.ts:59).
-- `AppModule` declara todas las páginas en un único módulo raíz, lo que escala peor cuando el proyecto crece.
-- `CardContainerComponent` mezcla demasiadas responsabilidades: carga de datos, preferencias, temporizador, estado del tablero, audio, menú y modal. Ver [card-container.component.ts](../src/app/modules/card/components/card-container/card-container.component.ts:30).
+- El enrutado sigue montado en un `AppRoutingModule` único y aún no hay una estrategia fuerte de lazy loading por dominio.
+- `AppModule` continúa siendo el punto de ensamblaje principal.
+- Aunque el estado del juego ya no vive directamente en el componente, `CardContainerComponent` sigue agrupando mucha UI en una sola pieza: cabecera, menú, tablero y diálogos.
 
 Mejora recomendada:
 - Separar la app por dominios o features más claros y preparar lazy loading por ruta.
@@ -31,11 +32,11 @@ Estado actual: parcial.
 
 Puntos a favor:
 - RxJS está bien usado para flujos asíncronos reales, como Firestore y autenticación.
-- En `GameComponent` se usa `async` pipe para consumir el nombre de usuario. Ver [game.component.html](../src/app/pages/game/game.component.html:3).
+- El estado local del juego y del ranking ya utiliza `signal()`, lo que aclara la frontera entre flujos externos y estado de UI.
 
 Problemas o mejoras:
-- No se usan `signals` en ningún sitio; todo el estado local se gestiona con propiedades mutables de clase.
-- `AuthService` usa `BehaviorSubject` para estado de login y nombre de usuario, aunque parte de ese estado es local y podría simplificarse. Ver [auth.service.ts](../src/app/services/auth.service.ts:24).
+- Conviven varios estilos de estado en la app: `signals`, observables y `localStorage`.
+- `AuthService` aún puede revisarse para hacer más explícita su estrategia de estado si se quiere homogeneidad total.
 
 Mejora recomendada:
 - Mantener RxJS para streams externos, pero migrar estado local de UI a `signals` cuando sea sencillo.
@@ -45,10 +46,12 @@ Mejora recomendada:
 
 Estado actual: mejorable.
 
+Puntos a favor:
+- Los componentes principales visibles ya usan `ChangeDetectionStrategy.OnPush`.
+
 Problemas o mejoras:
-- Ningún componente visible usa `ChangeDetectionStrategy.OnPush`.
-- `CardContainerComponent` hace bastante trabajo imperativo: temporizador con `setInterval`, escucha global de scroll y `cdr.detectChanges()`. Ver [card-container.component.ts](../src/app/modules/card/components/card-container/card-container.component.ts:110) y [card-container.component.ts](../src/app/modules/card/components/card-container/card-container.component.ts:201).
-- El componente principal del juego concentra muchos estados reactivos y mutaciones, lo que aumenta el riesgo de rerenders innecesarios.
+- Sigue existiendo una escucha global de scroll en el tablero.
+- El contenedor principal del juego conserva bastante comportamiento interactivo y muchas ramas de render.
 
 Mejora recomendada:
 - Introducir `OnPush` en componentes presentacionales y contenedores donde sea posible.
@@ -60,13 +63,12 @@ Mejora recomendada:
 Estado actual: mezcla de buenas prácticas y un punto débil.
 
 Puntos a favor:
-- `DataService` devuelve una función de limpieza para `onSnapshot`, así que la suscripción a Firestore sí se cancela correctamente. Ver [data.service.ts](../src/app/services/data.service.ts:89).
-- El temporizador del tablero se limpia en `ngOnDestroy`. Ver [card-container.component.ts](../src/app/modules/card/components/card-container/card-container.component.ts:110).
-- En `GameComponent` se usa `async` pipe, que evita suscripciones manuales. Ver [game.component.html](../src/app/pages/game/game.component.html:3).
+- `DataService` devuelve una función de limpieza para `onSnapshot`, así que la suscripción a Firestore sí se cancela correctamente.
+- `GameFacade` centraliza la suscripción principal a cartas y limpia recursos en `dispose()`.
+- El temporizador se detiene de forma explícita al destruirse la pantalla.
 
 Problemas o mejoras:
-- `CardContainerComponent.loadCards()` hace una suscripción directa a `getCards()` sin una estrategia explícita de teardown. Ver [card-container.component.ts](../src/app/modules/card/components/card-container/card-container.component.ts:73).
-- Aunque hoy el observable subyacente se completa o comparte bien, la ausencia de `takeUntilDestroyed()` o `DestroyRef` deja la intención menos clara y puede convertirse en fuga si el flujo cambia.
+- La limpieza está bien resuelta a nivel de fachada, pero futuras suscripciones de componente deberían seguir un patrón homogéneo con `takeUntilDestroyed()` o equivalente.
 
 Mejora recomendada:
 - Usar `takeUntilDestroyed()` o `DestroyRef` en suscripciones de componente.
@@ -78,12 +80,12 @@ Estado actual: correcto, pero con zonas poco explícitas.
 
 Puntos a favor:
 - Los accesos a Firestore y Firebase están centralizados en servicios.
-- El nombre de usuario baja desde el `GameComponent` al tablero por `@Input`. Ver [game.component.ts](../src/app/pages/game/game.component.ts:12) y [game.component.html](../src/app/pages/game/game.component.html:3).
+- El nombre de usuario baja desde `GameComponent` al tablero por `@Input`.
+- La nueva arquitectura multi-juego separa mejor el tipo de contenido (`Idiomas`, `Sinonimos`, `Antonimos`) de la mecanica del tablero.
 
 Problemas o mejoras:
-- El tablero concentra demasiada lógica mutable en el propio componente y eso hace que el ownership del estado sea menos claro.
-- Parte del estado vive en `localStorage` y parte en propiedades del componente, sin una capa intermedia que lo haga explícito.
-- `DataService` también mezcla gestión de fallback, estado de fuente de datos y errores, además de la lectura/escritura. Ver [data.service.ts](../src/app/services/data.service.ts:44).
+- Parte del estado vive en `localStorage` y parte en señales internas, lo que aún deja margen para una capa de persistencia de preferencias más explícita.
+- `DataService` sigue combinando acceso a datos, selección de colección, fallback y mensajes de estado.
 
 Mejora recomendada:
 - Definir mejor qué estado pertenece al servicio y cuál al componente.
@@ -95,13 +97,12 @@ Mejora recomendada:
 Estado actual: insuficiente para lógica de negocio.
 
 Puntos a favor:
-- Hay tests para componentes principales y algunos comportamientos concretos.
-- La suite actual pasa y cubre los flujos básicos.
+- Hay tests para fachada, ranking, generación y componentes principales.
+- La suite actual pasa y cubre parte del flujo multi-juego.
 
 Problemas o mejoras:
-- La mayoría de los tests son de creación de componente o validaciones muy ligeras. Ver [login.component.spec.ts](../src/app/pages/login/login.component.spec.ts:11), [generate.component.spec.ts](../src/app/pages/generate/generate.component.spec.ts:9) y [card-container.component.spec.ts](../src/app/modules/card/components/card-container/card-container.component.spec.ts:10).
-- Falta cobertura de reglas importantes: aciertos/errores del juego, temporizador, fallback de Firestore, login con errores y navegación por guard.
-- No hay tests de integración de flujo completo.
+- Sigue faltando cobertura más profunda de casos borde: fallos de Firestore, expiración del temporizador, preferencias guardadas y regresiones de los distintos juegos.
+- No hay tests de integración de flujo completo contra adaptadores reales.
 
 Mejora recomendada:
 - Añadir tests de comportamiento, no solo de existencia.
@@ -112,10 +113,12 @@ Mejora recomendada:
 
 Estado actual: mejorable.
 
+Puntos a favor:
+- Existe un `LoggerService` para encapsular parte del logging.
+
 Problemas o mejoras:
-- Hay bastante logging con `console.error` y `console.warn` disperso por servicios y componentes.
-- No existe una estrategia centralizada de logging, trazas o tratamiento de errores.
-- Algunos mensajes de error están mezclados entre UI y lógica, lo que complica seguir el flujo real de fallo.
+- Aun así, no hay una estrategia completa de logging, trazas o `ErrorHandler` centralizado para producción.
+- Algunos mensajes siguen mezclando estado de infraestructura con mensajes pensados para UI.
 
 Mejora recomendada:
 - Introducir un servicio de logging o `ErrorHandler` centralizado.
@@ -124,13 +127,12 @@ Mejora recomendada:
 
 ## Conclusión
 
-Mi valoración es que el proyecto está bien encaminado para una app pequeña o mediana, pero todavía no cumple del todo los principios de una Angular app escalable y limpia.
+Mi valoración es que el proyecto ha mejorado claramente respecto al estado anterior y ya tiene una base bastante razonable para seguir creciendo.
 
-Las mejoras con más impacto serían:
-1. Separar mejor el estado y la lógica del tablero.
-2. Introducir `OnPush` y una estrategia de estado más moderna.
-3. Añadir suscripciones con teardown explícito.
-4. Reforzar mucho más la batería de tests.
-5. Preparar una estructura de rutas/features más modular y con lazy loading.
+Las mejoras con más impacto a partir de aquí serían:
+1. Modularizar mejor la UI del tablero en subcomponentes.
+2. Simplificar `DataService` separando repositorio, fallback y estado de fuente.
+3. Reforzar la batería de tests con casos de error e integración.
+4. Preparar una estructura de features con lazy loading real.
 
 No he cambiado nada del código de la app; este fichero es solo un informe de revisión.

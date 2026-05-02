@@ -43,6 +43,7 @@ describe('GameLeaderboardService', () => {
     dataServiceMock.getTopScores.mockReturnValueOnce(of([
       {
         id: '1',
+        gameId: 'languages',
         playerName: 'Ana',
         durationSeconds: 18,
         language: 'gb',
@@ -53,19 +54,20 @@ describe('GameLeaderboardService', () => {
       }
     ]));
 
-    service.loadLeaderboard('gb', 'medium');
+    service.loadLeaderboard('languages', 'gb', 'medium');
 
-    expect(dataServiceMock.getTopScores).toHaveBeenCalledWith('gb', 'medium', 5);
+    expect(dataServiceMock.getTopScores).toHaveBeenCalledWith('languages', 'gb', 'medium', 5);
     expect(service.leaderboard()[0]?.playerName).toBe('Ana');
   });
 
   it('saves a completed score with the logged user by default', () => {
     service.resetRoundState();
-    service.openCompletedDialog(21, 'gb', 'medium');
+    service.openCompletedDialog(21, 'languages', 'gb', 'medium');
     service.saveCompletedGame();
 
     expect(dataServiceMock.saveScore).toHaveBeenCalledWith(
       expect.objectContaining({
+        gameId: 'languages',
         playerName: 'Jugador demo',
         durationSeconds: 21,
         language: 'gb',
@@ -79,7 +81,7 @@ describe('GameLeaderboardService', () => {
   it('exposes an error message when the score cannot be saved', () => {
     dataServiceMock.saveScore.mockReturnValueOnce(throwError(() => new Error('Firestore caido')));
 
-    service.openCompletedDialog(21, 'gb', 'hard');
+    service.openCompletedDialog(21, 'languages', 'gb', 'hard');
     service.saveCompletedGame();
 
     expect(service.scoreSaveMessage()).toBe('Firestore caido');

@@ -6,11 +6,12 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
 import { LoggerService } from '../../services/logger.service';
-import { Credentials, Pair } from '../../modules/card/interfaces/card';
+import { AppGameId, Credentials, GameLevelId, LanguagePair } from '../../modules/card/interfaces/card';
+import { DEFAULT_GAME, DEFAULT_LEVEL, GAME_LEVELS, GAME_OPTIONS } from '../../modules/card/services/game-config';
 
 // Fill from screen input and upload generated cards into Firestore
 // Add new elements to generate the cards
-const pairs: Pair[] = [
+const pairs: LanguagePair[] = [
   {"icon": "house", "es": "casa", "gb": "house", "it": "casa", "pt": "casa", "de": "Haus"},
   {"icon": "", "es": "coche", "gb": "car", "it": "macchina", "pt": "carro", "de": "Auto"},
   {"icon": "", "es": "perro", "gb": "dog", "it": "cane", "pt": "cachorro", "de": "Hund"},
@@ -151,9 +152,13 @@ export class GenerateComponent {
   generatedString = '';
   isLoading = false;
   openAICredentials!: Credentials;
+  readonly games = GAME_OPTIONS;
+  readonly levels = GAME_LEVELS;
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
   form = this.fb.group({
+    gameId: [DEFAULT_GAME as AppGameId, Validators.required],
+    level: [DEFAULT_LEVEL as GameLevelId, Validators.required],
     content: [JSON.stringify(pairs), Validators.required],
   });
 
@@ -230,10 +235,13 @@ export class GenerateComponent {
   // Sube el JSON de cartas a Firestore
   uploadCards() {
     this.isLoading = true;
-    this.dataService.deleteCards().pipe(
+    const gameId = (this.form.value.gameId || DEFAULT_GAME) as AppGameId;
+    const level = (this.form.value.level || DEFAULT_LEVEL) as GameLevelId;
+
+    this.dataService.deleteCards(gameId, level).pipe(
       concatMap(resultDelete => {
         if (this.form.value.content) {
-          return this.dataService.setCards(JSON.parse(this.form.value.content));
+          return this.dataService.setCards(JSON.parse(this.form.value.content), gameId, level);
         }
         return of({});
       }),

@@ -19,7 +19,8 @@
     "migrate:validate": "node scripts/validate-migration.js",
     "migrate:mongodb-to-firestore": "node scripts/migrate-mongodb-to-firestore.js",
     "migrate:atlas-to-firestore": "node scripts/migrate-atlas-to-firestore.js",
-    "seed:firestore-levels": "node scripts/seed-firestore-levels.js"
+    "seed:firestore-levels": "node scripts/seed-firestore-levels.js",
+    "seed:firestore-games": "node scripts/seed-firestore-games.js"
   },
   "private": true,
   "dependencies": {

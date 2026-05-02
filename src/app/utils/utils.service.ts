@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Card, Pair } from '../modules/card/interfaces/card';
+import { Card, LanguageCode, LanguagePair, SynonymPair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
-const LANGUAGE_VOICES: Record<string, string> = {
+const LANGUAGE_VOICES: Record<LanguageCode, string> = {
   es: 'es-ES',
   gb: 'en-GB',
   it: 'it-IT',
@@ -14,24 +14,63 @@ const LANGUAGE_VOICES: Record<string, string> = {
   providedIn: 'root',
 })
 export class UtilsService {
-  generateCards(pairs: Pair[], languages: string[]): Card[] {
-    const supportedLanguages = [BASE_LANGUAGE, ...languages];
-    const cardsForEachPair = supportedLanguages.length;
+  generateLanguageCards(pairs: LanguagePair[], targetLanguage: LanguageCode): Card[] {
+    return pairs.flatMap((pair: LanguagePair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
 
-    return pairs.flatMap((pair: Pair, index) => {
-      const baseId = cardsForEachPair * index;
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: pair.icon,
+          voice: LANGUAGE_VOICES[BASE_LANGUAGE],
+          pairs: [secondId],
+          value: pair.es,
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: pair.icon,
+          voice: LANGUAGE_VOICES[targetLanguage],
+          pairs: [firstId],
+          value: pair[targetLanguage],
+          match: false,
+          selected: false
+        }
+      ];
+    });
+  }
 
-      return supportedLanguages.map((language, languageIndex) => ({
-        id: baseId + languageIndex,
-        icon: pair.icon,
-        voice: LANGUAGE_VOICES[language],
-        pairs: supportedLanguages
-          .map((_, pairIndex) => baseId + pairIndex)
-          .filter((pairId) => pairId !== baseId + languageIndex),
-        value: pair[language as keyof Pair],
-        match: false,
-        selected: false
-      }));
+  generateSynonymCards(pairs: SynonymPair[]): Card[] {
+    return pairs.flatMap((pair: SynonymPair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
+
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: pair.icon,
+          voice: LANGUAGE_VOICES.es,
+          pairs: [secondId],
+          value: pair.left,
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: pair.icon,
+          voice: LANGUAGE_VOICES.es,
+          pairs: [firstId],
+          value: pair.right,
+          match: false,
+          selected: false
+        }
+      ];
     });
   }
 }

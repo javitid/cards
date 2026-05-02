@@ -1,10 +1,10 @@
 import { UtilsService } from './utils.service';
 
 describe('UtilsService', () => {
-  it('should generate five linked cards per pair', () => {
+  it('should generate two linked cards per language pair', () => {
     const service = new UtilsService();
 
-    const cards = service.generateCards([
+    const cards = service.generateLanguageCards([
       {
         icon: 'house',
         es: 'casa',
@@ -13,11 +13,12 @@ describe('UtilsService', () => {
         pt: 'casa',
         de: 'Haus'
       }
-    ], ['gb', 'it', 'pt', 'de']);
+    ], 'gb');
 
-    expect(cards).toHaveLength(5);
-    expect(cards.map((card) => card.id)).toEqual([0, 1, 2, 3, 4]);
-    expect(cards[0].pairs).toEqual([1, 2, 3, 4]);
-    expect(cards[4].pairs).toEqual([0, 1, 2, 3]);
+    expect(cards).toHaveLength(2);
+    expect(cards.map((card) => card.id)).toEqual([0, 1]);
+    expect(cards[0].groupId).toBe(0);
+    expect(cards[0].pairs).toEqual([1]);
+    expect(cards[1].pairs).toEqual([0]);
   });
 });

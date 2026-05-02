@@ -30,7 +30,11 @@ describe('GenerateComponent', () => {
         { provide: LoggerService, useValue: loggerServiceMock },
       ],
       schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
+    })
+      .overrideComponent(GenerateComponent, {
+        set: { template: '' }
+      })
+      .compileComponents();
 
     fixture = TestBed.createComponent(GenerateComponent);
     component = fixture.componentInstance;
@@ -42,11 +46,17 @@ describe('GenerateComponent', () => {
   });
 
   it('should upload cards when the form has content', () => {
+    component.form.controls.gameId.setValue('languages');
+    component.form.controls.level.setValue('easy');
     component.form.controls.content.setValue('[{"icon":"home","es":"Casa","gb":"House","it":"Casa","pt":"Casa","de":"Haus"}]');
 
     component.uploadCards();
 
-    expect(dataServiceMock.deleteCards).toHaveBeenCalled();
-    expect(dataServiceMock.setCards).toHaveBeenCalled();
+    expect(dataServiceMock.deleteCards).toHaveBeenCalledWith('languages', 'easy');
+    expect(dataServiceMock.setCards).toHaveBeenCalledWith(
+      [{ icon: 'home', es: 'Casa', gb: 'House', it: 'Casa', pt: 'Casa', de: 'Haus' }],
+      'languages',
+      'easy'
+    );
   });
 });

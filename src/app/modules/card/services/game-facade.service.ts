@@ -3,19 +3,17 @@ import { Subscription } from 'rxjs';
 
 import { DataService } from '../../../services/data.service';
 import { HelperService } from '../../../utils/helper.service';
-import { Card, GameLevelId } from '../interfaces/card';
-import { DEFAULT_CURRENT_LANGUAGE, DEFAULT_FLIP_EFFECT, DEFAULT_LEVEL, DEFAULT_SOUND, DEFAULT_TWO_COLUMNS, GAME_LEVELS, LANGUAGES, LOCAL_STORAGE_KEYS } from './game-config';
+import { AppGameId, Card, GameLevelId, LanguageCode } from '../interfaces/card';
+import { DEFAULT_CURRENT_LANGUAGE, DEFAULT_FLIP_EFFECT, DEFAULT_GAME, DEFAULT_LEVEL, DEFAULT_SOUND, DEFAULT_TWO_COLUMNS, GAME_LEVELS, GAME_OPTIONS, LANGUAGES, LOCAL_STORAGE_KEYS } from './game-config';
 import { GameLeaderboardService } from './game-leaderboard.service';
 import { GameTimerService } from './game-timer.service';
-
-const BASE_LANGUAGE = 'es';
-const CARDS_PER_PAIR = LANGUAGES.length + 1;
 
 @Injectable()
 export class GameFacade {
   readonly cards = signal<Card[]>([]);
   readonly isLoading = signal(true);
-  readonly currentLanguage = signal(DEFAULT_CURRENT_LANGUAGE);
+  readonly currentGame = signal<AppGameId>(DEFAULT_GAME);
+  readonly currentLanguage = signal<LanguageCode>(DEFAULT_CURRENT_LANGUAGE as LanguageCode);
   readonly currentLevel = signal<GameLevelId>(DEFAULT_LEVEL);
   readonly progress = signal(0);
   readonly isFlipEffect = signal(DEFAULT_FLIP_EFFECT);
@@ -36,9 +34,9 @@ export class GameFacade {
   readonly hasSavedScore = this.leaderboardService.hasSavedScore;
   readonly scoreSaveMessage = this.leaderboardService.scoreSaveMessage;
   readonly canSaveScore = this.leaderboardService.canSaveScore;
+  readonly games = GAME_OPTIONS;
 
   private allCards: Card[] = [];
-  private currentRoundGroups: Card[][] = [];
   private cardsSubscription?: Subscription;
   private lastSelectionId: number | undefined;
   private isLastCardSelected = false;
@@ -55,11 +53,11 @@ export class GameFacade {
 
   loadCards(): void {
     this.readPreferences();
-    this.leaderboardService.initialize(this.currentLanguage(), this.currentLevel());
+    this.leaderboardService.initialize(this.currentGame(), this.currentLanguage(), this.currentLevel());
     this.isLoading.set(true);
     this.cardsSubscription?.unsubscribe();
 
-    this.cardsSubscription = this.dataService.getCards(LANGUAGES, this.currentLevel()).subscribe((cards: Card[]) => {
+    this.cardsSubscription = this.dataService.getCards(this.currentGame(), this.currentLanguage(), this.currentLevel()).subscribe((cards: Card[]) => {
       this.syncCardsSourceState();
       this.allCards = cards.map((card) => this.cloneCard(card));
       this.startNewGame();
@@ -75,11 +73,29 @@ export class GameFacade {
   }
 
   selectLanguage(event: { value?: string } | string): void {
-    const nextLanguage = typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE;
+    const nextLanguage = (typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE) as LanguageCode;
     this.currentLanguage.set(nextLanguage);
     localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, nextLanguage);
-    this.leaderboardService.loadLeaderboard(nextLanguage, this.currentLevel());
-    this.startNewGame();
+    this.leaderboardService.loadLeaderboard(this.currentGame(), nextLanguage, this.currentLevel());
+    this.loadCards();
+  }
+
+  selectGame(event: { value?: AppGameId } | AppGameId): void {
+    const nextGame = typeof event === 'string' ? event : event.value || DEFAULT_GAME;
+
+    if (nextGame === this.currentGame()) {
+      return;
+    }
+
+    this.currentGame.set(nextGame);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_GAME, nextGame);
+
+    if (!this.currentGameConfig().supportsLanguageSelection) {
+      this.currentLanguage.set(this.currentGameConfig().defaultLanguage);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, this.currentGameConfig().defaultLanguage);
+    }
+
+    this.loadCards();
   }
 
   selectLevel(event: { value?: GameLevelId } | GameLevelId): void {
@@ -225,7 +241,7 @@ export class GameFacade {
       const timerSeconds = this.getCurrentLevelConfig().timerSeconds;
       const normalizedCompletionTime = timerSeconds - this.timeLeft();
       this.timerService.stop();
-      this.leaderboardService.openCompletedDialog(normalizedCompletionTime, this.currentLanguage(), this.currentLevel());
+      this.leaderboardService.openCompletedDialog(normalizedCompletionTime, this.currentGame(), this.currentLanguage(), this.currentLevel());
     }
   }
 
@@ -236,37 +252,18 @@ export class GameFacade {
     this.isSelectionBlocked = false;
     this.leaderboardService.resetRoundState();
     this.timerService.start(this.getCurrentLevelConfig().timerSeconds, () => this.leaderboardService.openTimeoutDialog());
-    this.currentRoundGroups = this.getRandomCardGroups();
     this.rebuildBoard();
   }
 
   private rebuildBoard(): void {
-    const esCards = this.shuffleArray(this.getCardsForLanguage(BASE_LANGUAGE));
-    const secondLanguageCards = this.getSelectedLanguageCards();
+    const cardGroups = this.getRandomCardGroups();
+    const firstColumnCards = this.shuffleArray(cardGroups.map((group) => group[0]));
+    const secondColumnCards = this.shuffleArray(cardGroups.map((group) => group[1]));
     const boardCards = this.isTwoColumns()
-      ? this.twoColumnsArray(esCards, secondLanguageCards)
-      : this.shuffleArray([...esCards, ...secondLanguageCards]);
+      ? this.twoColumnsArray(firstColumnCards, secondColumnCards)
+      : this.shuffleArray(cardGroups.flat());
 
     this.cards.set(boardCards);
-  }
-
-  private getCardsForLanguage(language: string): Card[] {
-    const languageIndex = [BASE_LANGUAGE, ...LANGUAGES].indexOf(language);
-    return this.currentRoundGroups.map((group) => group[languageIndex]);
-  }
-
-  private getSelectedLanguageCards(): Card[] {
-    switch (this.currentLanguage()) {
-      case 'it':
-        return this.shuffleArray(this.getCardsForLanguage('it'));
-      case 'pt':
-        return this.shuffleArray(this.getCardsForLanguage('pt'));
-      case 'de':
-        return this.shuffleArray(this.getCardsForLanguage('de'));
-      case 'gb':
-      default:
-        return this.shuffleArray(this.getCardsForLanguage('gb'));
-    }
   }
 
   private getRandomCardGroups(): Card[][] {
@@ -274,8 +271,17 @@ export class GameFacade {
       return [];
     }
 
-    const groups: Card[][] = [];
-    const totalPairs = Math.floor(this.allCards.length / CARDS_PER_PAIR);
+    const groupedCards = new Map<number, Card[]>();
+
+    this.allCards.forEach((card) => {
+      const group = groupedCards.get(card.groupId) || [];
+      group.push(this.cloneCard(card));
+      groupedCards.set(card.groupId, group);
+    });
+
+    const groups = Array.from(groupedCards.values()).filter((group) => group.length === 2);
+    const selectedGroups: Card[][] = [];
+    const totalPairs = groups.length;
     const desiredPairs = Math.min(this.getCurrentLevelConfig().pairs, totalPairs);
     const selectedIndexes = new Set<number>();
 
@@ -284,15 +290,10 @@ export class GameFacade {
     }
 
     selectedIndexes.forEach((pairIndex) => {
-      const start = pairIndex * CARDS_PER_PAIR;
-      const group = this.allCards
-        .slice(start, start + CARDS_PER_PAIR)
-        .map((card) => this.cloneCard(card));
-
-      groups.push(group);
+      selectedGroups.push(groups[pairIndex]);
     });
 
-    return groups;
+    return selectedGroups;
   }
 
   private resetCurrentSelection(cardIds: number[]): void {
@@ -303,7 +304,11 @@ export class GameFacade {
   }
 
   private readPreferences(): void {
-    this.currentLanguage.set(localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE);
+    const savedGame = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_GAME);
+    const nextGame = GAME_OPTIONS.some((game) => game.id === savedGame) ? (savedGame as AppGameId) : DEFAULT_GAME;
+
+    this.currentGame.set(nextGame);
+    this.currentLanguage.set(this.getSavedLanguage(nextGame));
     this.currentLevel.set(this.getSavedLevel());
     this.isFlipEffect.set(this.getBooleanPreference(LOCAL_STORAGE_KEYS.FLIP_EFFECT, DEFAULT_FLIP_EFFECT));
     this.isSoundOn.set(this.getBooleanPreference(LOCAL_STORAGE_KEYS.SOUND, DEFAULT_SOUND));
@@ -329,8 +334,39 @@ export class GameFacade {
     return GAME_LEVELS.some((level) => level.id === rawLevel) ? (rawLevel as GameLevelId) : DEFAULT_LEVEL;
   }
 
+  private getSavedLanguage(gameId: AppGameId): LanguageCode {
+    const gameConfig = GAME_OPTIONS.find((game) => game.id === gameId) || GAME_OPTIONS[0];
+
+    if (!gameConfig.supportsLanguageSelection) {
+      return gameConfig.defaultLanguage;
+    }
+
+    const rawLanguage = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
+    return rawLanguage as LanguageCode;
+  }
+
+  currentGameLabel(): string {
+    return this.currentGameConfig().label;
+  }
+
+  currentGameDescription(): string {
+    return this.currentGameConfig().description;
+  }
+
+  currentGameInstructions(): string {
+    return this.currentGameConfig().instructions;
+  }
+
+  supportsLanguageSelection(): boolean {
+    return this.currentGameConfig().supportsLanguageSelection;
+  }
+
   private getCurrentLevelConfig() {
     return GAME_LEVELS.find((level) => level.id === this.currentLevel()) || GAME_LEVELS[0];
+  }
+
+  private currentGameConfig() {
+    return GAME_OPTIONS.find((game) => game.id === this.currentGame()) || GAME_OPTIONS[0];
   }
 
   private cloneCard(card: Card): Card {

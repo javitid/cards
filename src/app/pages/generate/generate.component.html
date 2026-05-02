@@ -3,6 +3,32 @@
 <section class="px-12">
     <div class="flex flex-col justify-between items-center">
         <form [formGroup]="form" class="w-full">
+            <div class="mb-4 grid gap-3 md:grid-cols-2">
+                <p-floatlabel>
+                    <p-select
+                        inputId="game-id"
+                        formControlName="gameId"
+                        [options]="games"
+                        optionLabel="label"
+                        optionValue="id"
+                        appendTo="body">
+                    </p-select>
+                    <label for="game-id">Juego</label>
+                </p-floatlabel>
+
+                <p-floatlabel>
+                    <p-select
+                        inputId="level-id"
+                        formControlName="level"
+                        [options]="levels"
+                        optionLabel="label"
+                        optionValue="id"
+                        appendTo="body">
+                    </p-select>
+                    <label for="level-id">Nivel</label>
+                </p-floatlabel>
+            </div>
+
             <p-floatlabel>
                 <textarea pTextarea id="generate-json" formControlName="content" class="w-full !h-96" placeholder="Ej. [{ icon: 'home', es: 'Casa', gb: 'House' }]" required></textarea>
                 <label for="generate-json">JSON</label>

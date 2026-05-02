@@ -11,19 +11,17 @@ describe('CardContainerComponent', () => {
   let fixture: ComponentFixture<CardContainerComponent>;
   const createCardDeck = (): Card[] =>
     Array.from({ length: 5 }, (_, pairIndex) => {
-      const baseId = pairIndex * 5;
+      const baseId = pairIndex * 2;
 
       return [
-        { id: baseId, value: `es-${pairIndex}`, voice: 'es-ES', pairs: [baseId + 1, baseId + 2, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 1, value: `gb-${pairIndex}`, voice: 'en-GB', pairs: [baseId, baseId + 2, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 2, value: `it-${pairIndex}`, voice: 'it-IT', pairs: [baseId, baseId + 1, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 3, value: `pt-${pairIndex}`, voice: 'pt-PT', pairs: [baseId, baseId + 1, baseId + 2, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 4, value: `de-${pairIndex}`, voice: 'de-DE', pairs: [baseId, baseId + 1, baseId + 2, baseId + 3], selected: false, match: false, icon: '' }
+        { id: baseId, groupId: pairIndex, value: `es-${pairIndex}`, voice: 'es-ES', pairs: [baseId + 1], selected: false, match: false, icon: '' },
+        { id: baseId + 1, groupId: pairIndex, value: `gb-${pairIndex}`, voice: 'en-GB', pairs: [baseId], selected: false, match: false, icon: '' }
       ];
     }).flat();
   const gameFacadeMock = {
     cards: signal<Card[]>(createCardDeck()),
     isLoading: signal(false),
+    currentGame: signal('languages'),
     currentLanguage: signal('gb'),
     currentLevel: signal('easy'),
     progress: signal(0),
@@ -43,6 +41,11 @@ describe('CardContainerComponent', () => {
     hasSavedScore: signal(false),
     scoreSaveMessage: signal(''),
     canSaveScore: signal(false),
+    games: [
+      { id: 'languages', label: 'Idiomas', description: '', instructions: '', supportsLanguageSelection: true, defaultLanguage: 'gb' },
+      { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' },
+      { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' }
+    ],
     languages: ['gb', 'it', 'pt', 'de'],
     levels: [
       { id: 'easy', label: 'Facil', pairs: 5, timerSeconds: 60 },
@@ -51,6 +54,7 @@ describe('CardContainerComponent', () => {
     ],
     loadCards: jest.fn(),
     dispose: jest.fn(),
+    selectGame: jest.fn(),
     selectLanguage: jest.fn(),
     selectLevel: jest.fn(),
     toggleSound: jest.fn(),
@@ -60,6 +64,10 @@ describe('CardContainerComponent', () => {
     closeGameDialog: jest.fn(),
     saveCompletedGame: jest.fn(),
     setPlayerName: jest.fn(),
+    currentGameLabel: jest.fn(() => 'Idiomas'),
+    currentGameDescription: jest.fn(() => 'Empareja una palabra con su traduccion.'),
+    currentGameInstructions: jest.fn(() => 'Empareja cada palabra con su traduccion.'),
+    supportsLanguageSelection: jest.fn(() => true),
     currentLevelLabel: jest.fn(() => 'Facil'),
     displayProgress: jest.fn(() => 0),
     boardColumnCount: jest.fn(() => 2),
@@ -69,6 +77,7 @@ describe('CardContainerComponent', () => {
   beforeEach(async () => {
     gameFacadeMock.loadCards.mockClear();
     gameFacadeMock.dispose.mockClear();
+    gameFacadeMock.selectGame.mockClear();
     gameFacadeMock.selectLanguage.mockClear();
     gameFacadeMock.selectLevel.mockClear();
     gameFacadeMock.toggleSound.mockClear();
@@ -115,6 +124,13 @@ describe('CardContainerComponent', () => {
     component.selectLevel('medium');
 
     expect(gameFacadeMock.selectLevel).toHaveBeenCalledWith('medium');
+    expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
+  });
+
+  it('should switch game without fetching twice from the component', () => {
+    component.selectGame('synonyms');
+
+    expect(gameFacadeMock.selectGame).toHaveBeenCalledWith('synonyms');
     expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
   });
 });

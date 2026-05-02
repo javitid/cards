@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import {
   addDoc,
   collection,
+  CollectionReference,
   doc,
   getDoc,
   getDocs,
@@ -15,23 +16,31 @@ import {
 import { Observable, from, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
-import { Card, Credentials, GameLevelId, Pair, ScoreEntry, ScoreSubmission } from '../modules/card/interfaces/card';
+import {
+  AntonymPair,
+  AppGameId,
+  Card,
+  Credentials,
+  GameLevelId,
+  LanguageCode,
+  LanguagePair,
+  ScoreEntry,
+  ScoreSubmission,
+  SynonymPair
+} from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
 import { environment } from '../../environments/environment';
 import { db } from '../utils/firebase';
 import { LoggerService } from './logger.service';
-
-const LEVEL = {
-  EASY: 'easy' as GameLevelId,
-  MEDIUM: 'medium' as GameLevelId,
-  HARD: 'hard' as GameLevelId,
-  PRUEBA: 'prueba'
-};
 const LEADERBOARD_COLLECTION = 'leaderboards';
+const LEADERBOARD_BY_GAME_COLLECTION = 'leaderboardsByGame';
+const GAMES_COLLECTION = 'games';
+const DEFAULT_GAME: AppGameId = 'languages';
+const DEFAULT_LANGUAGE: LanguageCode = 'gb';
 
 const FIREBASE_PLACEHOLDER_PREFIXES = ['YOUR_FIREBASE_', 'FIREBASE_'];
 
-const FALLBACK_PAIRS: Pair[] = [
+const FALLBACK_LANGUAGE_PAIRS: LanguagePair[] = [
   { icon: 'house', es: 'casa', gb: 'house', it: 'casa', pt: 'casa', de: 'Haus' },
   { icon: '', es: 'coche', gb: 'car', it: 'macchina', pt: 'carro', de: 'Auto' },
   { icon: '', es: 'perro', gb: 'dog', it: 'cane', pt: 'cachorro', de: 'Hund' },
@@ -44,6 +53,34 @@ const FALLBACK_PAIRS: Pair[] = [
   { icon: '', es: 'fuego', gb: 'fire', it: 'fuoco', pt: 'fogo', de: 'Feuer' },
   { icon: '', es: 'amigo', gb: 'friend', it: 'amico', pt: 'amigo', de: 'Freund' },
   { icon: 'book', es: 'libro', gb: 'book', it: 'libro', pt: 'livro', de: 'Buch' },
+];
+const FALLBACK_SYNONYM_PAIRS: SynonymPair[] = [
+  { icon: '', left: 'alegre', right: 'contento' },
+  { icon: '', left: 'coche', right: 'automovil' },
+  { icon: '', left: 'empezar', right: 'comenzar' },
+  { icon: '', left: 'terminar', right: 'acabar' },
+  { icon: '', left: 'bonito', right: 'hermoso' },
+  { icon: '', left: 'rapido', right: 'veloz' },
+  { icon: '', left: 'hablar', right: 'conversar' },
+  { icon: '', left: 'enorme', right: 'gigante' },
+  { icon: '', left: 'facil', right: 'sencillo' },
+  { icon: '', left: 'feliz', right: 'dichoso' },
+  { icon: '', left: 'enojado', right: 'molesto' },
+  { icon: '', left: 'cuidar', right: 'proteger' },
+];
+const FALLBACK_ANTONYM_PAIRS: AntonymPair[] = [
+  { icon: '', left: 'alto', right: 'bajo' },
+  { icon: '', left: 'grande', right: 'pequeno' },
+  { icon: '', left: 'rapido', right: 'lento' },
+  { icon: '', left: 'encender', right: 'apagar' },
+  { icon: '', left: 'entrar', right: 'salir' },
+  { icon: '', left: 'feliz', right: 'triste' },
+  { icon: '', left: 'cerca', right: 'lejos' },
+  { icon: '', left: 'fuerte', right: 'debil' },
+  { icon: '', left: 'limpio', right: 'sucio' },
+  { icon: '', left: 'nuevo', right: 'viejo' },
+  { icon: '', left: 'abrir', right: 'cerrar' },
+  { icon: '', left: 'subir', right: 'bajar' },
 ];
 
 @Injectable({
@@ -61,8 +98,16 @@ export class DataService {
     private readonly logger: LoggerService
   ) { }
 
-  private getFallbackCards(languages: string[]): Card[] {
-    return this.utilsService.generateCards(FALLBACK_PAIRS, languages);
+  private getFallbackCards(gameId: AppGameId, language: LanguageCode): Card[] {
+    if (gameId === 'synonyms') {
+      return this.utilsService.generateSynonymCards(FALLBACK_SYNONYM_PAIRS);
+    }
+
+    if (gameId === 'antonyms') {
+      return this.utilsService.generateSynonymCards(FALLBACK_ANTONYM_PAIRS);
+    }
+
+    return this.utilsService.generateLanguageCards(FALLBACK_LANGUAGE_PAIRS, language);
   }
 
   getOpenAICredentials(): Observable<Credentials> {
@@ -79,8 +124,8 @@ export class DataService {
     );
   }
 
-  getCards(languages: string[], level: GameLevelId = LEVEL.EASY): Observable<Card[]>{
-    const cacheKey = `${level}:${languages.join(',')}`;
+  getCards(gameId: AppGameId = DEFAULT_GAME, language: LanguageCode = DEFAULT_LANGUAGE, level: GameLevelId = 'easy'): Observable<Card[]>{
+    const cacheKey = `${gameId}:${level}:${language}`;
 
     if (!this.cardsCache.has(cacheKey)) {
       if (!this.hasFirebaseConfig()) {
@@ -88,7 +133,7 @@ export class DataService {
         this.cardsSourceReason = 'La configuracion de Firebase usa placeholders. En local usa start:local; en GitHub Pages revisa la inyeccion de secrets en Actions.';
         this.logger.warn('Falling back to local cards because Firebase config still has placeholders.');
 
-        const fallbackCards$ = of(this.getFallbackCards(languages)).pipe(
+        const fallbackCards$ = of(this.getFallbackCards(gameId, language)).pipe(
           shareReplay({ bufferSize: 1, refCount: true })
         );
 
@@ -97,29 +142,30 @@ export class DataService {
       }
 
       const cardsRequest$ = new Observable<Card[]>((subscriber) => {
+        const collectionRef = this.getCardsCollection(gameId, level);
         const unsubscribe = onSnapshot(
-          collection(db, level),
+          collectionRef,
           (result) => {
-            const documents = result.docs.map((snapshot) => snapshot.data() as Pair);
+            const documents = result.docs.map((snapshot) => snapshot.data());
 
             if (!documents.length) {
               this.cardsSource = 'fallback';
-              this.cardsSourceReason = `La coleccion "${level}" de Firestore esta vacia.`;
-              this.logger.warn(`Firestore collection "${level}" returned no documents. Using fallback cards.`);
-              subscriber.next(this.getFallbackCards(languages));
+              this.cardsSourceReason = `La coleccion "${this.getCardsCollectionLabel(gameId, level)}" de Firestore esta vacia.`;
+              this.logger.warn(`Firestore collection "${this.getCardsCollectionLabel(gameId, level)}" returned no documents. Using fallback cards.`);
+              subscriber.next(this.getFallbackCards(gameId, language));
               return;
             }
 
             this.cardsSource = 'firestore';
-            this.cardsSourceReason = `Cargados ${documents.length} registros desde la coleccion "${level}" de Firestore.`;
-            subscriber.next(this.utilsService.generateCards(documents, languages));
+            this.cardsSourceReason = `Cargados ${documents.length} registros desde la coleccion "${this.getCardsCollectionLabel(gameId, level)}" de Firestore.`;
+            subscriber.next(this.mapCardsForGame(gameId, documents, language));
           },
           (error) => {
             this.setHttpError(error as Error);
             this.cardsSource = 'fallback';
-            this.cardsSourceReason = this.getFirestoreErrorMessage(level, error as Error);
+            this.cardsSourceReason = this.getFirestoreErrorMessage(this.getCardsCollectionLabel(gameId, level), error as Error);
             this.logger.error('Firestore request failed. Using fallback cards.', error);
-            subscriber.next(this.getFallbackCards(languages));
+            subscriber.next(this.getFallbackCards(gameId, language));
             subscriber.complete();
           }
         );
@@ -135,9 +181,9 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Pair[], level: GameLevelId = LEVEL.EASY): Observable<Pair[]> {
+  setCards(cards: Array<LanguagePair | SynonymPair | AntonymPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | SynonymPair | AntonymPair>> {
     const batch = writeBatch(db);
-    const cardsCollection = collection(db, level);
+    const cardsCollection = this.getCardsCollection(gameId, level);
 
     cards.forEach((card) => {
       batch.set(doc(cardsCollection), card);
@@ -153,8 +199,8 @@ export class DataService {
     );
   }
 
-  deleteCards(level: GameLevelId = LEVEL.EASY) {
-    const cardsCollection = collection(db, level);
+  deleteCards(gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy') {
+    const cardsCollection = this.getCardsCollection(gameId, level);
 
     return from(getDocs(cardsCollection)).pipe(
       switchMap((snapshots) => {
@@ -162,7 +208,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as Pair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | SynonymPair | AntonymPair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -173,8 +219,8 @@ export class DataService {
     );
   }
 
-  getTopScores(language: string, level: GameLevelId, amount = 5): Observable<ScoreEntry[]> {
-    const cacheKey = `${language}:${level}:${amount}`;
+  getTopScores(gameId: AppGameId, language: string, level: GameLevelId, amount = 5): Observable<ScoreEntry[]> {
+    const cacheKey = `${gameId}:${language}:${level}:${amount}`;
 
     if (!this.leaderboardCache.has(cacheKey)) {
       if (!this.hasFirebaseConfig()) {
@@ -188,7 +234,7 @@ export class DataService {
 
       const scoresRequest$ = new Observable<ScoreEntry[]>((subscriber) => {
         const scoresQuery = query(
-          collection(db, LEADERBOARD_COLLECTION, language, 'levels', level, 'times'),
+          this.getLeaderboardCollection(gameId, language, level),
           orderBy('durationSeconds', 'asc'),
           limit(amount)
         );
@@ -203,6 +249,7 @@ export class DataService {
                 return {
                 id: snapshot.id,
                 ...data,
+                gameId: data.gameId || gameId,
                 level: data.level || level
               };
               })
@@ -237,7 +284,7 @@ export class DataService {
       return throwError(() => new Error('El ranking no esta disponible mientras Firebase use placeholders.'));
     }
 
-    return from(addDoc(collection(db, LEADERBOARD_COLLECTION, score.language, 'levels', score.level, 'times'), {
+    return from(addDoc(this.getLeaderboardCollection(score.gameId, score.language, score.level), {
       ...score,
       createdAt: Date.now()
     })).pipe(
@@ -259,6 +306,42 @@ export class DataService {
 
   setHttpError(error: Error | HttpErrorResponse): void {
     this.httpError = error;
+  }
+
+  private mapCardsForGame(gameId: AppGameId, documents: Record<string, unknown>[], language: LanguageCode): Card[] {
+    if (gameId === 'synonyms') {
+      return this.utilsService.generateSynonymCards(documents as unknown as SynonymPair[]);
+    }
+
+    if (gameId === 'antonyms') {
+      return this.utilsService.generateSynonymCards(documents as unknown as AntonymPair[]);
+    }
+
+    return this.utilsService.generateLanguageCards(documents as unknown as LanguagePair[], language);
+  }
+
+  private getCardsCollection(gameId: AppGameId, level: GameLevelId): CollectionReference {
+    if (gameId === 'languages') {
+      return collection(db, level);
+    }
+
+    return collection(db, GAMES_COLLECTION, gameId, 'levels', level, 'cards');
+  }
+
+  private getCardsCollectionLabel(gameId: AppGameId, level: GameLevelId): string {
+    if (gameId === 'languages') {
+      return level;
+    }
+
+    return `${GAMES_COLLECTION}/${gameId}/levels/${level}/cards`;
+  }
+
+  private getLeaderboardCollection(gameId: AppGameId, language: string, level: GameLevelId): CollectionReference {
+    if (gameId === 'languages') {
+      return collection(db, LEADERBOARD_COLLECTION, language, 'levels', level, 'times');
+    }
+
+    return collection(db, LEADERBOARD_BY_GAME_COLLECTION, gameId, 'languages', language, 'levels', level, 'times');
   }
 
   private hasFirebaseConfig(): boolean {

@@ -14,14 +14,11 @@ describe('GameFacade', () => {
 
   const createCardDeck = (pairCount = 10): Card[] =>
     Array.from({ length: pairCount }, (_, pairIndex) => {
-      const baseId = pairIndex * 5;
+      const baseId = pairIndex * 2;
 
       return [
-        { id: baseId, value: `es-${pairIndex}`, voice: 'es-ES', pairs: [baseId + 1, baseId + 2, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 1, value: `gb-${pairIndex}`, voice: 'en-GB', pairs: [baseId, baseId + 2, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 2, value: `it-${pairIndex}`, voice: 'it-IT', pairs: [baseId, baseId + 1, baseId + 3, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 3, value: `pt-${pairIndex}`, voice: 'pt-PT', pairs: [baseId, baseId + 1, baseId + 2, baseId + 4], selected: false, match: false, icon: '' },
-        { id: baseId + 4, value: `de-${pairIndex}`, voice: 'de-DE', pairs: [baseId, baseId + 1, baseId + 2, baseId + 3], selected: false, match: false, icon: '' }
+        { id: baseId, groupId: pairIndex, value: `es-${pairIndex}`, voice: 'es-ES', pairs: [baseId + 1], selected: false, match: false, icon: '' },
+        { id: baseId + 1, groupId: pairIndex, value: `gb-${pairIndex}`, voice: 'en-GB', pairs: [baseId], selected: false, match: false, icon: '' }
       ];
     }).flat();
 
@@ -128,7 +125,7 @@ describe('GameFacade', () => {
 
     facade.saveCompletedGame();
 
-    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'gb', 'easy');
+    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(23, 'languages', 'gb', 'easy');
     expect(leaderboardServiceMock.saveCompletedGame).toHaveBeenCalled();
   });
 
@@ -148,13 +145,13 @@ describe('GameFacade', () => {
 
     expect(facade.progress()).toBe(100);
     expect(facade.displayProgress()).toBe(100);
-    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(15, 'gb', 'medium');
+    expect(leaderboardServiceMock.openCompletedDialog).toHaveBeenCalledWith(15, 'languages', 'gb', 'medium');
   });
 
   it('reloads cards when changing the level', () => {
     facade.selectLevel('medium');
 
-    expect(dataServiceMock.getCards).toHaveBeenLastCalledWith(['gb', 'it', 'pt', 'de'], 'medium');
-    expect(leaderboardServiceMock.initialize).toHaveBeenLastCalledWith('gb', 'medium');
+    expect(dataServiceMock.getCards).toHaveBeenLastCalledWith('languages', 'gb', 'medium');
+    expect(leaderboardServiceMock.initialize).toHaveBeenLastCalledWith('languages', 'gb', 'medium');
   });
 });

@@ -1,23 +1,158 @@
 # Cards
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.5.
 
-## Commands
-Check registry: `npm config get registry`
-Set default registry:  `npm install --registry=https://registry.npmjs.org/`
-Upgrade node version with nvm: `nvm use 18`
-Create project: `ng new cards`
-Deploy in github: `npm run deploy`
+Juego web de emparejar cartas construido con Angular y Firebase. La aplicacion ahora soporta varios juegos dentro de la misma experiencia:
+- `Idiomas`: emparejar una palabra en castellano con su traduccion.
+- `Sinonimos`: emparejar una palabra con otra de significado equivalente.
+- `Antonimos`: emparejar una palabra con su opuesta.
 
-## Firebase migration
-This project now uses Firebase for authentication and data storage.
+Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independiente.
 
-### 1. Configure Firebase project
-Update the `firebase` section in:
+## Comandos principales
+
+- Desarrollo local: `npm start`
+- Tests: `npm test -- --runInBand --watch=false`
+- Build local: `npm run build`
+- Deploy reglas Firestore: `npm run deploy:firestore-rules`
+- Seed juegos nuevos en Firestore: `npm run seed:firestore-games`
+- Deploy web en GitHub Pages: `npm run deploy:github`
+
+## Arquitectura funcional
+
+La app separa la mecanica base del tablero del tipo de contenido que se juega.
+
+- `GameFacade` coordina el estado principal del tablero, la seleccion de juego, el nivel, el idioma visible, el temporizador y la reconstruccion de la partida.
+- `GameLeaderboardService` carga y guarda tiempos por juego, idioma y dificultad.
+- `DataService` abstrae Firestore, los fallbacks locales y la transformacion de documentos en cartas jugables.
+- `UtilsService` genera mazos para `Idiomas` y para juegos binarios como `Sinonimos` y `Antonimos`.
+
+Documentacion ampliada:
+- Arquitectura: [docs/arquitectura-aplicacion.md](/Users/javiergarcia/git/cards/docs/arquitectura-aplicacion.md:1)
+- Scripts: [scripts/README.md](/Users/javiergarcia/git/cards/scripts/README.md:1)
+
+## Estructura de datos en Firestore
+
+### Cartas del juego `Idiomas`
+
+Colecciones legacy por nivel:
+- `easy`
+- `medium`
+- `hard`
+- `prueba` opcional
+
+Esquema de documento:
+```json
+{
+  "icon": "",
+  "es": "casa",
+  "gb": "house",
+  "it": "casa",
+  "pt": "casa",
+  "de": "Haus"
+}
+```
+
+### Cartas de `Sinonimos` y `Antonimos`
+
+Colecciones por juego y nivel:
+- `games/synonyms/levels/{level}/cards`
+- `games/antonyms/levels/{level}/cards`
+
+Esquema de documento:
+```json
+{
+  "icon": "",
+  "left": "alegre",
+  "right": "contento"
+}
+```
+
+Los seeds cargados actualmente en Firestore son:
+- `synonyms`: 102 pares por nivel
+- `antonyms`: 101 pares por nivel
+
+### Ranking
+
+Ranking legacy de `Idiomas`:
+- `leaderboards/{language}/levels/{level}/times`
+
+Ranking multi-juego:
+- `leaderboardsByGame/{gameId}/languages/{language}/levels/{level}/times`
+
+Campos principales:
+```json
+{
+  "gameId": "synonyms",
+  "playerName": "Ana",
+  "durationSeconds": 21,
+  "language": "es",
+  "level": "medium",
+  "createdAt": 1767111111111,
+  "userId": "uid-123",
+  "isAnonymous": false
+}
+```
+
+### Configuracion auxiliar
+
+- `config/openaiCredentials`
+  - `apiKey`
+  - `organization`
+
+Si no existe, la pagina `/generate` usa los valores definidos en `environment`.
+
+## Reglas de Firestore
+
+Las reglas versionadas estan en [firestore.rules](/Users/javiergarcia/git/cards/firestore.rules:1).
+
+Permisos actuales:
+- lectura autenticada para cartas legacy (`easy`, `medium`, `hard`, `prueba`)
+- lectura autenticada para `games/{gameId}/levels/{level}/cards`
+- lectura y escritura autenticada para rankings
+- escritura de cartas y `config/*` restringida al listado de administradores
+
+Notas:
+- los usuarios invitados tambien son autenticados en Firebase, asi que pueden jugar y guardar tiempos
+- no se debe permitir lectura publica de `config/openaiCredentials`
+
+## Seeds y administracion de contenido
+
+### Seed rapido de juegos
+
+Sube o reemplaza los contenidos de `synonyms` y `antonyms` en los niveles `easy`, `medium` y `hard`:
+
+```bash
+npm run seed:firestore-games
+```
+
+El script:
+- borra los documentos existentes de esas colecciones
+- escribe documentos nuevos con IDs estables
+- reutiliza credenciales de `firebase-tools` o una service account si existe
+
+### Replicar niveles legacy
+
+Para copiar documentos desde `easy` a otras colecciones legacy:
+
+```bash
+npm run seed:firestore-levels
+```
+
+### Carga manual desde la app
+
+La pagina `/generate` permite:
+- elegir juego
+- elegir nivel
+- pegar JSON
+- reemplazar el contenido de la coleccion seleccionada
+
+## Configuracion de Firebase
+
+Actualiza el bloque `firebase` en:
 - `src/environments/environment.ts`
 - `src/environments/environment.prod.ts`
 - `src/environments/environment.local.ts`
 
-Replace placeholder values:
+Sustituye los placeholders por:
 - `apiKey`
 - `authDomain`
 - `projectId`
@@ -25,53 +160,31 @@ Replace placeholder values:
 - `messagingSenderId`
 - `appId`
 
-### 2. Enable Authentication providers
-In Firebase Console -> Authentication -> Sign-in method, enable:
+## Autenticacion
+
+En Firebase Console -> Authentication -> Sign-in method, habilitar:
 - Email/Password
 - Google
 
-### 3. Firestore collections expected
-Create these collections/documents:
-- `easy`: documents with card pairs (`icon`, `es`, `gb`, `it`, `pt`, `de`)
-- `prueba`: optional same schema as `easy`
-- `config/openaiCredentials`: document with
-	- `apiKey`: string
-	- `organization`: string
+## Deploy
 
-If `config/openaiCredentials` does not exist, app falls back to `openAICredentials` in environment files.
+### GitHub Pages
 
-### 4. Firestore security rules
-The app reads cards from the browser, so Firestore rules must allow authenticated users to read `easy`.
+```bash
+npm run deploy:github
+```
 
-Recommended baseline:
-- `easy` and `prueba`: read for authenticated users
-- writes only for an admin email allowlist
-- `config/*`: admin only
+El proyecto ya usa una configuracion compatible con `<base href="./">`.
 
-Rules are versioned in:
-- `firestore.rules`
+### Reglas Firestore
 
-Important:
-- anonymous guest users are also authenticated in Firebase, so `request.auth != null` allows guest play
-- do not allow public writes to `easy`, because the `/generate` page writes directly from the browser
-- do not allow public reads to `config/openaiCredentials`, because that would expose API credentials to clients
+```bash
+npm run deploy:firestore-rules
+```
 
-Deploy rules:
-- `npm run deploy:firestore-rules`
+### Latarce.es por FTPS
 
-### Local secrets
-Do not commit Firebase service account files or real local environment credentials.
-
-- Keep service account json outside git-tracked files or in an ignored path.
-- `src/environments/environment.local.ts` should stay local-only with your own values.
-
-## Deploy in github
-Build for GitHub Pages: `npm run build:github`
-Deploy to GitHub Pages: `npm run deploy:github`
-The project already uses `<base href="./">` in `src/index.html`, which is compatible with GitHub Pages.
-
-## Build y despliegue en latarce.es
-1. Crear los ficheros locales:
+1. Crear ficheros locales:
 
 ```bash
 mkdir -p .local
@@ -79,45 +192,29 @@ cp scripts/latarce-firebase-prod.env.example .local/latarce-firebase-prod.env
 cp scripts/latarce-ftps.env.example .local/latarce-ftps.env
 ```
 
-2. Rellenar `.local/latarce-firebase-prod.env` con las claves reales de Firebase.
-
-3. Rellenar `.local/latarce-ftps.env` con las credenciales FTPS y la ruta remota.
-
-4. Generar build de produccion para latarce:
+2. Rellenar secretos reales.
+3. Generar build:
 
 ```bash
 npm run build:latarce
 ```
 
-5. Desplegar por FTPS limpiando antes el destino remoto:
+4. Desplegar:
 
 ```bash
 npm run deploy:latarce:build
 ```
 
 Notas:
+- `environment.prod.ts` sigue sin secretos en git
+- `.local/` y service accounts no deben versionarse
+- para login con Google, el dominio final debe estar autorizado en Firebase Auth
 
-- `environment.prod.ts` permanece sin secretos en git.
-- Los scripts generan temporalmente ese fichero desde `.local/latarce-firebase-prod.env` y lo restauran al terminar.
-- `.local/` no entra en commits.
-- Para login con Google, el dominio final debe estar autorizado en Firebase Auth.
-  - Añadir `latarce.es` y, si aplica, `www.latarce.es` en Authorized domains.
-  - Si no se hace, Google fallara con `auth/unauthorized-domain`.
+## Calidad
 
-## Development server
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Comprobaciones recomendadas antes de publicar:
 
-## Code scaffolding
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
-
-## Build
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
-
-## Running unit tests
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```bash
+npm test -- --runInBand --watch=false
+npm run build
+```
