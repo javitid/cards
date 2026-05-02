@@ -273,6 +273,199 @@ function buildPairDocs(pairs) {
   return pairs.map(([left, right]) => ({ icon: '', left, right }));
 }
 
+function buildGameDocsForAllLevels(docs) {
+  return {
+    easy: docs,
+    medium: docs,
+    hard: docs
+  };
+}
+
+function buildEasyMathPairs(count = 100) {
+  return Array.from({ length: count }, (_, index) => {
+    const result = index + 11;
+
+    if (index % 2 === 0) {
+      const addend = (index % 8) + 2;
+      return {
+        icon: '',
+        left: `${result - addend} + ${addend}`,
+        right: String(result)
+      };
+    }
+
+    const subtrahend = (index % 9) + 2;
+    return {
+      icon: '',
+      left: `${result + subtrahend} - ${subtrahend}`,
+      right: String(result)
+    };
+  });
+}
+
+function buildMediumMathPairs(count = 100) {
+  return Array.from({ length: count }, (_, index) => {
+    const result = index + 121;
+
+    switch (index % 4) {
+      case 0: {
+        const factor = (index % 5) + 3;
+        const quotient = Math.floor(result / factor);
+        const remainder = result - (factor * quotient);
+
+        return {
+          icon: '',
+          left: `${factor} x ${quotient} + ${remainder}`,
+          right: String(result)
+        };
+      }
+      case 1: {
+        const multiplier = (index % 4) + 2;
+        let adjustment = multiplier - (result % multiplier);
+
+        if (adjustment === multiplier) {
+          adjustment = multiplier;
+        }
+
+        const grouped = (result + adjustment) / multiplier;
+        const left = Math.floor(grouped / 2);
+        const right = grouped - left;
+
+        return {
+          icon: '',
+          left: `(${left} + ${right}) x ${multiplier} - ${adjustment}`,
+          right: String(result)
+        };
+      }
+      case 2: {
+        const factor = (index % 6) + 4;
+        const quotient = Math.ceil(result / factor);
+        const difference = (factor * quotient) - result;
+
+        return {
+          icon: '',
+          left: `${factor} x ${quotient} - ${difference}`,
+          right: String(result)
+        };
+      }
+      default: {
+        const divisor = (index % 4) + 2;
+        const bonus = (index % 7) + 3;
+
+        return {
+          icon: '',
+          left: `${(result - bonus) * divisor} / ${divisor} + ${bonus}`,
+          right: String(result)
+        };
+      }
+    }
+  });
+}
+
+function buildHardMathPairs(count = 100) {
+  return Array.from({ length: count }, (_, index) => {
+    const result = index + 251;
+
+    switch (index % 4) {
+      case 0: {
+        const multiplier = (index % 4) + 3;
+        let adjustment = multiplier - (result % multiplier);
+
+        if (adjustment === multiplier) {
+          adjustment = multiplier;
+        }
+
+        const grouped = (result + adjustment) / multiplier;
+        const first = 20 + (index % 11);
+        const second = grouped - first;
+
+        return {
+          icon: '',
+          left: `(${first} + ${second}) x ${multiplier} - ${adjustment}`,
+          right: String(result)
+        };
+      }
+      case 1: {
+        const factor = (index % 4) + 4;
+        let deduction = factor - (result % factor);
+
+        if (deduction === factor) {
+          deduction = factor;
+        }
+
+        const grouped = (result + deduction) / factor;
+        const first = 10 + (index % 9);
+        const second = grouped - first;
+
+        return {
+          icon: '',
+          left: `${factor} x (${first} + ${second}) - ${deduction}`,
+          right: String(result)
+        };
+      }
+      case 2: {
+        const factor = (index % 5) + 6;
+        const quotient = Math.floor(result / factor);
+        const remainder = result - (factor * quotient);
+        const subtraction = (index % 6) + 2;
+        const addition = remainder + subtraction;
+
+        return {
+          icon: '',
+          left: `(${factor} x ${quotient}) + ${addition} - ${subtraction}`,
+          right: String(result)
+        };
+      }
+      default: {
+        const bonusBase = (index % 8) + 5;
+        const multiplier = (index % 3) + 3;
+        let bonus = result % multiplier;
+
+        if (bonus === 0) {
+          bonus = multiplier;
+        }
+
+        if (bonus < bonusBase) {
+          bonus += multiplier * Math.ceil((bonusBase - bonus) / multiplier);
+        }
+
+        const grouped = (result - bonus) / multiplier;
+        const first = Math.floor(grouped / 2);
+        const second = grouped - first;
+
+        return {
+          icon: '',
+          left: `((${first} + ${second}) x ${multiplier}) + ${bonus}`,
+          right: String(result)
+        };
+      }
+    }
+  });
+}
+
+function buildMathDocsByLevel() {
+  return {
+    easy: buildEasyMathPairs(),
+    medium: buildMediumMathPairs(),
+    hard: buildHardMathPairs()
+  };
+}
+
+const GAME_SEEDS = {
+  synonyms: {
+    prefix: 'synonyms',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(SYNONYM_PAIRS))
+  },
+  antonyms: {
+    prefix: 'antonyms',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(ANTONYM_PAIRS))
+  },
+  math: {
+    prefix: 'math',
+    docsByLevel: buildMathDocsByLevel()
+  }
+};
+
 function targetPath(gameId, level) {
   return `${GAMES_COLLECTION}/${gameId}/levels/${level}/cards`;
 }
@@ -382,17 +575,23 @@ async function replaceCollectionRest(accessToken, collectionPath, docs, prefix) 
   }
 }
 
-async function seedGame(firestore, accessToken, gameId, docs, prefix) {
-  console.log(`\nSeeding ${gameId} (${docs.length} pares por nivel)`);
+async function seedGame(firestore, accessToken, gameId, gameSeed) {
+  console.log(`\nSeeding ${gameId}`);
 
   for (const level of LEVELS) {
+    const docs = gameSeed.docsByLevel[level];
+
+    if (!docs) {
+      continue;
+    }
+
     const collectionPath = targetPath(gameId, level);
     process.stdout.write(`- ${collectionPath.padEnd(40)} `);
 
     if (firestore) {
-      await replaceCollectionAdmin(firestore, collectionPath, docs, prefix);
+      await replaceCollectionAdmin(firestore, collectionPath, docs, gameSeed.prefix);
     } else {
-      await replaceCollectionRest(accessToken, collectionPath, docs, prefix);
+      await replaceCollectionRest(accessToken, collectionPath, docs, gameSeed.prefix);
     }
 
     console.log(`OK (${docs.length})`);
@@ -404,8 +603,10 @@ async function seedGames() {
   const accessToken = firestore ? null : getFirebaseToolsAccessToken();
 
   try {
-    await seedGame(firestore, accessToken, 'synonyms', buildPairDocs(SYNONYM_PAIRS), 'synonyms');
-    await seedGame(firestore, accessToken, 'antonyms', buildPairDocs(ANTONYM_PAIRS), 'antonyms');
+    for (const [gameId, gameSeed] of Object.entries(GAME_SEEDS)) {
+      await seedGame(firestore, accessToken, gameId, gameSeed);
+    }
+
     console.log('\nFirestore game seeding completed.\n');
   } finally {
     if (admin.apps.length) {
@@ -420,3 +621,9 @@ if (require.main === module) {
     process.exit(1);
   });
 }
+
+module.exports = {
+  buildEasyMathPairs,
+  buildMediumMathPairs,
+  buildHardMathPairs
+};

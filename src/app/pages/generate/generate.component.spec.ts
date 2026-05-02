@@ -59,4 +59,12 @@ describe('GenerateComponent', () => {
       'easy'
     );
   });
+
+  it('should swap the template when changing to the math game', () => {
+    component.form.controls.gameId.setValue('math');
+
+    expect(component.form.controls.content.value).toContain('3 + 12');
+    expect(component.form.controls.content.value).toContain('"left"');
+    expect(component.form.controls.content.value).toContain('"right"');
+  });
 });

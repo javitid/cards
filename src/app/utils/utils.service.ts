@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Card, LanguageCode, LanguagePair, SynonymPair } from '../modules/card/interfaces/card';
+import { BinaryPair, Card, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
 const LANGUAGE_VOICES: Record<LanguageCode, string> = {
@@ -44,8 +44,8 @@ export class UtilsService {
     });
   }
 
-  generateSynonymCards(pairs: SynonymPair[]): Card[] {
-    return pairs.flatMap((pair: SynonymPair, index) => {
+  generateBinaryCards(pairs: BinaryPair[]): Card[] {
+    return pairs.flatMap((pair: BinaryPair, index) => {
       const firstId = index * 2;
       const secondId = firstId + 1;
 

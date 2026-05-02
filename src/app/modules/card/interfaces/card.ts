@@ -10,7 +10,7 @@ export interface Card {
 }
 
 export interface CardResponse {
-  documents: Array<LanguagePair | SynonymPair | AntonymPair>;
+  documents: Array<LanguagePair | BinaryPair>;
 }
 
 export interface Credentials {
@@ -18,7 +18,7 @@ export interface Credentials {
   organization: string;
 }
 
-export type AppGameId = 'languages' | 'synonyms' | 'antonyms';
+export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
 export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
 
@@ -36,6 +36,7 @@ export interface GameLevelOption {
   label: string;
   pairs: number;
   timerSeconds: number;
+  timerSecondsByGame?: Partial<Record<AppGameId, number>>;
 }
 
 export interface ScoreEntry {
@@ -69,14 +70,12 @@ export interface LanguagePair {
   de: string;
 }
 
-export interface SynonymPair {
+export interface BinaryPair {
   icon: string;
   left: string;
   right: string;
 }
 
-export interface AntonymPair {
-  icon: string;
-  left: string;
-  right: string;
-}
+export type SynonymPair = BinaryPair;
+export type AntonymPair = BinaryPair;
+export type MathPair = BinaryPair;

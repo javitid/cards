@@ -4,6 +4,7 @@ Juego web de emparejar cartas construido con Angular y Firebase. La aplicacion a
 - `Idiomas`: emparejar una palabra en castellano con su traduccion.
 - `Sinonimos`: emparejar una palabra con otra de significado equivalente.
 - `Antonimos`: emparejar una palabra con su opuesta.
+- `Matematicas`: emparejar una operacion con su resultado.
 
 Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independiente.
 
@@ -23,7 +24,7 @@ La app separa la mecanica base del tablero del tipo de contenido que se juega.
 - `GameFacade` coordina el estado principal del tablero, la seleccion de juego, el nivel, el idioma visible, el temporizador y la reconstruccion de la partida.
 - `GameLeaderboardService` carga y guarda tiempos por juego, idioma y dificultad.
 - `DataService` abstrae Firestore, los fallbacks locales y la transformacion de documentos en cartas jugables.
-- `UtilsService` genera mazos para `Idiomas` y para juegos binarios como `Sinonimos` y `Antonimos`.
+- `UtilsService` genera mazos para `Idiomas` y para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`.
 
 Documentacion ampliada:
 - Arquitectura: [docs/arquitectura-aplicacion.md](/Users/javiergarcia/git/cards/docs/arquitectura-aplicacion.md:1)
@@ -51,11 +52,12 @@ Esquema de documento:
 }
 ```
 
-### Cartas de `Sinonimos` y `Antonimos`
+### Cartas de `Sinonimos`, `Antonimos` y `Matematicas`
 
 Colecciones por juego y nivel:
 - `games/synonyms/levels/{level}/cards`
 - `games/antonyms/levels/{level}/cards`
+- `games/math/levels/{level}/cards`
 
 Esquema de documento:
 ```json
@@ -69,6 +71,12 @@ Esquema de documento:
 Los seeds cargados actualmente en Firestore son:
 - `synonyms`: 102 pares por nivel
 - `antonyms`: 101 pares por nivel
+- `math`: 100 operaciones por nivel
+
+En `Matematicas`, la complejidad sube por nivel:
+- `easy`: sumas y restas simples
+- `medium`: combinaciones con multiplicacion, division y parentesis sencillos
+- `hard`: operaciones de varios pasos con mezcla de operadores
 
 ### Ranking
 
@@ -118,7 +126,7 @@ Notas:
 
 ### Seed rapido de juegos
 
-Sube o reemplaza los contenidos de `synonyms` y `antonyms` en los niveles `easy`, `medium` y `hard`:
+Sube o reemplaza los contenidos de `synonyms`, `antonyms` y `math` en los niveles `easy`, `medium` y `hard`:
 
 ```bash
 npm run seed:firestore-games
@@ -127,6 +135,7 @@ npm run seed:firestore-games
 El script:
 - borra los documentos existentes de esas colecciones
 - escribe documentos nuevos con IDs estables
+- genera `100` operaciones nuevas de matematicas por nivel
 - reutiliza credenciales de `firebase-tools` o una service account si existe
 
 ### Replicar niveles legacy
@@ -144,6 +153,10 @@ La pagina `/generate` permite:
 - elegir nivel
 - pegar JSON
 - reemplazar el contenido de la coleccion seleccionada
+
+Formatos esperados:
+- `Idiomas`: `{ icon, es, gb, it, pt, de }`
+- `Sinonimos`, `Antonimos`, `Matematicas`: `{ icon, left, right }`
 
 ## Configuracion de Firebase
 

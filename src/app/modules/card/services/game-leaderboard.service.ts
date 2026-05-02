@@ -52,7 +52,7 @@ export class GameLeaderboardService {
     this.leaderboardSubscription = this.dataService.getTopScores(gameId, language, level, LEADERBOARD_LIMIT).subscribe({
       next: (scores) => {
         this.leaderboard.set(scores);
-        this.leaderboardMessage.set(scores.length ? '' : 'Todavia no hay tiempos guardados.');
+        this.leaderboardMessage.set(scores.length ? '' : 'Todavía no hay tiempos guardados.');
       },
       error: () => {
         this.leaderboard.set([]);

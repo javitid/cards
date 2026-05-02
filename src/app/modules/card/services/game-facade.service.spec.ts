@@ -154,4 +154,15 @@ describe('GameFacade', () => {
     expect(dataServiceMock.getCards).toHaveBeenLastCalledWith('languages', 'gb', 'medium');
     expect(leaderboardServiceMock.initialize).toHaveBeenLastCalledWith('languages', 'gb', 'medium');
   });
+
+  it('uses longer timers for the math game on medium and hard', () => {
+    facade.selectGame('math');
+    facade.selectLevel('medium');
+
+    expect(timerServiceMock.start).toHaveBeenLastCalledWith(150, expect.any(Function));
+
+    facade.selectLevel('hard');
+
+    expect(timerServiceMock.start).toHaveBeenLastCalledWith(240, expect.any(Function));
+  });
 });

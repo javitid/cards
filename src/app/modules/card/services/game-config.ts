@@ -9,38 +9,47 @@ export const GAME_OPTIONS: GameOption[] = [
   {
     id: 'languages',
     label: 'Idiomas',
-    description: 'Empareja una palabra en castellano con su traduccion.',
-    instructions: 'Empareja cada palabra con su traduccion.',
+    description: 'Empareja una palabra en castellano con su traducción.',
+    instructions: 'Empareja cada palabra con su traducción.',
     supportsLanguageSelection: true,
     defaultLanguage: 'gb'
   },
   {
     id: 'synonyms',
-    label: 'Sinonimos',
+    label: 'Sinónimos',
     description: 'Encuentra las dos palabras que significan lo mismo.',
-    instructions: 'Empareja cada palabra con su sinonimo.',
+    instructions: 'Empareja cada palabra con su sinónimo.',
     supportsLanguageSelection: false,
     defaultLanguage: 'es'
   },
   {
     id: 'antonyms',
-    label: 'Antonimos',
+    label: 'Antónimos',
     description: 'Encuentra las dos palabras que significan lo contrario.',
-    instructions: 'Empareja cada palabra con su antonimo.',
+    instructions: 'Empareja cada palabra con su antónimo.',
+    supportsLanguageSelection: false,
+    defaultLanguage: 'es'
+  },
+  {
+    id: 'math',
+    label: 'Matemáticas',
+    description: 'Relaciona cada operación con su resultado.',
+    instructions: 'Empareja cada operación con su resultado correcto.',
     supportsLanguageSelection: false,
     defaultLanguage: 'es'
   }
 ];
 export const GAME_LEVELS: GameLevelOption[] = [
-  { id: 'easy', label: 'Facil', pairs: 5, timerSeconds: 60 },
-  { id: 'medium', label: 'Medio', pairs: 7, timerSeconds: 75 },
-  { id: 'hard', label: 'Dificil', pairs: 9, timerSeconds: 90 }
+  { id: 'easy', label: 'Fácil', pairs: 5, timerSeconds: 60 },
+  { id: 'medium', label: 'Medio', pairs: 7, timerSeconds: 75, timerSecondsByGame: { math: 150 } },
+  { id: 'hard', label: 'Difícil', pairs: 9, timerSeconds: 90, timerSecondsByGame: { math: 240 } }
 ];
 export const DEFAULT_GAME: AppGameId = 'languages';
 export const DEFAULT_LEVEL: GameLevelId = 'easy';
 export const LOCAL_STORAGE_KEYS = {
   CURRENT_GAME: 'currentGame',
   CURRENT_LANGUAGE: 'currentLanguage',
+  LANGUAGES_GAME_LANGUAGE: 'languagesGameLanguage',
   CURRENT_LEVEL: 'currentLevel',
   SOUND: 'sound',
   FLIP_EFFECT: 'flipEffect'

@@ -44,7 +44,8 @@ describe('CardContainerComponent', () => {
     games: [
       { id: 'languages', label: 'Idiomas', description: '', instructions: '', supportsLanguageSelection: true, defaultLanguage: 'gb' },
       { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' },
-      { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' }
+      { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' },
+      { id: 'math', label: 'Matematicas', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' }
     ],
     languages: ['gb', 'it', 'pt', 'de'],
     levels: [

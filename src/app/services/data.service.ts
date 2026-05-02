@@ -17,13 +17,14 @@ import { Observable, from, of, throwError } from 'rxjs';
 import { catchError, map, shareReplay, switchMap } from 'rxjs/operators';
 
 import {
-  AntonymPair,
   AppGameId,
+  BinaryPair,
   Card,
   Credentials,
   GameLevelId,
   LanguageCode,
   LanguagePair,
+  MathPair,
   ScoreEntry,
   ScoreSubmission,
   SynonymPair
@@ -45,8 +46,8 @@ const FALLBACK_LANGUAGE_PAIRS: LanguagePair[] = [
   { icon: '', es: 'coche', gb: 'car', it: 'macchina', pt: 'carro', de: 'Auto' },
   { icon: '', es: 'perro', gb: 'dog', it: 'cane', pt: 'cachorro', de: 'Hund' },
   { icon: '', es: 'gato', gb: 'cat', it: 'gatto', pt: 'gato', de: 'Katze' },
-  { icon: '', es: 'arbol', gb: 'tree', it: 'albero', pt: 'arvore', de: 'Baum' },
-  { icon: '', es: 'montana', gb: 'mountain', it: 'montagna', pt: 'montanha', de: 'Berg' },
+  { icon: '', es: 'árbol', gb: 'tree', it: 'albero', pt: 'árvore', de: 'Baum' },
+  { icon: '', es: 'montaña', gb: 'mountain', it: 'montagna', pt: 'montanha', de: 'Berg' },
   { icon: '', es: 'sol', gb: 'sun', it: 'sole', pt: 'sol', de: 'Sonne' },
   { icon: '', es: 'luna', gb: 'moon', it: 'luna', pt: 'lua', de: 'Mond' },
   { icon: 'water', es: 'agua', gb: 'water', it: 'acqua', pt: 'agua', de: 'Wasser' },
@@ -63,12 +64,12 @@ const FALLBACK_SYNONYM_PAIRS: SynonymPair[] = [
   { icon: '', left: 'rapido', right: 'veloz' },
   { icon: '', left: 'hablar', right: 'conversar' },
   { icon: '', left: 'enorme', right: 'gigante' },
-  { icon: '', left: 'facil', right: 'sencillo' },
+  { icon: '', left: 'fácil', right: 'sencillo' },
   { icon: '', left: 'feliz', right: 'dichoso' },
   { icon: '', left: 'enojado', right: 'molesto' },
   { icon: '', left: 'cuidar', right: 'proteger' },
 ];
-const FALLBACK_ANTONYM_PAIRS: AntonymPair[] = [
+const FALLBACK_ANTONYM_PAIRS: BinaryPair[] = [
   { icon: '', left: 'alto', right: 'bajo' },
   { icon: '', left: 'grande', right: 'pequeno' },
   { icon: '', left: 'rapido', right: 'lento' },
@@ -81,6 +82,20 @@ const FALLBACK_ANTONYM_PAIRS: AntonymPair[] = [
   { icon: '', left: 'nuevo', right: 'viejo' },
   { icon: '', left: 'abrir', right: 'cerrar' },
   { icon: '', left: 'subir', right: 'bajar' },
+];
+const FALLBACK_MATH_PAIRS: MathPair[] = [
+  { icon: '', left: '3 + 12', right: '15' },
+  { icon: '', left: '20 - 7', right: '13' },
+  { icon: '', left: '6 x 4', right: '24' },
+  { icon: '', left: '18 / 3', right: '6' },
+  { icon: '', left: '9 + 8', right: '17' },
+  { icon: '', left: '14 - 4', right: '10' },
+  { icon: '', left: '7 x 3', right: '21' },
+  { icon: '', left: '48 / 6', right: '8' },
+  { icon: '', left: '11 + 12', right: '23' },
+  { icon: '', left: '30 - 12', right: '18' },
+  { icon: '', left: '8 x 6', right: '48' },
+  { icon: '', left: '54 / 6', right: '9' },
 ];
 
 @Injectable({
@@ -100,11 +115,15 @@ export class DataService {
 
   private getFallbackCards(gameId: AppGameId, language: LanguageCode): Card[] {
     if (gameId === 'synonyms') {
-      return this.utilsService.generateSynonymCards(FALLBACK_SYNONYM_PAIRS);
+      return this.utilsService.generateBinaryCards(FALLBACK_SYNONYM_PAIRS);
     }
 
     if (gameId === 'antonyms') {
-      return this.utilsService.generateSynonymCards(FALLBACK_ANTONYM_PAIRS);
+      return this.utilsService.generateBinaryCards(FALLBACK_ANTONYM_PAIRS);
+    }
+
+    if (gameId === 'math') {
+      return this.utilsService.generateBinaryCards(FALLBACK_MATH_PAIRS);
     }
 
     return this.utilsService.generateLanguageCards(FALLBACK_LANGUAGE_PAIRS, language);
@@ -130,7 +149,7 @@ export class DataService {
     if (!this.cardsCache.has(cacheKey)) {
       if (!this.hasFirebaseConfig()) {
         this.cardsSource = 'fallback';
-        this.cardsSourceReason = 'La configuracion de Firebase usa placeholders. En local usa start:local; en GitHub Pages revisa la inyeccion de secrets en Actions.';
+        this.cardsSourceReason = 'La configuración de Firebase usa placeholders. En local usa start:local; en GitHub Pages revisa la inyección de secrets en Actions.';
         this.logger.warn('Falling back to local cards because Firebase config still has placeholders.');
 
         const fallbackCards$ = of(this.getFallbackCards(gameId, language)).pipe(
@@ -150,14 +169,14 @@ export class DataService {
 
             if (!documents.length) {
               this.cardsSource = 'fallback';
-              this.cardsSourceReason = `La coleccion "${this.getCardsCollectionLabel(gameId, level)}" de Firestore esta vacia.`;
+              this.cardsSourceReason = `La colección "${this.getCardsCollectionLabel(gameId, level)}" de Firestore está vacía.`;
               this.logger.warn(`Firestore collection "${this.getCardsCollectionLabel(gameId, level)}" returned no documents. Using fallback cards.`);
               subscriber.next(this.getFallbackCards(gameId, language));
               return;
             }
 
             this.cardsSource = 'firestore';
-            this.cardsSourceReason = `Cargados ${documents.length} registros desde la coleccion "${this.getCardsCollectionLabel(gameId, level)}" de Firestore.`;
+            this.cardsSourceReason = `Cargados ${documents.length} registros desde la colección "${this.getCardsCollectionLabel(gameId, level)}" de Firestore.`;
             subscriber.next(this.mapCardsForGame(gameId, documents, language));
           },
           (error) => {
@@ -181,7 +200,7 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Array<LanguagePair | SynonymPair | AntonymPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | SynonymPair | AntonymPair>> {
+  setCards(cards: Array<LanguagePair | BinaryPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair>> {
     const batch = writeBatch(db);
     const cardsCollection = this.getCardsCollection(gameId, level);
 
@@ -208,7 +227,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | SynonymPair | AntonymPair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -281,7 +300,7 @@ export class DataService {
 
   saveScore(score: ScoreSubmission): Observable<void> {
     if (!this.hasFirebaseConfig()) {
-      return throwError(() => new Error('El ranking no esta disponible mientras Firebase use placeholders.'));
+      return throwError(() => new Error('El ranking no está disponible mientras Firebase use placeholders.'));
     }
 
     return from(addDoc(this.getLeaderboardCollection(score.gameId, score.language, score.level), {
@@ -310,11 +329,15 @@ export class DataService {
 
   private mapCardsForGame(gameId: AppGameId, documents: Record<string, unknown>[], language: LanguageCode): Card[] {
     if (gameId === 'synonyms') {
-      return this.utilsService.generateSynonymCards(documents as unknown as SynonymPair[]);
+      return this.utilsService.generateBinaryCards(documents as unknown as SynonymPair[]);
     }
 
     if (gameId === 'antonyms') {
-      return this.utilsService.generateSynonymCards(documents as unknown as AntonymPair[]);
+      return this.utilsService.generateBinaryCards(documents as unknown as BinaryPair[]);
+    }
+
+    if (gameId === 'math') {
+      return this.utilsService.generateBinaryCards(documents as unknown as MathPair[]);
     }
 
     return this.utilsService.generateLanguageCards(documents as unknown as LanguagePair[], language);

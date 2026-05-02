@@ -76,6 +76,7 @@ export class GameFacade {
     const nextLanguage = (typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE) as LanguageCode;
     this.currentLanguage.set(nextLanguage);
     localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, nextLanguage);
+    localStorage.setItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE, nextLanguage);
     this.leaderboardService.loadLeaderboard(this.currentGame(), nextLanguage, this.currentLevel());
     this.loadCards();
   }
@@ -90,7 +91,11 @@ export class GameFacade {
     this.currentGame.set(nextGame);
     localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_GAME, nextGame);
 
-    if (!this.currentGameConfig().supportsLanguageSelection) {
+    if (this.currentGameConfig().supportsLanguageSelection) {
+      const savedLanguage = this.getSavedLanguage(nextGame);
+      this.currentLanguage.set(savedLanguage);
+      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, savedLanguage);
+    } else {
       this.currentLanguage.set(this.currentGameConfig().defaultLanguage);
       localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, this.currentGameConfig().defaultLanguage);
     }
@@ -341,7 +346,9 @@ export class GameFacade {
       return gameConfig.defaultLanguage;
     }
 
-    const rawLanguage = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE) || DEFAULT_CURRENT_LANGUAGE;
+    const rawLanguage = localStorage.getItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE)
+      || localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE)
+      || DEFAULT_CURRENT_LANGUAGE;
     return rawLanguage as LanguageCode;
   }
 
@@ -362,7 +369,13 @@ export class GameFacade {
   }
 
   private getCurrentLevelConfig() {
-    return GAME_LEVELS.find((level) => level.id === this.currentLevel()) || GAME_LEVELS[0];
+    const level = GAME_LEVELS.find((item) => item.id === this.currentLevel()) || GAME_LEVELS[0];
+    const overriddenTimer = level.timerSecondsByGame?.[this.currentGame()];
+
+    return {
+      ...level,
+      timerSeconds: overriddenTimer || level.timerSeconds
+    };
   }
 
   private currentGameConfig() {

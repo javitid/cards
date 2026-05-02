@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
 import { LoggerService } from '../../services/logger.service';
-import { AppGameId, Credentials, GameLevelId, LanguagePair } from '../../modules/card/interfaces/card';
+import { AppGameId, BinaryPair, Credentials, GameLevelId, LanguagePair } from '../../modules/card/interfaces/card';
 import { DEFAULT_GAME, DEFAULT_LEVEL, GAME_LEVELS, GAME_OPTIONS } from '../../modules/card/services/game-config';
 
 // Fill from screen input and upload generated cards into Firestore
@@ -139,6 +139,11 @@ const pairs: LanguagePair[] = [
   {"icon": "", "es": "kiwi", "gb": "kiwi", "it": "kiwi", "pt": "kiwi", "de": "Kiwi"},
   {"icon": "", "es": "dátil", "gb": "date", "it": "dattero", "pt": "tâmara", "de": "Dattel"}
 ];
+const binaryPairs: BinaryPair[] = [
+  { icon: '', left: 'alegre', right: 'contento' },
+  { icon: '', left: 'alto', right: 'bajo' },
+  { icon: '', left: '3 + 12', right: '15' }
+];
 
 @Component({
   selector: 'app-generate',
@@ -154,12 +159,22 @@ export class GenerateComponent {
   openAICredentials!: Credentials;
   readonly games = GAME_OPTIONS;
   readonly levels = GAME_LEVELS;
+  readonly gameTemplates: Record<AppGameId, string> = {
+    languages: JSON.stringify(pairs, null, 2),
+    synonyms: JSON.stringify(binaryPairs, null, 2),
+    antonyms: JSON.stringify(binaryPairs, null, 2),
+    math: JSON.stringify([
+      { icon: '', left: '3 + 12', right: '15' },
+      { icon: '', left: '8 x 7', right: '56' },
+      { icon: '', left: '(14 + 6) / 2', right: '10' }
+    ], null, 2)
+  };
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
   form = this.fb.group({
     gameId: [DEFAULT_GAME as AppGameId, Validators.required],
     level: [DEFAULT_LEVEL as GameLevelId, Validators.required],
-    content: [JSON.stringify(pairs), Validators.required],
+    content: [this.gameTemplates[DEFAULT_GAME], Validators.required],
   });
 
   constructor(
@@ -171,6 +186,17 @@ export class GenerateComponent {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(result => {
         this.openAICredentials = result;
+        this.cdr.markForCheck();
+      });
+
+    this.form.controls.gameId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((gameId) => {
+        if (!gameId) {
+          return;
+        }
+
+        this.form.controls.content.setValue(this.gameTemplates[gameId], { emitEvent: false });
         this.cdr.markForCheck();
       });
   }

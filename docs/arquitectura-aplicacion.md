@@ -6,6 +6,7 @@ La aplicacion es un juego de emparejar cartas construido con Angular. Desde mayo
 - `Idiomas`
 - `Sinonimos`
 - `Antonimos`
+- `Matematicas`
 
 Todos comparten la misma mecanica base de tablero, temporizador y ranking, pero no necesariamente la misma estructura de datos en Firestore.
 
@@ -128,6 +129,24 @@ Modelo jugable:
 Persistencia:
 - `games/antonyms/levels/{level}/cards`
 
+### `Matematicas`
+
+Modelo persistido:
+- documento binario con `left` y `right`
+- `left` contiene la operacion
+- `right` contiene el resultado correcto
+
+Modelo jugable:
+- dos cartas por grupo
+- una carta muestra una operacion
+- la otra muestra su resultado
+
+Persistencia:
+- `games/math/levels/{level}/cards`
+- `easy`: operaciones simples
+- `medium`: operaciones combinadas
+- `hard`: operaciones de varios pasos
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
@@ -179,7 +198,7 @@ Archivo: [src/app/utils/utils.service.ts](/Users/javiergarcia/git/cards/src/app/
 
 Responsabilidades:
 - generar cartas para `Idiomas`
-- generar cartas para juegos binarios como `Sinonimos` y `Antonimos`
+- generar cartas para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
 - asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
 
 ## Flujo de guardado de puntuacion
@@ -217,6 +236,8 @@ sequenceDiagram
 - `games/synonyms/levels/{level}/cards`
   - schema: `icon`, `left`, `right`
 - `games/antonyms/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/math/levels/{level}/cards`
   - schema: `icon`, `left`, `right`
 
 ### Ranking
@@ -282,11 +303,11 @@ Esto permite reutilizar la mecanica del tablero sin acoplarla al tipo de conteni
 
 ### Ranking separado por juego
 
-Los tiempos de `Idiomas`, `Sinonimos` y `Antonimos` no se mezclan. Esto evita comparativas inconsistentes entre mecanicas o vocabularios distintos.
+Los tiempos de `Idiomas`, `Sinonimos`, `Antonimos` y `Matematicas` no se mezclan. Esto evita comparativas inconsistentes entre mecanicas o contenidos distintos.
 
 ## Mejoras futuras
 
-- permitir iconos reales en `Sinonimos` y `Antonimos`
+- permitir iconos reales en juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
 - añadir mas juegos binarios reutilizando la misma estructura
 - mover seeds a JSON externos si el catalogo sigue creciendo
 - unificar completamente la persistencia de `Idiomas` en `games/languages/...` cuando deje de hacer falta compatibilidad legacy
