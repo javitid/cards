@@ -121,6 +121,38 @@ describe('BlackjackComponent', () => {
     expect(component.phase()).toBe('player-turn');
   });
 
+  it('should allow splitting mixed 10-value cards (K and Q)', () => {
+    component.chips.set(90);
+    component.currentBet.set(10);
+    component.phase.set('player-turn');
+    component.playerHands.set([
+      {
+        id: 'main',
+        bet: 10,
+        outcome: 'pending',
+        wasSplitHand: false,
+        finished: false,
+        cards: [
+          makeCard('c1', 'K', 10, 'spades'),
+          makeCard('c2', 'Q', 10, 'hearts')
+        ]
+      }
+    ] as never[]);
+
+    setDeck(
+      makeCard('draw-1', '5', 5, 'diamonds'),
+      makeCard('draw-2', '7', 7, 'clubs')
+    );
+
+    expect(component.canSplit()).toBe(true);
+
+    component.split();
+    jest.advanceTimersByTime(1000);
+
+    expect(component.playerHands()).toHaveLength(2);
+    expect(component.chips()).toBe(80);
+  });
+
   it('should allow doubling by adding one card and doubling the hand bet', () => {
     component.chips.set(100);
     component.currentBet.set(20);

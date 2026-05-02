@@ -82,7 +82,7 @@ export class BlackjackComponent implements OnDestroy {
       && this.playerHands().length === 1
       && !!hand
       && hand.cards.length === 2
-      && hand.cards[0].rank === hand.cards[1].rank
+      && hand.cards[0].value === hand.cards[1].value
       && this.chips() >= hand.bet;
   });
   readonly isRoundActive = computed(() => this.phase() !== 'betting' && this.phase() !== 'round-over');
