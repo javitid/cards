@@ -25,6 +25,11 @@
       </div>
 
       <div class="status-card">
+        <span class="status-card__label">Seguro</span>
+        <strong class="status-card__value">{{ insuranceBet() || 0 }}</strong>
+      </div>
+
+      <div class="status-card">
         <span class="status-card__label">Cartas en mazo</span>
         <strong class="status-card__value">{{ deckCount() }}</strong>
       </div>
@@ -72,6 +77,8 @@
           <li>Blackjack natural paga 3:2.</li>
           <li>Empate devuelve la apuesta.</li>
           <li>Puedes dividir cuando recibes una pareja y tienes fichas para igualar la apuesta.</li>
+          <li>Puedes doblar en dos cartas: duplicas apuesta, robas una carta y te plantas.</li>
+          <li>Si la banca muestra As, puedes tomar seguro por la mitad de la apuesta.</li>
         </ul>
       </div>
     </aside>
@@ -156,6 +163,27 @@
       </div>
 
       <footer class="table-controls">
+        @if (phase() === 'insurance') {
+          <button
+            pButton
+            type="button"
+            label="Tomar seguro"
+            severity="help"
+            icon="pi pi-shield"
+            [disabled]="!canTakeInsurance()"
+            (click)="takeInsurance()">
+          </button>
+
+          <button
+            pButton
+            type="button"
+            label="Sin seguro"
+            severity="secondary"
+            icon="pi pi-forward"
+            (click)="declineInsurance()">
+          </button>
+        }
+
         <button
           pButton
           type="button"
@@ -173,6 +201,16 @@
           icon="pi pi-stop"
           [disabled]="!canStand()"
           (click)="stand()">
+        </button>
+
+        <button
+          pButton
+          type="button"
+          label="Doblar"
+          severity="help"
+          icon="pi pi-angle-double-up"
+          [disabled]="!canDouble()"
+          (click)="doubleDown()">
         </button>
 
         <button

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, computed, signal } from '@angular/core';
 
-type RoundPhase = 'betting' | 'dealing' | 'player-turn' | 'dealer-turn' | 'round-over';
+type RoundPhase = 'betting' | 'dealing' | 'insurance' | 'player-turn' | 'dealer-turn' | 'round-over';
 type RoundOutcome = 'idle' | 'win' | 'lose' | 'push' | 'blackjack';
 type Suit = 'spades' | 'hearts' | 'diamonds' | 'clubs';
 type HandOutcome = 'pending' | 'win' | 'lose' | 'push' | 'blackjack';
@@ -51,6 +51,7 @@ export class BlackjackComponent implements OnDestroy {
   readonly phase = signal<RoundPhase>('betting');
   readonly outcome = signal<RoundOutcome>('idle');
   readonly message = signal('Elige una apuesta y reparte para comenzar la partida.');
+  readonly insuranceBet = signal(0);
   readonly playerHands = signal<PlayerHandState[]>([]);
   readonly activeHandIndex = signal(0);
   readonly dealerHand = signal<BlackjackCard[]>([]);
@@ -63,6 +64,17 @@ export class BlackjackComponent implements OnDestroy {
   readonly canDeal = computed(() => (this.phase() === 'betting' || this.phase() === 'round-over') && this.chips() >= this.selectedBet());
   readonly canHit = computed(() => this.phase() === 'player-turn' && !!this.activeHand());
   readonly canStand = computed(() => this.phase() === 'player-turn' && !!this.activeHand());
+  readonly canDouble = computed(() => {
+    const hand = this.activeHand();
+
+    return this.phase() === 'player-turn'
+      && !!hand
+      && hand.cards.length === 2
+      && !hand.finished
+      && this.chips() >= hand.bet;
+  });
+  readonly canTakeInsurance = computed(() => this.phase() === 'insurance' && this.insuranceBet() === 0 && this.chips() >= this.insuranceCost());
+  readonly insuranceCost = computed(() => Math.floor(this.currentBet() / 2));
   readonly canSplit = computed(() => {
     const hand = this.activeHand();
 
@@ -111,6 +123,7 @@ export class BlackjackComponent implements OnDestroy {
     this.currentBet.set(this.selectedBet());
     this.chips.set(this.chips() - this.selectedBet());
     this.activeHandIndex.set(0);
+    this.insuranceBet.set(0);
     this.playerHands.set([this.createPlayerHand('main', this.selectedBet())]);
     this.dealerHand.set([]);
 
@@ -189,6 +202,61 @@ export class BlackjackComponent implements OnDestroy {
     }, CARD_DEAL_DELAY_MS * 2 + 60);
   }
 
+  doubleDown(): void {
+    const hand = this.activeHand();
+
+    if (!this.canDouble() || !hand) {
+      return;
+    }
+
+    this.phase.set('dealing');
+    this.message.set(`Doblas en ${this.handDisplayName(this.activeHandIndex())}. Recibes una sola carta.`);
+    this.chips.set(this.chips() - hand.bet);
+    this.currentBet.set(this.currentBet() + hand.bet);
+    this.playerHands.update((hands) =>
+      hands.map((currentHand, index) =>
+        index === this.activeHandIndex()
+          ? { ...currentHand, bet: currentHand.bet * 2 }
+          : currentHand
+      )
+    );
+
+    this.dealCardToPlayerHand(this.activeHandIndex(), () => {
+      const nextHand = this.playerHands()[this.activeHandIndex()];
+      const handValue = this.calculateHandValue(nextHand.cards).total;
+
+      if (handValue > 21) {
+        this.markHandOutcome(this.activeHandIndex(), 'lose', true);
+        this.message.set(`${this.handDisplayName(this.activeHandIndex())} se pasa al doblar.`);
+      } else {
+        this.markHandFinished(this.activeHandIndex());
+      }
+
+      this.advanceAfterPlayerAction();
+    });
+  }
+
+  takeInsurance(): void {
+    if (!this.canTakeInsurance()) {
+      return;
+    }
+
+    this.insuranceBet.set(this.insuranceCost());
+    this.chips.set(this.chips() - this.insuranceCost());
+    this.currentBet.set(this.currentBet() + this.insuranceCost());
+    this.message.set('Seguro tomado. La banca comprueba blackjack.');
+    this.resolveDealerPeek();
+  }
+
+  declineInsurance(): void {
+    if (this.phase() !== 'insurance') {
+      return;
+    }
+
+    this.message.set('Sin seguro. La banca comprueba blackjack.');
+    this.resolveDealerPeek();
+  }
+
   resetSession(): void {
     this.clearScheduledActions();
     this.deck = [];
@@ -196,6 +264,7 @@ export class BlackjackComponent implements OnDestroy {
     this.sequence = 0;
     this.chips.set(STARTING_CHIPS);
     this.currentBet.set(0);
+    this.insuranceBet.set(0);
     this.playerHands.set([]);
     this.activeHandIndex.set(0);
     this.dealerHand.set([]);
@@ -272,33 +341,56 @@ export class BlackjackComponent implements OnDestroy {
   }
 
   private finishInitialDeal(): void {
+    if (this.isInsuranceOfferAvailable()) {
+      this.phase.set('insurance');
+      this.message.set('La banca muestra un As. Puedes tomar seguro o continuar sin seguro.');
+      return;
+    }
+
+    this.resolveDealerPeek();
+  }
+
+  private resolveDealerPeek(): void {
     const playerCards = this.playerHands()[0]?.cards || [];
     const playerTotal = this.calculateHandValue(playerCards).total;
     const dealerTotal = this.calculateHandValue(this.dealerHand().map((card) => ({ ...card, hidden: false }))).total;
+    const hadInsurance = this.insuranceBet() > 0;
 
     if (playerTotal === 21 || dealerTotal === 21) {
       this.revealDealerHand(() => {
+        if (dealerTotal === 21 && hadInsurance) {
+          this.chips.set(this.chips() + (this.insuranceBet() * 3));
+        }
+
         if (playerTotal === 21 && dealerTotal === 21) {
           this.markHandOutcome(0, 'push', true);
-          this.finishRound('push', 'Empate: ambos tenéis blackjack.');
+          this.payoutHand(this.playerHands()[0], PUSH_PAYOUT);
+          this.finishRound('push', hadInsurance ? 'Empate: ambos tenéis blackjack. El seguro compensa la mano principal.' : 'Empate: ambos tenéis blackjack.');
           return;
         }
 
         if (playerTotal === 21) {
           this.markHandOutcome(0, 'blackjack', true);
           this.payoutHand(this.playerHands()[0], BLACKJACK_PAYOUT);
-          this.finishRound('blackjack', '¡Blackjack! Cobras 3:2.');
+          this.finishRound('blackjack', hadInsurance ? '¡Blackjack! Cobras 3:2. El seguro se pierde.' : '¡Blackjack! Cobras 3:2.');
           return;
         }
 
         this.markHandOutcome(0, 'lose', true);
-        this.finishRound('lose', 'La banca tiene blackjack.');
+        this.finishRound('lose', hadInsurance ? 'La banca tiene blackjack, pero cobras el seguro 2:1.' : 'La banca tiene blackjack.');
       });
       return;
     }
 
+    if (hadInsurance) {
+      this.currentBet.set(this.currentBet() - this.insuranceBet());
+      this.insuranceBet.set(0);
+    }
+
     this.phase.set('player-turn');
-    this.message.set('Tu turno. Pide carta, plántate o divide si tienes pareja.');
+    this.message.set(hadInsurance
+      ? 'La banca no tiene blackjack. Pierdes el seguro. Tu turno.'
+      : 'Tu turno. Pide carta, plántate o divide si tienes pareja.');
   }
 
   private runDealerTurn(): void {
@@ -396,6 +488,20 @@ export class BlackjackComponent implements OnDestroy {
     this.phase.set('round-over');
     this.message.set(this.chips() <= 0 ? 'Te quedaste sin fichas. Reinicia la mesa para volver a 100.' : message);
     this.currentBet.set(0);
+    this.insuranceBet.set(0);
+  }
+
+  private isInsuranceOfferAvailable(): boolean {
+    if (this.playerHands().length !== 1) {
+      return false;
+    }
+
+    const dealerCards = this.dealerHand();
+    if (dealerCards.length < 2) {
+      return false;
+    }
+
+    return dealerCards[0].rank === 'A';
   }
 
   private revealDealerHand(callback?: () => void): void {
