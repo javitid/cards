@@ -14,24 +14,26 @@
 
   <section class="blackjack-layout">
     <aside class="blackjack-sidebar">
-      <div class="status-card">
-        <span class="status-card__label">Crédito</span>
-        <strong class="status-card__value">{{ chips() }}</strong>
-      </div>
+      <div class="status-grid">
+        <div class="status-card">
+          <span class="status-card__label">Crédito</span>
+          <strong class="status-card__value">{{ chips() }}</strong>
+        </div>
 
-      <div class="status-card">
-        <span class="status-card__label">Apuesta actual</span>
-        <strong class="status-card__value">{{ currentBet() || selectedBet() }}</strong>
-      </div>
+        <div class="status-card">
+          <span class="status-card__label">Apuesta</span>
+          <strong class="status-card__value">{{ currentBet() || selectedBet() }}</strong>
+        </div>
 
-      <div class="status-card">
-        <span class="status-card__label">Seguro</span>
-        <strong class="status-card__value">{{ insuranceBet() || 0 }}</strong>
-      </div>
+        <div class="status-card">
+          <span class="status-card__label">Seguro</span>
+          <strong class="status-card__value">{{ insuranceBet() || 0 }}</strong>
+        </div>
 
-      <div class="status-card">
-        <span class="status-card__label">Cartas en mazo</span>
-        <strong class="status-card__value">{{ deckCount() }}</strong>
+        <div class="status-card">
+          <span class="status-card__label">Mazo</span>
+          <strong class="status-card__value">{{ deckCount() }}</strong>
+        </div>
       </div>
 
       <div class="bet-panel">
@@ -121,6 +123,16 @@
         <div class="blackjack-banner">
           <span class="blackjack-banner__bet">Apuesta: {{ currentBet() || selectedBet() }}</span>
           <strong>{{ message() }}</strong>
+          @if (phase() === 'round-over') {
+            <button
+              pButton
+              type="button"
+              label="Repartir de nuevo"
+              icon="pi pi-play"
+              [disabled]="!canDeal()"
+              (click)="dealRound()">
+            </button>
+          }
         </div>
 
         <div class="player-hands">
