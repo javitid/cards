@@ -19,6 +19,10 @@ const routes: Routes = [
         loadChildren: () => import('./pages/game/game.module').then((m) => m.GameModule),
       },
       {
+        path: 'blackjack',
+        loadChildren: () => import('./pages/blackjack/blackjack.module').then((m) => m.BlackjackModule),
+      },
+      {
         path: 'generate',
         loadChildren: () => import('./pages/generate/generate.module').then((m) => m.GenerateModule),
       },

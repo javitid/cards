@@ -1,4 +1,16 @@
 <div class="game-container">
+  <header class="game-switcher">
+    <div class="game-switcher__copy">
+      <span class="game-switcher__eyebrow">Juegos</span>
+      <strong>Elige entre memoria y blackjack</strong>
+    </div>
+
+    <div class="game-switcher__actions">
+      <button pButton type="button" label="Memoria" routerLink="/game"></button>
+      <button pButton type="button" label="Blackjack" severity="secondary" routerLink="/blackjack"></button>
+    </div>
+  </header>
+
   <div class="game-content">
     <app-card-container
       [username]="username()"

@@ -1,0 +1,201 @@
+<div class="blackjack-page">
+  <header class="blackjack-topbar">
+    <div class="blackjack-topbar__copy">
+      <span class="blackjack-topbar__eyebrow">Mesa clásica</span>
+      <h1>Blackjack</h1>
+      <p>Juega contra la banca con 100 fichas iniciales. Todo se guarda solo en tu navegador mientras dura la sesión.</p>
+    </div>
+
+    <div class="blackjack-topbar__actions">
+      <button pButton type="button" label="Memoria" severity="secondary" routerLink="/game"></button>
+      <button pButton type="button" label="Blackjack" routerLink="/blackjack"></button>
+    </div>
+  </header>
+
+  <section class="blackjack-layout">
+    <aside class="blackjack-sidebar">
+      <div class="status-card">
+        <span class="status-card__label">Crédito</span>
+        <strong class="status-card__value">{{ chips() }}</strong>
+      </div>
+
+      <div class="status-card">
+        <span class="status-card__label">Apuesta actual</span>
+        <strong class="status-card__value">{{ currentBet() || selectedBet() }}</strong>
+      </div>
+
+      <div class="status-card">
+        <span class="status-card__label">Cartas en mazo</span>
+        <strong class="status-card__value">{{ deckCount() }}</strong>
+      </div>
+
+      <div class="bet-panel">
+        <span class="bet-panel__title">Apuesta</span>
+        <div class="bet-panel__chips">
+          @for (amount of betOptions; track amount) {
+            <button
+              type="button"
+              class="chip-button"
+              [class.chip-button--active]="selectedBet() === amount"
+              [disabled]="isRoundActive()"
+              (click)="selectBet(amount)">
+              {{ amount }}
+            </button>
+          }
+        </div>
+
+        <div class="bet-panel__actions">
+          <button
+            pButton
+            type="button"
+            label="Repartir"
+            icon="pi pi-play"
+            [disabled]="!canDeal()"
+            (click)="dealRound()">
+          </button>
+
+          <button
+            pButton
+            type="button"
+            label="Reiniciar mesa"
+            severity="secondary"
+            icon="pi pi-refresh"
+            (click)="resetSession()">
+          </button>
+        </div>
+      </div>
+
+      <div class="rules-card">
+        <span class="rules-card__title">Reglas</span>
+        <ul>
+          <li>La banca se planta con 17 o más.</li>
+          <li>Blackjack natural paga 3:2.</li>
+          <li>Empate devuelve la apuesta.</li>
+          <li>Puedes dividir cuando recibes una pareja y tienes fichas para igualar la apuesta.</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="blackjack-table" [class.blackjack-table--win]="outcome() === 'win' || outcome() === 'blackjack'" [class.blackjack-table--lose]="outcome() === 'lose'" [class.blackjack-table--push]="outcome() === 'push'">
+      <div class="blackjack-felt">
+        <section class="hand-zone hand-zone--dealer">
+          <div class="hand-zone__heading">
+            <div>
+              <span class="hand-zone__eyebrow">Banca</span>
+              <h2>Dealer</h2>
+            </div>
+            <span class="hand-zone__score">
+              @if (phase() === 'round-over' || phase() === 'dealer-turn') {
+                {{ handLabel(dealerFinalValue()) }}
+              } @else {
+                {{ handLabel(dealerVisibleValue()) }}
+              }
+            </span>
+          </div>
+
+          <div class="card-row">
+            @for (card of dealerHand(); track card.id) {
+              <article class="playing-card" [class.playing-card--fresh]="card.fresh">
+                <div class="playing-card__inner" [class.playing-card__inner--flipped]="!card.hidden">
+                  <div class="playing-card__face playing-card__face--back">
+                    <div class="playing-card__pattern"></div>
+                  </div>
+                  <div class="playing-card__face playing-card__face--front" [class.playing-card__face--red]="suitColor(card) === 'red'">
+                    <span class="playing-card__corner">{{ card.rank }}</span>
+                    <span class="playing-card__suit">{{ suitSymbol(card) }}</span>
+                    <span class="playing-card__corner playing-card__corner--bottom">{{ card.rank }}</span>
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        </section>
+
+        <div class="blackjack-banner">
+          <span class="blackjack-banner__bet">Apuesta: {{ currentBet() || selectedBet() }}</span>
+          <strong>{{ message() }}</strong>
+        </div>
+
+        <div class="player-hands">
+          @for (hand of playerHands(); track hand.id; let handIndex = $index) {
+            <section
+              class="hand-zone hand-zone--player"
+              [class.hand-zone--active]="phase() === 'player-turn' && handIndex === activeHandIndex()"
+              [class.hand-zone--resolved]="hand.finished || hand.outcome !== 'pending'">
+              <div class="hand-zone__heading">
+                <div>
+                  <span class="hand-zone__eyebrow">Jugador</span>
+                  <h2>{{ playerHands().length > 1 ? 'Mano ' + (handIndex + 1) : 'Tu mano' }}</h2>
+                </div>
+
+                <div class="hand-zone__meta">
+                  <span class="hand-zone__badge">{{ handBadge(handIndex, hand) }}</span>
+                  <span class="hand-zone__score">{{ handLabel(handValueFor(hand)) }}</span>
+                </div>
+              </div>
+
+              <div class="card-row">
+                @for (card of hand.cards; track card.id) {
+                  <article class="playing-card" [class.playing-card--fresh]="card.fresh">
+                    <div class="playing-card__inner playing-card__inner--flipped">
+                      <div class="playing-card__face playing-card__face--back">
+                        <div class="playing-card__pattern"></div>
+                      </div>
+                      <div class="playing-card__face playing-card__face--front" [class.playing-card__face--red]="suitColor(card) === 'red'">
+                        <span class="playing-card__corner">{{ card.rank }}</span>
+                        <span class="playing-card__suit">{{ suitSymbol(card) }}</span>
+                        <span class="playing-card__corner playing-card__corner--bottom">{{ card.rank }}</span>
+                      </div>
+                    </div>
+                  </article>
+                }
+              </div>
+            </section>
+          }
+        </div>
+      </div>
+
+      <footer class="table-controls">
+        <button
+          pButton
+          type="button"
+          label="Pedir carta"
+          icon="pi pi-plus"
+          [disabled]="!canHit()"
+          (click)="hit()">
+        </button>
+
+        <button
+          pButton
+          type="button"
+          label="Plantarse"
+          severity="secondary"
+          icon="pi pi-stop"
+          [disabled]="!canStand()"
+          (click)="stand()">
+        </button>
+
+        <button
+          pButton
+          type="button"
+          label="Dividir"
+          severity="help"
+          icon="pi pi-clone"
+          [disabled]="!canSplit()"
+          (click)="split()">
+        </button>
+
+        @if (canRecover()) {
+          <button
+            pButton
+            type="button"
+            label="Recuperar 100 fichas"
+            severity="contrast"
+            icon="pi pi-wallet"
+            (click)="resetSession()">
+          </button>
+        }
+      </footer>
+    </main>
+  </section>
+</div>
