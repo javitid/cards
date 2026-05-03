@@ -27,6 +27,13 @@ export class AuthService {
   readonly username = signal<string>(sessionStorage.getItem('username') || '');
 
   constructor(private readonly logger: LoggerService) {
+    if (this.isE2eSessionEnabled()) {
+      this.saveToken(sessionStorage.getItem('token') || 'e2e-token');
+      this.saveUsername(sessionStorage.getItem('username') || 'e2e.user@cards.test');
+      this.loginStatus.set(true);
+      return;
+    }
+
     setPersistence(auth, browserSessionPersistence).catch((error) => {
       this.logger.error('Could not set Firebase session persistence', error);
     });
@@ -140,5 +147,9 @@ export class AuthService {
 
   setUsername(val: any) {
     this.username.set(String(val || ''));
+  }
+
+  private isE2eSessionEnabled(): boolean {
+    return sessionStorage.getItem('cards:e2e-auth') === 'true';
   }
 }

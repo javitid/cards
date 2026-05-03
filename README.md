@@ -12,6 +12,7 @@ Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independ
 
 - Desarrollo local: `npm start`
 - Tests: `npm test -- --runInBand --watch=false`
+- Tests e2e: `npm run test:e2e`
 - Build local: `npm run build`
 - Deploy reglas Firestore: `npm run deploy:firestore-rules`
 - Seed juegos nuevos en Firestore: `npm run seed:firestore-games`
@@ -243,4 +244,5 @@ Comprobaciones recomendadas antes de publicar:
 ```bash
 npm test -- --runInBand --watch=false
 npm run build
+npm run test:e2e
 ```

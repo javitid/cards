@@ -37,6 +37,9 @@ firebase-debug.log
 /libpeerconnection.log
 testem.log
 /typings
+/features-gen
+/.features-gen
+/test-results
 
 # System files
 .DS_Store
