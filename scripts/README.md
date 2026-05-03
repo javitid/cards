@@ -2,6 +2,14 @@
 
 Este directorio contiene utilidades operativas para Firestore, migraciones y despliegues auxiliares.
 
+## Regla de despliegue
+
+En este repositorio, una peticion de "desplegar" se interpreta por defecto como:
+- publicar en `GitHub Pages` con `npm run deploy:github`
+- publicar en `Latarce` con `npm run deploy:latarce:build`
+
+Si solo se quiere uno de los destinos, debe indicarse de forma explicita.
+
 ## Scripts disponibles
 
 ### Validacion y migracion

@@ -181,6 +181,10 @@ En Firebase Console -> Authentication -> Sign-in method, habilitar:
 
 ## Deploy
 
+Convencion operativa de este proyecto:
+- cuando se pida "desplegar", se debe publicar en `GitHub Pages` y en `Latarce`
+- si solo se quiere uno de los dos destinos, hay que indicarlo explicitamente
+
 ### GitHub Pages
 
 ```bash
@@ -215,6 +219,15 @@ npm run build:latarce
 4. Desplegar:
 
 ```bash
+npm run deploy:latarce:build
+```
+
+### Despliegue completo
+
+Cuando se pida un despliegue general del proyecto, ejecutar ambos:
+
+```bash
+npm run deploy:github
 npm run deploy:latarce:build
 ```
 
