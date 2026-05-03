@@ -11,6 +11,7 @@ const LEADERBOARD_LIMIT = 5;
 export class GameLeaderboardService {
   readonly isGameDialogVisible = signal(false);
   readonly gameDialogMessage = signal('');
+  readonly showCompletedLeaderboard = signal(false);
   readonly leaderboard = signal<ScoreEntry[]>([]);
   readonly leaderboardMessage = signal('Cargando mejores tiempos...');
   readonly leaderboardAvailable = signal(true);
@@ -64,6 +65,7 @@ export class GameLeaderboardService {
 
   resetRoundState(): void {
     this.completedTimeSeconds = undefined;
+    this.showCompletedLeaderboard.set(false);
     this.canSaveScore.set(false);
     this.isSavingScore.set(false);
     this.hasSavedScore.set(false);
@@ -82,9 +84,10 @@ export class GameLeaderboardService {
     this.scoreSaveMessage.set('');
     this.playerName.set(this.getDefaultPlayerName());
     this.gameDialogMessage.set(`Completado en ${durationSeconds} segundos`);
+    this.showCompletedLeaderboard.set(this.shouldAutoSaveOnMobile());
 
     if (this.shouldAutoSaveOnMobile()) {
-      this.isGameDialogVisible.set(false);
+      this.isGameDialogVisible.set(true);
       this.saveCompletedGame();
       return;
     }
@@ -94,6 +97,7 @@ export class GameLeaderboardService {
 
   openTimeoutDialog(): void {
     this.completedTimeSeconds = undefined;
+    this.showCompletedLeaderboard.set(false);
     this.canSaveScore.set(false);
     this.gameDialogMessage.set('Se acabó el tiempo');
     this.isGameDialogVisible.set(true);
@@ -104,6 +108,7 @@ export class GameLeaderboardService {
 
     if (!visible) {
       this.gameDialogMessage.set('');
+      this.showCompletedLeaderboard.set(false);
     }
   }
 

@@ -269,7 +269,32 @@
     <div class="dialog-content">
         <span>{{ facade.gameDialogMessage() }}</span>
 
-        @if (facade.canSaveScore()) {
+        @if (facade.showCompletedLeaderboard()) {
+            <div class="leaderboard-dialog">
+                <div class="leaderboard__header">
+                    <span class="leaderboard__title">Ranking actual</span>
+                    <span class="leaderboard__badge">{{ facade.currentLevelLabel() }} · {{ facade.currentLanguage() | uppercase }}</span>
+                </div>
+
+                @if (facade.scoreSaveMessage()) {
+                    <small class="dialog-content__feedback">{{ facade.scoreSaveMessage() }}</small>
+                }
+
+                @if (facade.leaderboard().length) {
+                    <ol class="leaderboard__list">
+                        @for (score of facade.leaderboard(); track score.id) {
+                            <li class="leaderboard__item">
+                                <span class="leaderboard__position">{{ $index + 1 }}</span>
+                                <span class="leaderboard__name">{{ score.playerName }}</span>
+                                <strong class="leaderboard__time">{{ score.durationSeconds }}s</strong>
+                            </li>
+                        }
+                    </ol>
+                } @else {
+                    <p class="leaderboard__empty">{{ facade.leaderboardMessage() }}</p>
+                }
+            </div>
+        } @else if (facade.canSaveScore()) {
             <label class="dialog-content__field">
                 <span>Nombre</span>
                 <input
@@ -296,8 +321,10 @@
         }
 
         <div class="dialog-content__actions">
-            <button pButton type="button" label="Cerrar" severity="secondary" (click)="closeGameDialog(false)"></button>
-            <button pButton type="button" label="Nueva partida" (click)="closeGameDialog(true)"></button>
+            @if (!facade.showCompletedLeaderboard()) {
+                <button pButton type="button" label="Cerrar" severity="secondary" (click)="closeGameDialog(false)"></button>
+            }
+            <button pButton type="button" [label]="facade.showCompletedLeaderboard() ? 'Volver a jugar' : 'Nueva partida'" (click)="closeGameDialog(true)"></button>
         </div>
     </div>
 </p-dialog>

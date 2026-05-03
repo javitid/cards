@@ -103,7 +103,8 @@ describe('GameLeaderboardService', () => {
 
     service.openCompletedDialog(16, 'languages', 'gb', 'easy');
 
-    expect(service.isGameDialogVisible()).toBe(false);
+    expect(service.isGameDialogVisible()).toBe(true);
+    expect(service.showCompletedLeaderboard()).toBe(true);
     expect(dataServiceMock.saveScore).toHaveBeenCalledWith(
       expect.objectContaining({
         playerName: 'jugador.demo',

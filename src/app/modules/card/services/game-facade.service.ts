@@ -26,6 +26,7 @@ export class GameFacade {
   readonly timeLeft = this.timerService.timeLeft;
   readonly isGameDialogVisible = this.leaderboardService.isGameDialogVisible;
   readonly gameDialogMessage = this.leaderboardService.gameDialogMessage;
+  readonly showCompletedLeaderboard = this.leaderboardService.showCompletedLeaderboard;
   readonly leaderboard = this.leaderboardService.leaderboard;
   readonly leaderboardMessage = this.leaderboardService.leaderboardMessage;
   readonly leaderboardAvailable = this.leaderboardService.leaderboardAvailable;
