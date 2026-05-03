@@ -80,11 +80,15 @@
 
 @media (max-width: 720px) {
   .card {
-    min-height: 64px;
+    min-height: 54px;
     height: auto;
-    padding: 0.55rem 0.45rem;
-    border-radius: 0.9rem;
-    font-size: 0.82rem;
+    padding: 0.38rem 0.35rem;
+    border-radius: 0.8rem;
+    font-size: 0.74rem;
     line-height: 1.1;
+  }
+
+  .card-state {
+    font-size: 0.82rem;
   }
 }

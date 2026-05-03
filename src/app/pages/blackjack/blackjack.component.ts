@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, computed, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 
 type RoundPhase = 'betting' | 'dealing' | 'insurance' | 'player-turn' | 'dealer-turn' | 'round-over';
 type RoundOutcome = 'idle' | 'win' | 'lose' | 'push' | 'blackjack';
@@ -44,6 +45,8 @@ const PUSH_PAYOUT = 1;
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class BlackjackComponent implements OnDestroy {
+  private readonly router = inject(Router);
+  readonly isGamePickerOpen = signal(false);
   readonly betOptions = BET_OPTIONS;
   readonly chips = signal(STARTING_CHIPS);
   readonly selectedBet = signal<number>(BET_OPTIONS[0]);
@@ -96,6 +99,19 @@ export class BlackjackComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.clearScheduledActions();
+  }
+
+  toggleGamePicker(): void {
+    this.isGamePickerOpen.update((value) => !value);
+  }
+
+  closeGamePicker(): void {
+    this.isGamePickerOpen.set(false);
+  }
+
+  navigateToGame(path: '/game' | '/blackjack'): void {
+    this.closeGamePicker();
+    this.router.navigateByUrl(path);
   }
 
   selectBet(amount: number): void {

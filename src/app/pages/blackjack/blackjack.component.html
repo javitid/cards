@@ -1,14 +1,26 @@
 <div class="blackjack-page">
   <header class="blackjack-topbar">
-    <div class="blackjack-topbar__copy">
-      <span class="blackjack-topbar__eyebrow">Mesa clásica</span>
-      <h1>Blackjack</h1>
-      <p>Juega contra la banca con 100 fichas iniciales. Todo se guarda solo en tu navegador mientras dura la sesión.</p>
+    @if (isGamePickerOpen()) {
+      <div class="blackjack-topbar__backdrop" (click)="closeGamePicker()"></div>
+    }
+
+    <div class="blackjack-topbar__switcher">
+      <button pButton type="button" label="Memoria" severity="secondary" class="p-button-sm" routerLink="/game"></button>
+      <button pButton type="button" label="Blackjack" class="p-button-sm" routerLink="/blackjack"></button>
     </div>
 
-    <div class="blackjack-topbar__actions">
-      <button pButton type="button" label="Memoria" severity="secondary" routerLink="/game"></button>
-      <button pButton type="button" label="Blackjack" routerLink="/blackjack"></button>
+    <div class="blackjack-topbar__copy">
+      <span class="blackjack-topbar__eyebrow">Mesa clásica</span>
+      <div class="blackjack-topbar__title-wrap">
+        <button type="button" class="blackjack-topbar__title" (click)="toggleGamePicker()">Blackjack</button>
+
+        @if (isGamePickerOpen()) {
+          <div class="blackjack-game-picker">
+            <button type="button" class="blackjack-game-picker__item" (click)="navigateToGame('/game')">Memoria</button>
+            <button type="button" class="blackjack-game-picker__item blackjack-game-picker__item--active" (click)="navigateToGame('/blackjack')">Blackjack</button>
+          </div>
+        }
+      </div>
     </div>
   </header>
 

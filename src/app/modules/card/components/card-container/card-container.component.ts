@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewEncapsulation, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { AppGameId, Card, GameLevelId } from '../../interfaces/card';
 import { GameFacade } from '../../services/game-facade.service';
@@ -18,6 +19,7 @@ export class CardContainerComponent implements OnInit, OnDestroy {
   @Output() logoutRequested = new EventEmitter<void>();
 
   readonly facade = inject(GameFacade);
+  private readonly router = inject(Router);
   readonly games = this.facade.games;
   readonly languages = this.facade.languages;
   readonly levels = this.facade.levels;
@@ -25,6 +27,7 @@ export class CardContainerComponent implements OnInit, OnDestroy {
   isGameDialogVisible = false;
   isLeaderboardDialogVisible = false;
   isMenuOpen = false;
+  isGamePickerOpen = false;
   isHeaderFixed = false;
   isMenuShown = true;
 
@@ -45,6 +48,15 @@ export class CardContainerComponent implements OnInit, OnDestroy {
     this.isMenuOpen = false;
   }
 
+  closeGamePicker(): void {
+    this.isGamePickerOpen = false;
+  }
+
+  toggleGamePicker(): void {
+    this.isGamePickerOpen = !this.isGamePickerOpen;
+    this.isMenuOpen = false;
+  }
+
   selectLanguage(event: { value?: string } | string): void {
     this.facade.selectLanguage(event);
     this.closeMenu();
@@ -52,6 +64,7 @@ export class CardContainerComponent implements OnInit, OnDestroy {
 
   selectGame(event: { value?: AppGameId } | AppGameId): void {
     this.facade.selectGame(event);
+    this.closeGamePicker();
     this.closeMenu();
   }
 
@@ -100,4 +113,9 @@ export class CardContainerComponent implements OnInit, OnDestroy {
   closeGameDialog(reload = false): void {
     this.facade.closeGameDialog(reload);
   }
+
+  navigateTo(path: '/game' | '/blackjack'): void {
+    this.router.navigateByUrl(path);
+  }
+
 }

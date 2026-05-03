@@ -2,17 +2,56 @@
     <header class="board-header" [class.board-header-fixed]="isHeaderFixed">
         <div class="board-header__top">
             <div class="board-header__brand">
-                <span class="board-header__eyebrow">{{ facade.currentGameLabel() }}</span>
-                <button
-                    pButton
-                    type="button"
-                    icon="pi pi-info-circle"
-                    class="p-button-text p-button-sm board-header__info"
-                    [pTooltip]="facade.currentGameInstructions()"
-                    tooltipPosition="bottom"
-                    [hideDelay]="2000"
-                    aria-label="Instrucciones del juego">
-                </button>
+                <div class="board-header__page-switch">
+                    <button
+                        pButton
+                        type="button"
+                        label="Memoria"
+                        class="p-button-sm"
+                        (click)="navigateTo('/game')">
+                    </button>
+                    <button
+                        pButton
+                        type="button"
+                        label="Blackjack"
+                        severity="secondary"
+                        class="p-button-sm"
+                        (click)="navigateTo('/blackjack')">
+                    </button>
+                </div>
+
+                <div class="board-header__title-row">
+                    <button
+                        type="button"
+                        class="board-header__eyebrow board-header__eyebrow--action"
+                        (click)="toggleGamePicker()">
+                        {{ facade.currentGameLabel() }}
+                    </button>
+                    <button
+                        pButton
+                        type="button"
+                        icon="pi pi-info-circle"
+                        class="p-button-text p-button-sm board-header__info"
+                        [pTooltip]="facade.currentGameInstructions()"
+                        tooltipPosition="bottom"
+                        [hideDelay]="2000"
+                        aria-label="Instrucciones del juego">
+                    </button>
+
+                    @if (isGamePickerOpen) {
+                        <div class="board-game-picker">
+                            @for (game of games; track game.id) {
+                                <button
+                                    type="button"
+                                    class="board-game-picker__item"
+                                    [class.board-game-picker__item--active]="facade.currentGame() === game.id"
+                                    (click)="selectGame(game.id)">
+                                    {{ game.label }}
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
 
             <div class="board-header__mobile-summary">
@@ -63,8 +102,8 @@
                     aria-label="Abrir opciones del juego">
                 </button>
 
-                @if (isMenuOpen) {
-                    <div class="board-menu-backdrop" (click)="closeMenu()"></div>
+                @if (isMenuOpen || isGamePickerOpen) {
+                    <div class="board-menu-backdrop" (click)="closeMenu(); closeGamePicker()"></div>
                 }
 
                 @if (isMenuOpen && isMenuShown) {
@@ -215,35 +254,6 @@
             </div>
         }
     </div>
-
-    <p-toolbar styleClass="game-toolbar">
-        <ng-template pTemplate="start">
-            <span class="game-toolbar__title">Más juegos</span>
-        </ng-template>
-        <ng-template pTemplate="end">
-            @if (facade.cardsSourceReason()) {
-                <button
-                    pButton
-                    type="button"
-                    [icon]="facade.isUsingFallbackCards() ? 'pi pi-info-circle' : 'pi pi-check-circle'"
-                    class="p-button-text p-button-sm game-toolbar__meta-button"
-                    [pTooltip]="facade.cardsSourceReason()"
-                    tooltipPosition="top"
-                    aria-label="Estado de los datos">
-                </button>
-            }
-            @for (game of games; track game.id) {
-                <button
-                    pButton
-                    type="button"
-                    class="p-button-text p-button-sm game-toolbar__game-button"
-                    [label]="game.label"
-                    [severity]="facade.currentGame() === game.id ? 'primary' : 'secondary'"
-                    (click)="selectGame(game.id)">
-                </button>
-            }
-        </ng-template>
-    </p-toolbar>
 </section>
 
 <p-dialog

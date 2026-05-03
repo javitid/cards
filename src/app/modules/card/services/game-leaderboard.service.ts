@@ -77,7 +77,18 @@ export class GameLeaderboardService {
     this.currentLevel = level;
     this.completedTimeSeconds = durationSeconds;
     this.canSaveScore.set(true);
+    this.hasSavedScore.set(false);
+    this.isSavingScore.set(false);
+    this.scoreSaveMessage.set('');
+    this.playerName.set(this.getDefaultPlayerName());
     this.gameDialogMessage.set(`Completado en ${durationSeconds} segundos`);
+
+    if (this.shouldAutoSaveOnMobile()) {
+      this.isGameDialogVisible.set(false);
+      this.saveCompletedGame();
+      return;
+    }
+
     this.isGameDialogVisible.set(true);
   }
 
@@ -138,6 +149,20 @@ export class GameLeaderboardService {
   }
 
   private getDefaultPlayerName(): string {
-    return this.authService.username().trim() || 'Invitado';
+    if (this.authService.isAnonymousUser()) {
+      return 'Invitado';
+    }
+
+    const rawUsername = this.authService.username().trim();
+    if (!rawUsername) {
+      return 'Invitado';
+    }
+
+    const [emailPrefix] = rawUsername.split('@');
+    return (emailPrefix || rawUsername).trim() || 'Invitado';
+  }
+
+  private shouldAutoSaveOnMobile(): boolean {
+    return typeof window !== 'undefined' && window.innerWidth <= 720;
   }
 }
