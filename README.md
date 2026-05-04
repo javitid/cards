@@ -5,6 +5,7 @@ Juego web de emparejar cartas construido con Angular y Firebase. La aplicacion a
 - `Sinonimos`: emparejar una palabra con otra de significado equivalente.
 - `Antonimos`: emparejar una palabra con su opuesta.
 - `Matematicas`: emparejar una operacion con su resultado.
+- `Parejas`: emparejar dos imagenes iguales usando SVGs locales.
 
 Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independiente.
 
@@ -79,6 +80,31 @@ En `Matematicas`, la complejidad sube por nivel:
 - `medium`: combinaciones con multiplicacion, division y parentesis sencillos
 - `hard`: operaciones de varios pasos con mezcla de operadores
 
+### Cartas de `Parejas`
+
+Colecciones por juego y nivel:
+- `games/pairs/levels/{level}/cards`
+
+Esquema de documento:
+```json
+{
+  "image": "balloon"
+}
+```
+
+Notas:
+- la imagen debe existir como `assets/memory-pairs/balloon.svg`
+- el juego usa actualmente 12 SVGs base
+- el tablero es fijo por nivel:
+  - `easy`: `4x3`
+  - `medium`: `4x4`
+  - `hard`: `6x4`
+- tiempos configurados actualmente:
+  - `easy`: `75s`
+  - `medium`: `105s`
+  - `hard`: `150s`
+- el modo `Parejas` no usa idioma y no permite cambiar a `2 columnas`
+
 ### Ranking
 
 Ranking legacy de `Idiomas`:
@@ -127,7 +153,7 @@ Notas:
 
 ### Seed rapido de juegos
 
-Sube o reemplaza los contenidos de `synonyms`, `antonyms` y `math` en los niveles `easy`, `medium` y `hard`:
+Sube o reemplaza los contenidos de `synonyms`, `antonyms`, `math` y `pairs` en los niveles `easy`, `medium` y `hard`:
 
 ```bash
 npm run seed:firestore-games
@@ -137,7 +163,8 @@ El script:
 - borra los documentos existentes de esas colecciones
 - escribe documentos nuevos con IDs estables
 - genera `100` operaciones nuevas de matematicas por nivel
-- reutiliza credenciales de `firebase-tools` o una service account si existe
+- sube tambien `12` nombres de SVG por nivel para `pairs`
+- intenta usar `gcloud` si existe y, si no, `firebase-tools` o una service account
 
 ### Replicar niveles legacy
 
@@ -158,6 +185,29 @@ La pagina `/generate` permite:
 Formatos esperados:
 - `Idiomas`: `{ icon, es, gb, it, pt, de }`
 - `Sinonimos`, `Antonimos`, `Matematicas`: `{ icon, left, right }`
+- `Parejas`: `{ image }`
+
+## Notas recientes
+
+### Robustez de arranque
+
+En mayo de 2026 se endurecio el arranque de la app para navegadores que bloquean `sessionStorage`, `localStorage` o APIs como `matchMedia`.
+
+Puntos clave:
+- `AuthService` y `GameFacade` ya no dependen de acceso directo a storage
+- existe un wrapper seguro en [src/app/utils/browser-storage.ts](/Users/javiergarcia/git/cards/src/app/utils/browser-storage.ts:1)
+- `HelperService` protege el uso de `matchMedia`
+
+### Parejas y layout
+
+`Parejas` se anadio como variante de juego con cartas cuadradas de imagen y despues se compacto el layout para aprovechar mejor la altura visible y evitar scroll vertical en escenarios normales.
+
+Si hay que seguir afinandolo, revisar:
+- [src/app/modules/card/components/card/card.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card/card.component.scss:1)
+- [src/app/modules/card/components/card-container/card-container.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card-container/card-container.component.scss:1)
+
+Observacion:
+- la build pasa, pero `card-container.component.scss` supera el budget de estilos por unos `655 bytes`
 
 ## Configuracion de Firebase
 

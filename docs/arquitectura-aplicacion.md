@@ -7,8 +7,14 @@ La aplicacion es un juego de emparejar cartas construido con Angular. Desde mayo
 - `Sinonimos`
 - `Antonimos`
 - `Matematicas`
+- `Parejas`
 
 Todos comparten la misma mecanica base de tablero, temporizador y ranking, pero no necesariamente la misma estructura de datos en Firestore.
+
+Notas de estado relevantes desde mayo de 2026:
+- el arranque se endurecio para tolerar navegadores que bloquean `sessionStorage`, `localStorage` o `matchMedia`
+- se anadio el juego `Parejas`
+- despues se ajusto el layout de `Parejas` para ocupar mejor la pantalla y reducir necesidad de scroll
 
 Firebase se usa para:
 - autenticacion
@@ -50,7 +56,7 @@ La UI consume estado expuesto por `GameFacade` y emite eventos como:
 ### 2. Coordinacion del dominio
 
 `GameFacade` es el punto de entrada de la pantalla. Orquesta:
-- preferencias en `localStorage`
+- preferencias persistidas via wrapper seguro de storage
 - carga de cartas para el juego actual
 - seleccion y emparejamiento de cartas
 - progreso
@@ -64,6 +70,11 @@ La UI consume estado expuesto por `GameFacade` y emite eventos como:
 - `DataService`: acceso a Firestore y fallbacks
 - `AuthService`: login, usuario actual e invitado
 - `UtilsService`: construccion del mazo jugable a partir de pares persistidos
+
+Detalles de robustez:
+- `AuthService` usa [src/app/utils/browser-storage.ts](/Users/javiergarcia/git/cards/src/app/utils/browser-storage.ts:1) para evitar errores de arranque si el navegador bloquea `sessionStorage`
+- `GameFacade` usa ese mismo wrapper para preferencias guardadas
+- `HelperService` protege `matchMedia` para no romper en entornos restringidos
 
 ## Flujo de una partida
 
@@ -147,6 +158,40 @@ Persistencia:
 - `medium`: operaciones combinadas
 - `hard`: operaciones de varios pasos
 
+### `Parejas`
+
+Modelo persistido:
+- documento minimo con `image`
+
+Modelo jugable:
+- dos cartas por grupo
+- ambas muestran la misma imagen
+- las cartas usan `contentType = image`
+- la ruta real del asset se resuelve como `assets/memory-pairs/<image>.svg`
+
+Persistencia:
+- `games/pairs/levels/{level}/cards`
+
+Reglas de tablero:
+- no soporta seleccion de idioma
+- no soporta modo `2 columnas`
+- siempre se mezcla el tablero completo
+- `easy`: `4x3`
+- `medium`: `4x4`
+- `hard`: `6x4`
+
+Temporizadores configurados:
+- `easy`: `75s`
+- `medium`: `105s`
+- `hard`: `150s`
+
+Presentacion:
+- usa cartas cuadradas con `contentType = image`
+- el layout se compacto para aprovechar mejor la altura visible
+- el ajuste principal esta en:
+  - [src/app/modules/card/components/card/card.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card/card.component.scss:1)
+  - [src/app/modules/card/components/card-container/card-container.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card-container/card-container.component.scss:1)
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
@@ -199,7 +244,12 @@ Archivo: [src/app/utils/utils.service.ts](/Users/javiergarcia/git/cards/src/app/
 Responsabilidades:
 - generar cartas para `Idiomas`
 - generar cartas para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
+- generar cartas de imagen para `Parejas`
 - asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
+
+Notas de implementacion:
+- `generateImageCards` resuelve `imagePath` a partir de `image`
+- el modelo de `Card` soporta ahora `contentType`, `imageName` e `imagePath`
 
 ## Flujo de guardado de puntuacion
 
@@ -239,6 +289,8 @@ sequenceDiagram
   - schema: `icon`, `left`, `right`
 - `games/math/levels/{level}/cards`
   - schema: `icon`, `left`, `right`
+- `games/pairs/levels/{level}/cards`
+  - schema: `image`
 
 ### Ranking
 
@@ -258,6 +310,26 @@ Campos de score:
 - `isAnonymous`
 
 ### Configuracion
+
+## Continuidad
+
+Si otro agente retoma mejoras sobre estos cambios, los puntos mas utiles para continuar son:
+
+- [src/app/modules/card/services/game-config.ts](/Users/javiergarcia/git/cards/src/app/modules/card/services/game-config.ts:1)
+  - numero de parejas, tiempos y columnas por dificultad
+- [src/app/modules/card/services/game-facade.service.ts](/Users/javiergarcia/git/cards/src/app/modules/card/services/game-facade.service.ts:1)
+  - reglas del tablero por juego
+- [src/app/modules/card/components/card/card.component.ts](/Users/javiergarcia/git/cards/src/app/modules/card/components/card/card.component.ts:1)
+  - render de carta de imagen frente a texto
+- [src/app/modules/card/components/card-container/card-container.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card-container/card-container.component.scss:1)
+  - compactacion del tablero de `Parejas`
+- [src/app/utils/browser-storage.ts](/Users/javiergarcia/git/cards/src/app/utils/browser-storage.ts:1)
+  - robustez de almacenamiento del navegador
+
+Mejoras pendientes razonables:
+- afinar todavia mas `Parejas` en movil bajo, sobre todo en `hard`
+- bajar el warning del budget SCSS de `card-container.component.scss`
+- anadir tests de componente para render de cartas de imagen
 
 - `config/openaiCredentials`
 

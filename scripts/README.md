@@ -31,9 +31,13 @@ Si solo se quiere uno de los destinos, debe indicarse de forma explicita.
   - Reemplaza el contenido de:
     - `games/synonyms/levels/easy|medium|hard/cards`
     - `games/antonyms/levels/easy|medium|hard/cards`
+    - `games/math/levels/easy|medium|hard/cards`
+    - `games/pairs/levels/easy|medium|hard/cards`
   - Sube actualmente:
     - `102` pares de sinonimos por nivel
     - `101` pares de antonimos por nivel
+    - `100` operaciones de matematicas por nivel
+    - `12` nombres de SVG para `pairs` por nivel
 
 ## Prerrequisitos
 
@@ -90,7 +94,27 @@ npm run seed:firestore-games
 Comportamiento:
 - borra los documentos existentes de las colecciones objetivo
 - escribe documentos nuevos con IDs estables
-- usa Admin SDK si hay service account y, si no, usa REST con el token de `firebase-tools`
+- usa Admin SDK si hay service account
+- si no, intenta este orden para autenticarse:
+  - `GOOGLE_OAUTH_ACCESS_TOKEN`
+  - `gcloud auth print-access-token` si `gcloud` existe
+  - token de `firebase-tools`
+
+Notas operativas recientes:
+- en este proyecto se vio un `401` cuando el token cacheado de `firebase-tools` estaba desfasado
+- una forma fiable de refrescar contexto antes de sembrar es:
+
+```bash
+npx firebase-tools login:list
+npx firebase-tools projects:list --json
+npm run seed:firestore-games
+```
+
+Resultado operativo actual:
+- `synonyms`: `102` docs por nivel
+- `antonyms`: `101` docs por nivel
+- `math`: `100` docs por nivel
+- `pairs`: `12` docs por nivel
 
 ## Migracion desde MongoDB Realm/Data API
 
