@@ -47,6 +47,9 @@
   flex-wrap: wrap;
   gap: 0.5rem;
 }
+.board-header__blackjack-mobile {
+  display: none;
+}
 .board-header__title-row {
   display: flex;
   align-items: center;
@@ -552,7 +555,15 @@
   .board-header__page-switch {
     width: auto;
     flex-wrap: nowrap;
-    gap: 0.35rem;
+    gap: 0.28rem;
+  }
+  .board-header__blackjack-desktop {
+    display: none;
+  }
+  .board-header__blackjack-mobile {
+    display: inline;
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
   .board-header__actions {
     gap: 0.25rem;
@@ -663,9 +674,12 @@
     display: none;
   }
   :host ::ng-deep .board-header__page-switch .p-button {
-    padding: 0.42rem 0.7rem;
+    padding: 0.42rem 0.58rem;
     font-size: 0.72rem;
     border-radius: 0.75rem;
+  }
+  :host ::ng-deep .board-header__blackjack-button.p-button {
+    min-width: 4.2rem;
   }
   :host ::ng-deep .board-header__menu-button {
     width: 2.15rem;

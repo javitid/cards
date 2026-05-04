@@ -7,6 +7,16 @@ export const DEFAULT_TWO_COLUMNS = true;
 export const LANGUAGES = ['gb', 'it', 'pt', 'de'];
 export const GAME_OPTIONS: GameOption[] = [
   {
+    id: 'pairs',
+    label: 'Parejas',
+    description: 'Encuentra las dos cartas con la misma imagen.',
+    instructions: 'Empareja cada imagen con su pareja idéntica.',
+    supportsLanguageSelection: false,
+    supportsColumnToggle: false,
+    cardContent: 'image',
+    defaultLanguage: 'es'
+  },
+  {
     id: 'languages',
     label: 'Idiomas',
     description: 'Empareja una palabra en castellano con su traducción.',
@@ -45,16 +55,6 @@ export const GAME_OPTIONS: GameOption[] = [
     supportsColumnToggle: true,
     cardContent: 'text',
     defaultLanguage: 'es'
-  },
-  {
-    id: 'pairs',
-    label: 'Parejas',
-    description: 'Encuentra las dos cartas con la misma imagen.',
-    instructions: 'Empareja cada imagen con su pareja idéntica.',
-    supportsLanguageSelection: false,
-    supportsColumnToggle: false,
-    cardContent: 'image',
-    defaultLanguage: 'es'
   }
 ];
 export const GAME_LEVELS: GameLevelOption[] = [
@@ -86,7 +86,7 @@ export const GAME_LEVELS: GameLevelOption[] = [
     boardColumnsByGame: { pairs: 6 }
   }
 ];
-export const DEFAULT_GAME: AppGameId = 'languages';
+export const DEFAULT_GAME: AppGameId = 'pairs';
 export const DEFAULT_LEVEL: GameLevelId = 'easy';
 export const LOCAL_STORAGE_KEYS = {
   CURRENT_GAME: 'currentGame',

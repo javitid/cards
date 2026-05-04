@@ -119,6 +119,7 @@ describe('GameFacade', () => {
   });
 
   it('stores the completed time when the puzzle is solved', () => {
+    facade.selectGame('languages');
     timerServiceMock.timeLeft.set(37);
     leaderboardServiceMock.canSaveScore.set(true);
 
@@ -140,6 +141,7 @@ describe('GameFacade', () => {
   });
 
   it('reaches 100 progress for medium difficulty when all pairs are matched', () => {
+    facade.selectGame('languages');
     facade.selectLevel('medium');
 
     while (facade.progress() < 100) {
@@ -159,6 +161,7 @@ describe('GameFacade', () => {
   });
 
   it('reloads cards when changing the level', () => {
+    facade.selectGame('languages');
     facade.selectLevel('medium');
 
     expect(dataServiceMock.getCards).toHaveBeenLastCalledWith('languages', 'gb', 'medium');
@@ -207,5 +210,22 @@ describe('GameFacade', () => {
     facade.selectCard(matchingCard!);
 
     expect(playMatchSoundSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('plays a victory sound when the puzzle is completed', () => {
+    const playVictorySoundSpy = jest.spyOn(facade as never, 'playVictorySound' as never);
+
+    while (Math.round(facade.progress()) < 100) {
+      const unmatchedCard = facade.cards().find((card) => !card.match);
+      const matchingCard = facade.cards().find((card) => unmatchedCard?.pairs.includes(card.id));
+
+      expect(unmatchedCard).toBeTruthy();
+      expect(matchingCard).toBeTruthy();
+
+      facade.selectCard(unmatchedCard!);
+      facade.selectCard(matchingCard!);
+    }
+
+    expect(playVictorySoundSpy).toHaveBeenCalledTimes(1);
   });
 });

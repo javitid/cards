@@ -261,6 +261,7 @@ export class GameFacade {
       this.progress.set(100);
       const timerSeconds = this.getCurrentLevelConfig().timerSeconds;
       const normalizedCompletionTime = timerSeconds - this.timeLeft();
+      this.playVictorySound();
       this.timerService.stop();
       this.leaderboardService.openCompletedDialog(normalizedCompletionTime, this.currentGame(), this.currentLanguage(), this.currentLevel());
     }
@@ -454,21 +455,19 @@ export class GameFacade {
   }
 
   private playMatchSound(): void {
-    if (!this.isSoundOn() || typeof window === 'undefined') {
-      return;
-    }
-
-    const BrowserAudioContext = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!BrowserAudioContext) {
+    if (!this.isSoundOn()) {
       return;
     }
 
     try {
-      this.audioContext ??= new BrowserAudioContext();
+      const audioContext = this.getAudioContext();
+      if (!audioContext) {
+        return;
+      }
 
-      const oscillator = this.audioContext.createOscillator();
-      const gainNode = this.audioContext.createGain();
-      const currentTime = this.audioContext.currentTime;
+      const oscillator = audioContext.createOscillator();
+      const gainNode = audioContext.createGain();
+      const currentTime = audioContext.currentTime;
 
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(880, currentTime);
@@ -479,13 +478,65 @@ export class GameFacade {
       gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.12);
 
       oscillator.connect(gainNode);
-      gainNode.connect(this.audioContext.destination);
+      gainNode.connect(audioContext.destination);
 
       oscillator.start(currentTime);
       oscillator.stop(currentTime + 0.12);
     } catch {
       // Ignore browsers that restrict or fail Web Audio setup.
     }
+  }
+
+  private playVictorySound(): void {
+    if (!this.isSoundOn()) {
+      return;
+    }
+
+    try {
+      const audioContext = this.getAudioContext();
+      if (!audioContext) {
+        return;
+      }
+
+      const notes = [523.25, 659.25, 783.99];
+      const startAt = audioContext.currentTime;
+
+      notes.forEach((frequency, index) => {
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        const noteStart = startAt + index * 0.09;
+        const noteEnd = noteStart + 0.14;
+
+        oscillator.type = 'triangle';
+        oscillator.frequency.setValueAtTime(frequency, noteStart);
+
+        gainNode.gain.setValueAtTime(0.0001, noteStart);
+        gainNode.gain.exponentialRampToValueAtTime(0.06, noteStart + 0.015);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, noteEnd);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+
+        oscillator.start(noteStart);
+        oscillator.stop(noteEnd);
+      });
+    } catch {
+      // Ignore browsers that restrict or fail Web Audio setup.
+    }
+  }
+
+  private getAudioContext(): AudioContext | undefined {
+    if (typeof window === 'undefined') {
+      return undefined;
+    }
+
+    const BrowserAudioContext = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!BrowserAudioContext) {
+      return undefined;
+    }
+
+    this.audioContext ??= new BrowserAudioContext();
+    return this.audioContext;
   }
 
   private patchCards(cardIds: number[], patch: Partial<Card>): void {
