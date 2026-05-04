@@ -133,16 +133,18 @@
 
   .card--image {
     min-height: 0;
+    height: auto;
+    aspect-ratio: 1 / 1;
     padding: 0.28rem;
     border-radius: 0.75rem;
   }
 
   .card-image,
   .card-image-back {
-    width: 72%;
-    height: 72%;
-    max-width: 92px;
-    max-height: 92px;
+    width: 80%;
+    height: 80%;
+    max-width: 96px;
+    max-height: 96px;
   }
 
   .card-state {

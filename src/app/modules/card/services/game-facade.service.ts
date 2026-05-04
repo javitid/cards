@@ -43,6 +43,7 @@ export class GameFacade {
   private lastSelectionId: number | undefined;
   private isLastCardSelected = false;
   private isSelectionBlocked = false;
+  private audioContext?: AudioContext;
 
   constructor(
     private readonly dataService: DataService,
@@ -195,6 +196,10 @@ export class GameFacade {
 
   boardColumnCount(): number {
     if (this.usesImageCards()) {
+      if (this.helperService.isSmallScreen) {
+        return Math.min(4, this.getCurrentLevelConfig().boardColumns);
+      }
+
       return this.getCurrentLevelConfig().boardColumns;
     }
 
@@ -236,6 +241,7 @@ export class GameFacade {
     });
 
     if (isMatch) {
+      this.playMatchSound();
       this.updateProgress();
       this.resetCurrentSelection([firstSelectionId, card.id]);
       this.progressBarCompleted();
@@ -445,6 +451,41 @@ export class GameFacade {
 
   private twoColumnsArray(esCards: Card[], otherCards: Card[]): Card[] {
     return esCards.flatMap((card: Card, index) => [card, otherCards[index]]);
+  }
+
+  private playMatchSound(): void {
+    if (!this.isSoundOn() || typeof window === 'undefined') {
+      return;
+    }
+
+    const BrowserAudioContext = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!BrowserAudioContext) {
+      return;
+    }
+
+    try {
+      this.audioContext ??= new BrowserAudioContext();
+
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      const currentTime = this.audioContext.currentTime;
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(1320, currentTime + 0.06);
+
+      gainNode.gain.setValueAtTime(0.0001, currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.05, currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, currentTime + 0.12);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+
+      oscillator.start(currentTime);
+      oscillator.stop(currentTime + 0.12);
+    } catch {
+      // Ignore browsers that restrict or fail Web Audio setup.
+    }
   }
 
   private patchCards(cardIds: number[], patch: Partial<Card>): void {

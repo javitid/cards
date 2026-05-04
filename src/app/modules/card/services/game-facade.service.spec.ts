@@ -194,4 +194,18 @@ describe('GameFacade', () => {
     expect(facade.boardColumnCount()).toBe(6);
     expect(facade.boardRowCount()).toBe(4);
   });
+
+  it('plays a short match sound when the selected pair is correct', () => {
+    const playMatchSoundSpy = jest.spyOn(facade as never, 'playMatchSound' as never);
+    const firstCard = facade.cards()[0];
+    const matchingCard = facade.cards().find((card) => firstCard.pairs.includes(card.id));
+
+    expect(firstCard).toBeTruthy();
+    expect(matchingCard).toBeTruthy();
+
+    facade.selectCard(firstCard!);
+    facade.selectCard(matchingCard!);
+
+    expect(playMatchSoundSpy).toHaveBeenCalledTimes(1);
+  });
 });
