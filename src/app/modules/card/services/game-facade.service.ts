@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { Subscription } from 'rxjs';
 
 import { DataService } from '../../../services/data.service';
+import { getLocalItem, setLocalItem } from '../../../utils/browser-storage';
 import { HelperService } from '../../../utils/helper.service';
 import { AppGameId, Card, GameLevelId, LanguageCode } from '../interfaces/card';
 import { DEFAULT_CURRENT_LANGUAGE, DEFAULT_FLIP_EFFECT, DEFAULT_GAME, DEFAULT_LEVEL, DEFAULT_SOUND, DEFAULT_TWO_COLUMNS, GAME_LEVELS, GAME_OPTIONS, LANGUAGES, LOCAL_STORAGE_KEYS } from './game-config';
@@ -76,8 +77,8 @@ export class GameFacade {
   selectLanguage(event: { value?: string } | string): void {
     const nextLanguage = (typeof event === 'string' ? event : event.value || DEFAULT_CURRENT_LANGUAGE) as LanguageCode;
     this.currentLanguage.set(nextLanguage);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, nextLanguage);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE, nextLanguage);
+    setLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, nextLanguage);
+    setLocalItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE, nextLanguage);
     this.leaderboardService.loadLeaderboard(this.currentGame(), nextLanguage, this.currentLevel());
     this.loadCards();
   }
@@ -90,15 +91,15 @@ export class GameFacade {
     }
 
     this.currentGame.set(nextGame);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_GAME, nextGame);
+    setLocalItem(LOCAL_STORAGE_KEYS.CURRENT_GAME, nextGame);
 
     if (this.currentGameConfig().supportsLanguageSelection) {
       const savedLanguage = this.getSavedLanguage(nextGame);
       this.currentLanguage.set(savedLanguage);
-      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, savedLanguage);
+      setLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, savedLanguage);
     } else {
       this.currentLanguage.set(this.currentGameConfig().defaultLanguage);
-      localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, this.currentGameConfig().defaultLanguage);
+      setLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE, this.currentGameConfig().defaultLanguage);
     }
 
     this.loadCards();
@@ -112,20 +113,20 @@ export class GameFacade {
     }
 
     this.currentLevel.set(nextLevel);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL, nextLevel);
+    setLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL, nextLevel);
     this.loadCards();
   }
 
   toggleSound(): void {
     const nextValue = !this.isSoundOn();
     this.isSoundOn.set(nextValue);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.SOUND, JSON.stringify(nextValue));
+    setLocalItem(LOCAL_STORAGE_KEYS.SOUND, JSON.stringify(nextValue));
   }
 
   toggleFlipEffect(): void {
     const nextValue = !this.isFlipEffect();
     this.isFlipEffect.set(nextValue);
-    localStorage.setItem(LOCAL_STORAGE_KEYS.FLIP_EFFECT, JSON.stringify(nextValue));
+    setLocalItem(LOCAL_STORAGE_KEYS.FLIP_EFFECT, JSON.stringify(nextValue));
   }
 
   toggleColumns(): void {
@@ -310,7 +311,7 @@ export class GameFacade {
   }
 
   private readPreferences(): void {
-    const savedGame = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_GAME);
+    const savedGame = getLocalItem(LOCAL_STORAGE_KEYS.CURRENT_GAME);
     const nextGame = GAME_OPTIONS.some((game) => game.id === savedGame) ? (savedGame as AppGameId) : DEFAULT_GAME;
 
     this.currentGame.set(nextGame);
@@ -326,7 +327,7 @@ export class GameFacade {
   }
 
   private getBooleanPreference(key: string, defaultValue: boolean): boolean {
-    const value = localStorage.getItem(key);
+    const value = getLocalItem(key);
 
     if (value === null) {
       return defaultValue;
@@ -336,7 +337,7 @@ export class GameFacade {
   }
 
   private getSavedLevel(): GameLevelId {
-    const rawLevel = localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL);
+    const rawLevel = getLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LEVEL);
     return GAME_LEVELS.some((level) => level.id === rawLevel) ? (rawLevel as GameLevelId) : DEFAULT_LEVEL;
   }
 
@@ -347,8 +348,8 @@ export class GameFacade {
       return gameConfig.defaultLanguage;
     }
 
-    const rawLanguage = localStorage.getItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE)
-      || localStorage.getItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE)
+    const rawLanguage = getLocalItem(LOCAL_STORAGE_KEYS.LANGUAGES_GAME_LANGUAGE)
+      || getLocalItem(LOCAL_STORAGE_KEYS.CURRENT_LANGUAGE)
       || DEFAULT_CURRENT_LANGUAGE;
     return rawLanguage as LanguageCode;
   }

@@ -7,6 +7,12 @@ export class HelperService {
   public isSmallScreen: boolean;
 
   constructor() {
-    this.isSmallScreen = typeof window !== 'undefined' && window.matchMedia('(max-width: 640px)').matches;
+    try {
+      this.isSmallScreen = typeof window !== 'undefined'
+        && typeof window.matchMedia === 'function'
+        && window.matchMedia('(max-width: 640px)').matches;
+    } catch {
+      this.isSmallScreen = false;
+    }
   }
 }

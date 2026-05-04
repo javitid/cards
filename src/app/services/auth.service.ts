@@ -17,6 +17,7 @@ import { map, switchMap } from 'rxjs/operators';
 import { toObservable } from '@angular/core/rxjs-interop';
 
 import { auth } from '../utils/firebase';
+import { getSessionItem, removeSessionItem, setSessionItem } from '../utils/browser-storage';
 import { LoggerService } from './logger.service';
 
 @Injectable({
@@ -24,12 +25,12 @@ import { LoggerService } from './logger.service';
 })
 export class AuthService {
   readonly loginStatus = signal<boolean>(this.loggedIn());
-  readonly username = signal<string>(sessionStorage.getItem('username') || '');
+  readonly username = signal<string>(getSessionItem('username') || '');
 
   constructor(private readonly logger: LoggerService) {
     if (this.isE2eSessionEnabled()) {
-      this.saveToken(sessionStorage.getItem('token') || 'e2e-token');
-      this.saveUsername(sessionStorage.getItem('username') || 'e2e.user@cards.test');
+      this.saveToken(getSessionItem('token') || 'e2e-token');
+      this.saveUsername(getSessionItem('username') || 'e2e.user@cards.test');
       this.loginStatus.set(true);
       return;
     }
@@ -55,8 +56,8 @@ export class AuthService {
 
   public logout(): void {
     signOut(auth).finally(() => {
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('username');
+      removeSessionItem('token');
+      removeSessionItem('username');
       this.setLoginStatus(false);
     });
   }
@@ -114,11 +115,13 @@ export class AuthService {
   }
 
   saveToken(token: string) {
-    sessionStorage.setItem('token', token);
+    if (!setSessionItem('token', token)) {
+      this.logger.warn('Session storage is not available. Token will only live in memory.');
+    }
   }
 
   getToken(): string {
-    return sessionStorage.getItem('token') || '';
+    return getSessionItem('token') || '';
   }
 
   getCurrentUserId(): string | null {
@@ -130,12 +133,15 @@ export class AuthService {
   }
 
   saveUsername(username: string) {
-    sessionStorage.setItem('username', username);
+    if (!setSessionItem('username', username)) {
+      this.logger.warn('Session storage is not available. Username will only live in memory.');
+    }
+
     this.username.set(username);
   }
 
   loggedIn(): boolean {
-    if (sessionStorage.getItem('token')) {
+    if (getSessionItem('token')) {
       return true;
     }
     return false;
@@ -150,6 +156,6 @@ export class AuthService {
   }
 
   private isE2eSessionEnabled(): boolean {
-    return sessionStorage.getItem('cards:e2e-auth') === 'true';
+    return getSessionItem('cards:e2e-auth') === 'true';
   }
 }
