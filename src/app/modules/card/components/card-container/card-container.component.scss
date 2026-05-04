@@ -328,6 +328,11 @@
   align-content: stretch;
   overflow: hidden;
 }
+.board-grid--square app-card {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
 .board-grid--loading {
   min-height: 280px;
 }
