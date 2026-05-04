@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BinaryPair, Card, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
+import { BinaryPair, Card, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
 const LANGUAGE_VOICES: Record<LanguageCode, string> = {
@@ -27,6 +27,7 @@ export class UtilsService {
           voice: LANGUAGE_VOICES[BASE_LANGUAGE],
           pairs: [secondId],
           value: pair.es,
+          contentType: 'text',
           match: false,
           selected: false
         },
@@ -37,6 +38,7 @@ export class UtilsService {
           voice: LANGUAGE_VOICES[targetLanguage],
           pairs: [firstId],
           value: pair[targetLanguage],
+          contentType: 'text',
           match: false,
           selected: false
         }
@@ -57,6 +59,7 @@ export class UtilsService {
           voice: LANGUAGE_VOICES.es,
           pairs: [secondId],
           value: pair.left,
+          contentType: 'text',
           match: false,
           selected: false
         },
@@ -67,10 +70,61 @@ export class UtilsService {
           voice: LANGUAGE_VOICES.es,
           pairs: [firstId],
           value: pair.right,
+          contentType: 'text',
           match: false,
           selected: false
         }
       ];
     });
+  }
+
+  generateImageCards(pairs: ImagePair[]): Card[] {
+    return pairs.flatMap((pair: ImagePair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
+      const imageName = this.normalizeImageName(pair.image);
+      const imagePath = `assets/memory-pairs/${imageName}.svg`;
+      const label = this.humanizeImageName(imageName);
+
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [secondId],
+          value: label,
+          contentType: 'image',
+          imageName,
+          imagePath,
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [firstId],
+          value: label,
+          contentType: 'image',
+          imageName,
+          imagePath,
+          match: false,
+          selected: false
+        }
+      ];
+    });
+  }
+
+  private normalizeImageName(imageName: string): string {
+    return imageName.replace(/\.svg$/i, '').trim();
+  }
+
+  private humanizeImageName(imageName: string): string {
+    return this.normalizeImageName(imageName)
+      .replace(/[-_]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
   }
 }

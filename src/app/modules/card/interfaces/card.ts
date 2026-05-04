@@ -5,6 +5,9 @@ export interface Card {
   voice: string;
   pairs: number[];
   value: string;
+  contentType?: 'text' | 'image';
+  imageName?: string;
+  imagePath?: string;
   match?: boolean;
   selected?: boolean;
 }
@@ -18,7 +21,7 @@ export interface Credentials {
   organization: string;
 }
 
-export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math';
+export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
 export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
 
@@ -28,6 +31,8 @@ export interface GameOption {
   description: string;
   instructions: string;
   supportsLanguageSelection: boolean;
+  supportsColumnToggle: boolean;
+  cardContent: 'text' | 'image';
   defaultLanguage: LanguageCode;
 }
 
@@ -36,7 +41,9 @@ export interface GameLevelOption {
   label: string;
   pairs: number;
   timerSeconds: number;
+  pairsByGame?: Partial<Record<AppGameId, number>>;
   timerSecondsByGame?: Partial<Record<AppGameId, number>>;
+  boardColumnsByGame?: Partial<Record<AppGameId, number>>;
 }
 
 export interface ScoreEntry {
@@ -74,6 +81,10 @@ export interface BinaryPair {
   icon: string;
   left: string;
   right: string;
+}
+
+export interface ImagePair {
+  image: string;
 }
 
 export type SynonymPair = BinaryPair;

@@ -21,6 +21,16 @@ describe('GameFacade', () => {
         { id: baseId + 1, groupId: pairIndex, value: `gb-${pairIndex}`, voice: 'en-GB', pairs: [baseId], selected: false, match: false, icon: '' }
       ];
     }).flat();
+  const createImageDeck = (pairCount = 12): Card[] =>
+    Array.from({ length: pairCount }, (_, pairIndex) => {
+      const baseId = pairIndex * 2;
+      const imageName = `shape-${pairIndex}`;
+
+      return [
+        { id: baseId, groupId: pairIndex, value: imageName, voice: '', pairs: [baseId + 1], selected: false, match: false, icon: '', contentType: 'image' as const, imageName, imagePath: `assets/memory-pairs/${imageName}.svg` },
+        { id: baseId + 1, groupId: pairIndex, value: imageName, voice: '', pairs: [baseId], selected: false, match: false, icon: '', contentType: 'image' as const, imageName, imagePath: `assets/memory-pairs/${imageName}.svg` }
+      ];
+    }).flat();
 
   const dataServiceMock = {
     getCards: jest.fn(),
@@ -164,5 +174,24 @@ describe('GameFacade', () => {
     facade.selectLevel('hard');
 
     expect(timerServiceMock.start).toHaveBeenLastCalledWith(240, expect.any(Function));
+  });
+
+  it('uses a fixed mixed board for the pairs game by difficulty', () => {
+    dataServiceMock.getCards.mockReturnValue(of(createImageDeck()));
+
+    facade.selectGame('pairs');
+
+    expect(facade.usesImageCards()).toBe(true);
+    expect(facade.supportsColumnToggle()).toBe(false);
+    expect(facade.boardColumnCount()).toBe(4);
+    expect(facade.boardRowCount()).toBe(3);
+
+    facade.selectLevel('medium');
+    expect(facade.boardColumnCount()).toBe(4);
+    expect(facade.boardRowCount()).toBe(4);
+
+    facade.selectLevel('hard');
+    expect(facade.boardColumnCount()).toBe(6);
+    expect(facade.boardRowCount()).toBe(4);
   });
 });

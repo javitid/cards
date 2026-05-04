@@ -1,6 +1,7 @@
 <button
     type="button"
     class="card"
+    [class.card--image]="isImageCard"
     [class.card-back]="isFlipEffect && !card.match && !card.selected"
     [class.highlight-card]="card.selected"
     [class.matched-card]="card.match"
@@ -12,7 +13,20 @@
         </span>
     }
 
-    <span class="card-value">
-        {{ isFlipEffect && !card.match && !card.selected ? '•••' : card.value }}
-    </span>
+    @if (isImageCard) {
+        @if (isHiddenByFlipEffect) {
+            <span class="card-image-back" aria-hidden="true">
+                <i class="pi pi-image"></i>
+            </span>
+        } @else {
+            <img
+                class="card-image"
+                [src]="card.imagePath"
+                [alt]="card.value">
+        }
+    } @else {
+        <span class="card-value">
+            {{ isHiddenByFlipEffect ? '•••' : card.value }}
+        </span>
+    }
 </button>

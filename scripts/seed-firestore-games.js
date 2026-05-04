@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const admin = require('firebase-admin');
+const { execFileSync } = require('child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -220,6 +221,20 @@ const ANTONYM_PAIRS = [
   ['inspirar', 'espirar'],
   ['acercar', 'alejar']
 ];
+const IMAGE_PAIRS = [
+  'balloon',
+  'boat',
+  'camera',
+  'cherry',
+  'flower',
+  'guitar',
+  'heart',
+  'kite',
+  'leaf',
+  'rocket',
+  'star',
+  'turtle'
+];
 
 function getServiceKeyPath() {
   if (process.env.FIREBASE_SERVICE_KEY) {
@@ -253,6 +268,30 @@ function getFirebaseToolsAccessToken() {
   return accessToken;
 }
 
+function getGcloudAccessToken() {
+  try {
+    return execFileSync('gcloud', ['auth', 'print-access-token'], {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore']
+    }).trim();
+  } catch (_error) {
+    return '';
+  }
+}
+
+function getAccessToken() {
+  if (process.env.GOOGLE_OAUTH_ACCESS_TOKEN) {
+    return process.env.GOOGLE_OAUTH_ACCESS_TOKEN;
+  }
+
+  const gcloudAccessToken = getGcloudAccessToken();
+  if (gcloudAccessToken) {
+    return gcloudAccessToken;
+  }
+
+  return getFirebaseToolsAccessToken();
+}
+
 function initializeFirestoreAdmin() {
   const serviceKeyPath = getServiceKeyPath();
 
@@ -279,6 +318,10 @@ function buildGameDocsForAllLevels(docs) {
     medium: docs,
     hard: docs
   };
+}
+
+function buildImageDocs(imageNames) {
+  return imageNames.map((image) => ({ image }));
 }
 
 function buildEasyMathPairs(count = 100) {
@@ -463,6 +506,10 @@ const GAME_SEEDS = {
   math: {
     prefix: 'math',
     docsByLevel: buildMathDocsByLevel()
+  },
+  pairs: {
+    prefix: 'pairs',
+    docsByLevel: buildGameDocsForAllLevels(buildImageDocs(IMAGE_PAIRS))
   }
 };
 
@@ -600,7 +647,7 @@ async function seedGame(firestore, accessToken, gameId, gameSeed) {
 
 async function seedGames() {
   const firestore = initializeFirestoreAdmin();
-  const accessToken = firestore ? null : getFirebaseToolsAccessToken();
+  const accessToken = firestore ? null : getAccessToken();
 
   try {
     for (const [gameId, gameSeed] of Object.entries(GAME_SEEDS)) {

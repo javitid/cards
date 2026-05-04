@@ -322,6 +322,11 @@
 .board-grid--columns {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+.board-grid--square {
+  grid-template-rows: none;
+  align-content: start;
+  overflow-y: auto;
+}
 .board-grid--loading {
   min-height: 280px;
 }

@@ -17,4 +17,12 @@ export class CardComponent {
 
   @Output()
   selectCard = new EventEmitter<Card>();
+
+  get isImageCard(): boolean {
+    return this.card?.contentType === 'image';
+  }
+
+  get isHiddenByFlipEffect(): boolean {
+    return this.isFlipEffect && !this.card.match && !this.card.selected;
+  }
 }

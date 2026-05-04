@@ -67,4 +67,11 @@ describe('GenerateComponent', () => {
     expect(component.form.controls.content.value).toContain('"left"');
     expect(component.form.controls.content.value).toContain('"right"');
   });
+
+  it('should swap the template when changing to the pairs game', () => {
+    component.form.controls.gameId.setValue('pairs');
+
+    expect(component.form.controls.content.value).toContain('"image"');
+    expect(component.form.controls.content.value).toContain('balloon');
+  });
 });

@@ -42,10 +42,11 @@ describe('CardContainerComponent', () => {
     scoreSaveMessage: signal(''),
     canSaveScore: signal(false),
     games: [
-      { id: 'languages', label: 'Idiomas', description: '', instructions: '', supportsLanguageSelection: true, defaultLanguage: 'gb' },
-      { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' },
-      { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' },
-      { id: 'math', label: 'Matematicas', description: '', instructions: '', supportsLanguageSelection: false, defaultLanguage: 'es' }
+      { id: 'languages', label: 'Idiomas', description: '', instructions: '', supportsLanguageSelection: true, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'gb' },
+      { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'math', label: 'Matematicas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'pairs', label: 'Parejas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' }
     ],
     languages: ['gb', 'it', 'pt', 'de'],
     levels: [
@@ -69,7 +70,11 @@ describe('CardContainerComponent', () => {
     currentGameDescription: jest.fn(() => 'Empareja una palabra con su traduccion.'),
     currentGameInstructions: jest.fn(() => 'Empareja cada palabra con su traduccion.'),
     supportsLanguageSelection: jest.fn(() => true),
+    supportsColumnToggle: jest.fn(() => true),
+    usesImageCards: jest.fn(() => false),
+    isTwoColumnLayoutEnabled: jest.fn(() => true),
     currentLevelLabel: jest.fn(() => 'Facil'),
+    leaderboardBadgeLabel: jest.fn(() => 'Facil · GB'),
     displayProgress: jest.fn(() => 0),
     boardColumnCount: jest.fn(() => 2),
     boardRowCount: jest.fn(() => 5)

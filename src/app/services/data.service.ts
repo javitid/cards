@@ -22,6 +22,7 @@ import {
   Card,
   Credentials,
   GameLevelId,
+  ImagePair,
   LanguageCode,
   LanguagePair,
   MathPair,
@@ -97,6 +98,20 @@ const FALLBACK_MATH_PAIRS: MathPair[] = [
   { icon: '', left: '8 x 6', right: '48' },
   { icon: '', left: '54 / 6', right: '9' },
 ];
+const FALLBACK_IMAGE_PAIRS: ImagePair[] = [
+  { image: 'balloon' },
+  { image: 'boat' },
+  { image: 'camera' },
+  { image: 'cherry' },
+  { image: 'flower' },
+  { image: 'guitar' },
+  { image: 'heart' },
+  { image: 'kite' },
+  { image: 'leaf' },
+  { image: 'rocket' },
+  { image: 'star' },
+  { image: 'turtle' },
+];
 
 @Injectable({
   providedIn: 'root'
@@ -114,6 +129,10 @@ export class DataService {
   ) { }
 
   private getFallbackCards(gameId: AppGameId, language: LanguageCode): Card[] {
+    if (gameId === 'pairs') {
+      return this.utilsService.generateImageCards(FALLBACK_IMAGE_PAIRS);
+    }
+
     if (gameId === 'synonyms') {
       return this.utilsService.generateBinaryCards(FALLBACK_SYNONYM_PAIRS);
     }
@@ -200,7 +219,7 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Array<LanguagePair | BinaryPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair>> {
+  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair>> {
     const batch = writeBatch(db);
     const cardsCollection = this.getCardsCollection(gameId, level);
 
@@ -227,7 +246,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -328,6 +347,10 @@ export class DataService {
   }
 
   private mapCardsForGame(gameId: AppGameId, documents: Record<string, unknown>[], language: LanguageCode): Card[] {
+    if (gameId === 'pairs') {
+      return this.utilsService.generateImageCards(documents as unknown as ImagePair[]);
+    }
+
     if (gameId === 'synonyms') {
       return this.utilsService.generateBinaryCards(documents as unknown as SynonymPair[]);
     }

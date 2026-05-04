@@ -130,6 +130,10 @@ export class GameFacade {
   }
 
   toggleColumns(): void {
+    if (!this.supportsColumnToggle()) {
+      return;
+    }
+
     this.isTwoColumns.set(!this.isTwoColumns());
     this.rebuildBoard();
   }
@@ -142,7 +146,7 @@ export class GameFacade {
       return;
     }
 
-    if ('speechSynthesis' in window && this.isSoundOn()) {
+    if (card.voice && 'speechSynthesis' in window && this.isSoundOn()) {
       const synth = window.speechSynthesis;
       const utterThis = new SpeechSynthesisUtterance();
       utterThis.lang = card.voice;
@@ -190,6 +194,10 @@ export class GameFacade {
   }
 
   boardColumnCount(): number {
+    if (this.usesImageCards()) {
+      return this.getCurrentLevelConfig().boardColumns;
+    }
+
     if (this.helperService.isSmallScreen) {
       return 2;
     }
@@ -264,6 +272,11 @@ export class GameFacade {
 
   private rebuildBoard(): void {
     const cardGroups = this.getRandomCardGroups();
+    if (this.usesImageCards()) {
+      this.cards.set(this.shuffleArray(cardGroups.flat()));
+      return;
+    }
+
     const firstColumnCards = this.shuffleArray(cardGroups.map((group) => group[0]));
     const secondColumnCards = this.shuffleArray(cardGroups.map((group) => group[1]));
     const boardCards = this.isTwoColumns()
@@ -370,13 +383,37 @@ export class GameFacade {
     return this.currentGameConfig().supportsLanguageSelection;
   }
 
+  supportsColumnToggle(): boolean {
+    return this.currentGameConfig().supportsColumnToggle;
+  }
+
+  usesImageCards(): boolean {
+    return this.currentGameConfig().cardContent === 'image';
+  }
+
+  isTwoColumnLayoutEnabled(): boolean {
+    return this.supportsColumnToggle() && this.isTwoColumns();
+  }
+
+  leaderboardBadgeLabel(): string {
+    if (this.supportsLanguageSelection()) {
+      return `${this.currentLevelLabel()} · ${this.currentLanguage().toUpperCase()}`;
+    }
+
+    return this.currentLevelLabel();
+  }
+
   private getCurrentLevelConfig() {
     const level = GAME_LEVELS.find((item) => item.id === this.currentLevel()) || GAME_LEVELS[0];
     const overriddenTimer = level.timerSecondsByGame?.[this.currentGame()];
+    const overriddenPairs = level.pairsByGame?.[this.currentGame()];
+    const boardColumns = level.boardColumnsByGame?.[this.currentGame()];
 
     return {
       ...level,
-      timerSeconds: overriddenTimer || level.timerSeconds
+      pairs: overriddenPairs || level.pairs,
+      timerSeconds: overriddenTimer || level.timerSeconds,
+      boardColumns: boardColumns || 0
     };
   }
 
@@ -388,6 +425,8 @@ export class GameFacade {
     return {
       ...card,
       pairs: [...card.pairs],
+      imageName: card.imageName,
+      imagePath: card.imagePath,
       match: false,
       selected: false
     };
@@ -417,7 +456,9 @@ export class GameFacade {
           ? {
               ...currentCard,
               ...patch,
-              pairs: [...currentCard.pairs]
+              pairs: [...currentCard.pairs],
+              imageName: currentCard.imageName,
+              imagePath: currentCard.imagePath
             }
           : currentCard
       )

@@ -204,10 +204,12 @@
                             <span>{{ facade.isFlipEffect() ? 'Cartas ocultas' : 'Cartas visibles' }}</span>
                         </button>
 
-                        <button type="button" class="board-menu__item" (click)="toggleColumns()">
-                            <i class="pi" [ngClass]="facade.isTwoColumns() ? 'pi-table' : 'pi-th-large'"></i>
-                            <span>{{ facade.isTwoColumns() ? 'Dos columnas' : 'Tablero mezclado' }}</span>
-                        </button>
+                        @if (facade.supportsColumnToggle()) {
+                            <button type="button" class="board-menu__item" (click)="toggleColumns()">
+                                <i class="pi" [ngClass]="facade.isTwoColumns() ? 'pi-table' : 'pi-th-large'"></i>
+                                <span>{{ facade.isTwoColumns() ? 'Dos columnas' : 'Tablero mezclado' }}</span>
+                            </button>
+                        }
 
                         <button type="button" class="board-menu__item" (click)="startNewGame()">
                             <i class="pi pi-refresh"></i>
@@ -235,7 +237,8 @@
 
     <div
         class="board-grid"
-        [class.board-grid--columns]="facade.isTwoColumns()"
+        [class.board-grid--columns]="facade.isTwoColumnLayoutEnabled()"
+        [class.board-grid--square]="facade.usesImageCards()"
         [class.board-grid--loading]="facade.isLoading()"
         [style.--board-column-count]="facade.boardColumnCount()"
         [style.--board-row-count]="facade.boardRowCount()">
@@ -273,7 +276,7 @@
             <div class="leaderboard-dialog">
                 <div class="leaderboard__header">
                     <span class="leaderboard__title">Ranking actual</span>
-                    <span class="leaderboard__badge">{{ facade.currentLevelLabel() }} · {{ facade.currentLanguage() | uppercase }}</span>
+                    <span class="leaderboard__badge">{{ facade.leaderboardBadgeLabel() }}</span>
                 </div>
 
                 @if (facade.scoreSaveMessage()) {
@@ -341,7 +344,7 @@
     <div class="leaderboard-dialog">
         <div class="leaderboard__header">
             <span class="leaderboard__title">Ranking actual</span>
-            <span class="leaderboard__badge">{{ facade.currentLevelLabel() }} · {{ facade.currentLanguage() | uppercase }}</span>
+            <span class="leaderboard__badge">{{ facade.leaderboardBadgeLabel() }}</span>
         </div>
 
         @if (facade.leaderboard().length) {

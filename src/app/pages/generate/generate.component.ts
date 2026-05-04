@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
 import { LoggerService } from '../../services/logger.service';
-import { AppGameId, BinaryPair, Credentials, GameLevelId, LanguagePair } from '../../modules/card/interfaces/card';
+import { AppGameId, BinaryPair, Credentials, GameLevelId, ImagePair, LanguagePair } from '../../modules/card/interfaces/card';
 import { DEFAULT_GAME, DEFAULT_LEVEL, GAME_LEVELS, GAME_OPTIONS } from '../../modules/card/services/game-config';
 
 // Fill from screen input and upload generated cards into Firestore
@@ -144,6 +144,14 @@ const binaryPairs: BinaryPair[] = [
   { icon: '', left: 'alto', right: 'bajo' },
   { icon: '', left: '3 + 12', right: '15' }
 ];
+const imagePairs: ImagePair[] = [
+  { image: 'balloon' },
+  { image: 'boat' },
+  { image: 'camera' },
+  { image: 'cherry' },
+  { image: 'flower' },
+  { image: 'guitar' }
+];
 
 @Component({
   selector: 'app-generate',
@@ -167,7 +175,8 @@ export class GenerateComponent {
       { icon: '', left: '3 + 12', right: '15' },
       { icon: '', left: '8 x 7', right: '56' },
       { icon: '', left: '(14 + 6) / 2', right: '10' }
-    ], null, 2)
+    ], null, 2),
+    pairs: JSON.stringify(imagePairs, null, 2)
   };
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
