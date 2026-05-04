@@ -45,8 +45,8 @@
 .card--image {
   aspect-ratio: 1 / 1;
   height: auto;
-  padding: 0.85rem;
-  border-radius: 1.15rem;
+  padding: 0.55rem;
+  border-radius: 0.95rem;
 }
 
 .card-back {
@@ -105,15 +105,15 @@
   justify-content: center;
   width: 100%;
   height: 100%;
-  border-radius: 0.95rem;
+  border-radius: 0.7rem;
   background: rgba(255, 255, 255, 0.08);
-  font-size: clamp(1.15rem, 2vw, 1.9rem);
+  font-size: clamp(0.95rem, 1.5vw, 1.55rem);
 }
 
 .card--image.matched-card .card-image,
 .card--image.highlight-card .card-image {
-  padding: 0.25rem;
-  border-radius: 0.95rem;
+  padding: 0.15rem;
+  border-radius: 0.7rem;
   background: rgba(255, 255, 255, 0.16);
 }
 
@@ -129,8 +129,8 @@
 
   .card--image {
     min-height: 0;
-    padding: 0.45rem;
-    border-radius: 0.85rem;
+    padding: 0.32rem;
+    border-radius: 0.75rem;
   }
 
   .card-state {
