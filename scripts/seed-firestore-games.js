@@ -263,6 +263,90 @@ const COUNTRY_PAIRS = [
   { country: 'Chile', flag: 'chile', landmark: 'moai' },
   { country: 'Suecia', flag: 'sweden', landmark: 'viking-ship' }
 ];
+const CAPITAL_PAIRS = [
+  ['España', 'Madrid'],
+  ['Francia', 'París'],
+  ['Italia', 'Roma'],
+  ['Portugal', 'Lisboa'],
+  ['Alemania', 'Berlín'],
+  ['Japón', 'Tokio'],
+  ['Canadá', 'Ottawa'],
+  ['Brasil', 'Brasilia'],
+  ['Argentina', 'Buenos Aires'],
+  ['México', 'Ciudad de México'],
+  ['Chile', 'Santiago'],
+  ['Suecia', 'Estocolmo']
+];
+const COMMUNITY_PAIRS = [
+  ['Andalucía', 'Sevilla'],
+  ['Aragón', 'Zaragoza'],
+  ['Asturias', 'Oviedo'],
+  ['Canarias', 'Santa Cruz de Tenerife'],
+  ['Cantabria', 'Santander'],
+  ['Castilla y León', 'Valladolid'],
+  ['Castilla-La Mancha', 'Toledo'],
+  ['Cataluña', 'Barcelona'],
+  ['Galicia', 'Santiago de Compostela'],
+  ['Comunidad de Madrid', 'Madrid'],
+  ['Región de Murcia', 'Murcia'],
+  ['Comunidad Valenciana', 'Valencia']
+];
+const INSTRUMENT_PAIRS = [
+  ['guitarra', 'rasgueo'],
+  ['tambor', 'redoble'],
+  ['piano', 'melodía'],
+  ['trompeta', 'fanfarria'],
+  ['violín', 'arco'],
+  ['flauta', 'soplido'],
+  ['campana', 'tilín'],
+  ['maracas', 'chas chas'],
+  ['saxofón', 'jazz'],
+  ['xilófono', 'clinc clinc'],
+  ['acordeón', 'fuelle'],
+  ['batería', 'ba dum']
+];
+const PROFESSION_PAIRS = [
+  ['médico', 'fonendoscopio'],
+  ['carpintero', 'martillo'],
+  ['bombero', 'manguera'],
+  ['cocinero', 'sartén'],
+  ['pintor', 'brocha'],
+  ['jardinero', 'regadera'],
+  ['piloto', 'cabina'],
+  ['fotógrafo', 'cámara'],
+  ['músico', 'partitura'],
+  ['albañil', 'paleta'],
+  ['electricista', 'destornillador'],
+  ['científico', 'microscopio']
+];
+const PLANET_PAIRS = [
+  ['Mercurio', 'más cercano al Sol'],
+  ['Venus', 'planeta más caliente'],
+  ['Tierra', 'planeta azul'],
+  ['Marte', 'planeta rojo'],
+  ['Júpiter', 'el más grande'],
+  ['Saturno', 'anillos visibles'],
+  ['Urano', 'gira de lado'],
+  ['Neptuno', 'vientos intensos'],
+  ['Plutón', 'planeta enano'],
+  ['Luna', 'provoca mareas'],
+  ['Sol', 'estrella del sistema'],
+  ['Europa', 'luna helada']
+];
+const SHADOW_PAIRS = [
+  { object: 'globo', image: 'balloon', shadow: 'balloon-shadow' },
+  { object: 'barco', image: 'boat', shadow: 'boat-shadow' },
+  { object: 'cámara', image: 'camera', shadow: 'camera-shadow' },
+  { object: 'cereza', image: 'cherry', shadow: 'cherry-shadow' },
+  { object: 'flor', image: 'flower', shadow: 'flower-shadow' },
+  { object: 'guitarra', image: 'guitar', shadow: 'guitar-shadow' },
+  { object: 'corazón', image: 'heart', shadow: 'heart-shadow' },
+  { object: 'cometa', image: 'kite', shadow: 'kite-shadow' },
+  { object: 'hoja', image: 'leaf', shadow: 'leaf-shadow' },
+  { object: 'cohete', image: 'rocket', shadow: 'rocket-shadow' },
+  { object: 'estrella', image: 'star', shadow: 'star-shadow' },
+  { object: 'tortuga', image: 'turtle', shadow: 'turtle-shadow' }
+];
 
 function getServiceKeyPath() {
   if (process.env.FIREBASE_SERVICE_KEY) {
@@ -546,6 +630,30 @@ const GAME_SEEDS = {
   countries: {
     prefix: 'countries',
     docsByLevel: buildGameDocsForAllLevels(COUNTRY_PAIRS)
+  },
+  capitals: {
+    prefix: 'capitals',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(CAPITAL_PAIRS))
+  },
+  communities: {
+    prefix: 'communities',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(COMMUNITY_PAIRS))
+  },
+  instruments: {
+    prefix: 'instruments',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(INSTRUMENT_PAIRS))
+  },
+  professions: {
+    prefix: 'professions',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(PROFESSION_PAIRS))
+  },
+  planets: {
+    prefix: 'planets',
+    docsByLevel: buildGameDocsForAllLevels(buildPairDocs(PLANET_PAIRS))
+  },
+  shadows: {
+    prefix: 'shadows',
+    docsByLevel: buildGameDocsForAllLevels(SHADOW_PAIRS)
   }
 };
 

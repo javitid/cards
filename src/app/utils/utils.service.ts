@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BinaryPair, Card, CountryAssociationPair, FamilyPair, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
+import { BinaryPair, Card, CountryAssociationPair, FamilyPair, ImagePair, LanguageCode, LanguagePair, ShadowPair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
 const LANGUAGE_VOICES: Record<LanguageCode, string> = {
@@ -194,7 +194,45 @@ export class UtilsService {
     });
   }
 
-  private getImagePath(folder: 'memory-pairs' | 'memory-families' | 'memory-countries', imageName: string): string {
+  generateShadowCards(pairs: ShadowPair[]): Card[] {
+    return pairs.flatMap((pair: ShadowPair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
+      const imageName = this.normalizeImageName(pair.image);
+      const shadowName = this.normalizeImageName(pair.shadow);
+
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [secondId],
+          value: pair.object,
+          contentType: 'image',
+          imageName,
+          imagePath: this.getImagePath('memory-shadows', imageName),
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [firstId],
+          value: `${pair.object} sombra`,
+          contentType: 'image',
+          imageName: shadowName,
+          imagePath: this.getImagePath('memory-shadows', shadowName),
+          match: false,
+          selected: false
+        }
+      ];
+    });
+  }
+
+  private getImagePath(folder: 'memory-pairs' | 'memory-families' | 'memory-countries' | 'memory-shadows', imageName: string): string {
     return `assets/${folder}/${imageName}.svg`;
   }
 

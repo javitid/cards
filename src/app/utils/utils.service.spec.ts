@@ -77,4 +77,22 @@ describe('UtilsService', () => {
     expect(cards[0].pairs).toEqual([1]);
     expect(cards[1].pairs).toEqual([0]);
   });
+
+  it('should generate one object card and one shadow card per shadow pair', () => {
+    const service = new UtilsService();
+
+    const cards = service.generateShadowCards([
+      {
+        object: 'globo',
+        image: 'balloon',
+        shadow: 'balloon-shadow'
+      }
+    ]);
+
+    expect(cards).toHaveLength(2);
+    expect(cards[0].imagePath).toBe('assets/memory-shadows/balloon.svg');
+    expect(cards[1].imagePath).toBe('assets/memory-shadows/balloon-shadow.svg');
+    expect(cards[0].pairs).toEqual([1]);
+    expect(cards[1].pairs).toEqual([0]);
+  });
 });

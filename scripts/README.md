@@ -32,16 +32,24 @@ Si solo se quiere uno de los destinos, debe indicarse de forma explicita.
     - `games/synonyms/levels/easy|medium|hard/cards`
     - `games/antonyms/levels/easy|medium|hard/cards`
     - `games/math/levels/easy|medium|hard/cards`
+    - `games/capitals/levels/easy|medium|hard/cards`
+    - `games/communities/levels/easy|medium|hard/cards`
+    - `games/instruments/levels/easy|medium|hard/cards`
+    - `games/professions/levels/easy|medium|hard/cards`
+    - `games/planets/levels/easy|medium|hard/cards`
     - `games/pairs/levels/easy|medium|hard/cards`
     - `games/families/levels/easy|medium|hard/cards`
     - `games/countries/levels/easy|medium|hard/cards`
+    - `games/shadows/levels/easy|medium|hard/cards`
   - Sube actualmente:
     - `102` pares de sinonimos por nivel
     - `101` pares de antonimos por nivel
     - `100` operaciones de matematicas por nivel
+    - `12` pares por nivel para `capitals`, `communities`, `instruments`, `professions` y `planets`
     - `12` nombres de SVG para `pairs` por nivel
     - `12` parejas visuales relacionadas para `families` por nivel
     - `12` parejas visuales relacionadas para `countries` por nivel
+    - `12` parejas visuales relacionadas para `shadows` por nivel
 
 ## Prerrequisitos
 
@@ -118,9 +126,15 @@ Resultado operativo actual:
 - `synonyms`: `102` docs por nivel
 - `antonyms`: `101` docs por nivel
 - `math`: `100` docs por nivel
+- `capitals`: `12` docs por nivel
+- `communities`: `12` docs por nivel
+- `instruments`: `12` docs por nivel
+- `professions`: `12` docs por nivel
+- `planets`: `12` docs por nivel
 - `pairs`: `12` docs por nivel
 - `families`: `12` docs por nivel
 - `countries`: `12` docs por nivel
+- `shadows`: `12` docs por nivel
 
 ## Migracion desde MongoDB Realm/Data API
 

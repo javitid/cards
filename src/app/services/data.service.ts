@@ -30,6 +30,7 @@ import {
   MathPair,
   ScoreEntry,
   ScoreSubmission,
+  ShadowPair,
   SynonymPair
 } from '../modules/card/interfaces/card';
 import { UtilsService } from '../utils/utils.service';
@@ -100,6 +101,76 @@ const FALLBACK_MATH_PAIRS: MathPair[] = [
   { icon: '', left: '8 x 6', right: '48' },
   { icon: '', left: '54 / 6', right: '9' },
 ];
+const FALLBACK_CAPITAL_PAIRS: BinaryPair[] = [
+  { icon: '', left: 'España', right: 'Madrid' },
+  { icon: '', left: 'Francia', right: 'París' },
+  { icon: '', left: 'Italia', right: 'Roma' },
+  { icon: '', left: 'Portugal', right: 'Lisboa' },
+  { icon: '', left: 'Alemania', right: 'Berlín' },
+  { icon: '', left: 'Japón', right: 'Tokio' },
+  { icon: '', left: 'Canadá', right: 'Ottawa' },
+  { icon: '', left: 'Brasil', right: 'Brasilia' },
+  { icon: '', left: 'Argentina', right: 'Buenos Aires' },
+  { icon: '', left: 'México', right: 'Ciudad de México' },
+  { icon: '', left: 'Chile', right: 'Santiago' },
+  { icon: '', left: 'Suecia', right: 'Estocolmo' },
+];
+const FALLBACK_COMMUNITY_PAIRS: BinaryPair[] = [
+  { icon: '', left: 'Andalucía', right: 'Sevilla' },
+  { icon: '', left: 'Aragón', right: 'Zaragoza' },
+  { icon: '', left: 'Asturias', right: 'Oviedo' },
+  { icon: '', left: 'Canarias', right: 'Santa Cruz de Tenerife' },
+  { icon: '', left: 'Cantabria', right: 'Santander' },
+  { icon: '', left: 'Castilla y León', right: 'Valladolid' },
+  { icon: '', left: 'Castilla-La Mancha', right: 'Toledo' },
+  { icon: '', left: 'Cataluña', right: 'Barcelona' },
+  { icon: '', left: 'Galicia', right: 'Santiago de Compostela' },
+  { icon: '', left: 'Comunidad de Madrid', right: 'Madrid' },
+  { icon: '', left: 'Región de Murcia', right: 'Murcia' },
+  { icon: '', left: 'Comunidad Valenciana', right: 'Valencia' },
+];
+const FALLBACK_INSTRUMENT_PAIRS: BinaryPair[] = [
+  { icon: '', left: 'guitarra', right: 'rasgueo' },
+  { icon: '', left: 'tambor', right: 'redoble' },
+  { icon: '', left: 'piano', right: 'melodía' },
+  { icon: '', left: 'trompeta', right: 'fanfarria' },
+  { icon: '', left: 'violín', right: 'arco' },
+  { icon: '', left: 'flauta', right: 'soplido' },
+  { icon: '', left: 'campana', right: 'tilín' },
+  { icon: '', left: 'maracas', right: 'chas chas' },
+  { icon: '', left: 'saxofón', right: 'jazz' },
+  { icon: '', left: 'xilófono', right: 'clinc clinc' },
+  { icon: '', left: 'acordeón', right: 'fuelle' },
+  { icon: '', left: 'batería', right: 'ba dum' },
+];
+const FALLBACK_PROFESSION_PAIRS: BinaryPair[] = [
+  { icon: '', left: 'médico', right: 'fonendoscopio' },
+  { icon: '', left: 'carpintero', right: 'martillo' },
+  { icon: '', left: 'bombero', right: 'manguera' },
+  { icon: '', left: 'cocinero', right: 'sartén' },
+  { icon: '', left: 'pintor', right: 'brocha' },
+  { icon: '', left: 'jardinero', right: 'regadera' },
+  { icon: '', left: 'piloto', right: 'cabina' },
+  { icon: '', left: 'fotógrafo', right: 'cámara' },
+  { icon: '', left: 'músico', right: 'partitura' },
+  { icon: '', left: 'albañil', right: 'paleta' },
+  { icon: '', left: 'electricista', right: 'destornillador' },
+  { icon: '', left: 'científico', right: 'microscopio' },
+];
+const FALLBACK_PLANET_PAIRS: BinaryPair[] = [
+  { icon: '', left: 'Mercurio', right: 'más cercano al Sol' },
+  { icon: '', left: 'Venus', right: 'planeta más caliente' },
+  { icon: '', left: 'Tierra', right: 'planeta azul' },
+  { icon: '', left: 'Marte', right: 'planeta rojo' },
+  { icon: '', left: 'Júpiter', right: 'el más grande' },
+  { icon: '', left: 'Saturno', right: 'anillos visibles' },
+  { icon: '', left: 'Urano', right: 'gira de lado' },
+  { icon: '', left: 'Neptuno', right: 'vientos intensos' },
+  { icon: '', left: 'Plutón', right: 'planeta enano' },
+  { icon: '', left: 'Luna', right: 'provoca mareas' },
+  { icon: '', left: 'Sol', right: 'estrella del sistema' },
+  { icon: '', left: 'Europa', right: 'luna helada' },
+];
 const FALLBACK_IMAGE_PAIRS: ImagePair[] = [
   { image: 'balloon' },
   { image: 'boat' },
@@ -142,6 +213,20 @@ const FALLBACK_COUNTRY_PAIRS: CountryAssociationPair[] = [
   { country: 'Chile', flag: 'chile', landmark: 'moai' },
   { country: 'Suecia', flag: 'sweden', landmark: 'viking-ship' },
 ];
+const FALLBACK_SHADOW_PAIRS: ShadowPair[] = [
+  { object: 'globo', image: 'balloon', shadow: 'balloon-shadow' },
+  { object: 'barco', image: 'boat', shadow: 'boat-shadow' },
+  { object: 'cámara', image: 'camera', shadow: 'camera-shadow' },
+  { object: 'cereza', image: 'cherry', shadow: 'cherry-shadow' },
+  { object: 'flor', image: 'flower', shadow: 'flower-shadow' },
+  { object: 'guitarra', image: 'guitar', shadow: 'guitar-shadow' },
+  { object: 'corazón', image: 'heart', shadow: 'heart-shadow' },
+  { object: 'cometa', image: 'kite', shadow: 'kite-shadow' },
+  { object: 'hoja', image: 'leaf', shadow: 'leaf-shadow' },
+  { object: 'cohete', image: 'rocket', shadow: 'rocket-shadow' },
+  { object: 'estrella', image: 'star', shadow: 'star-shadow' },
+  { object: 'tortuga', image: 'turtle', shadow: 'turtle-shadow' },
+];
 
 @Injectable({
   providedIn: 'root'
@@ -169,6 +254,30 @@ export class DataService {
 
     if (gameId === 'countries') {
       return this.utilsService.generateCountryCards(FALLBACK_COUNTRY_PAIRS);
+    }
+
+    if (gameId === 'shadows') {
+      return this.utilsService.generateShadowCards(FALLBACK_SHADOW_PAIRS);
+    }
+
+    if (gameId === 'capitals') {
+      return this.utilsService.generateBinaryCards(FALLBACK_CAPITAL_PAIRS);
+    }
+
+    if (gameId === 'communities') {
+      return this.utilsService.generateBinaryCards(FALLBACK_COMMUNITY_PAIRS);
+    }
+
+    if (gameId === 'instruments') {
+      return this.utilsService.generateBinaryCards(FALLBACK_INSTRUMENT_PAIRS);
+    }
+
+    if (gameId === 'professions') {
+      return this.utilsService.generateBinaryCards(FALLBACK_PROFESSION_PAIRS);
+    }
+
+    if (gameId === 'planets') {
+      return this.utilsService.generateBinaryCards(FALLBACK_PLANET_PAIRS);
     }
 
     if (gameId === 'synonyms') {
@@ -257,7 +366,7 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair>> {
+  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair | ShadowPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair | ShadowPair>> {
     const batch = writeBatch(db);
     const cardsCollection = this.getCardsCollection(gameId, level);
 
@@ -284,7 +393,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair | ShadowPair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -397,7 +506,11 @@ export class DataService {
       return this.utilsService.generateCountryCards(documents as unknown as CountryAssociationPair[]);
     }
 
-    if (gameId === 'synonyms') {
+    if (gameId === 'shadows') {
+      return this.utilsService.generateShadowCards(documents as unknown as ShadowPair[]);
+    }
+
+    if (gameId === 'synonyms' || gameId === 'capitals' || gameId === 'communities' || gameId === 'instruments' || gameId === 'professions' || gameId === 'planets') {
       return this.utilsService.generateBinaryCards(documents as unknown as SynonymPair[]);
     }
 

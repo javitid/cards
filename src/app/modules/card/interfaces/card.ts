@@ -21,7 +21,20 @@ export interface Credentials {
   organization: string;
 }
 
-export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs' | 'families' | 'countries';
+export type AppGameId =
+  | 'languages'
+  | 'synonyms'
+  | 'antonyms'
+  | 'math'
+  | 'pairs'
+  | 'families'
+  | 'countries'
+  | 'capitals'
+  | 'communities'
+  | 'instruments'
+  | 'professions'
+  | 'planets'
+  | 'shadows';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
 export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
 
@@ -97,6 +110,12 @@ export interface CountryAssociationPair {
   country: string;
   flag: string;
   landmark: string;
+}
+
+export interface ShadowPair {
+  object: string;
+  image: string;
+  shadow: string;
 }
 
 export type SynonymPair = BinaryPair;

@@ -46,9 +46,15 @@ describe('CardContainerComponent', () => {
       { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
       { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
       { id: 'math', label: 'Matematicas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'capitals', label: 'Capitales', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'communities', label: 'Comunidades', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'instruments', label: 'Instrumentos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'professions', label: 'Profesiones', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
+      { id: 'planets', label: 'Planetas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
       { id: 'pairs', label: 'Parejas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' },
       { id: 'families', label: 'Familias', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' },
-      { id: 'countries', label: 'Paises', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' }
+      { id: 'countries', label: 'Paises', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' },
+      { id: 'shadows', label: 'Sombras', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' }
     ],
     languages: ['gb', 'it', 'pt', 'de'],
     levels: [

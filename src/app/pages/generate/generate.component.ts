@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
 import { LoggerService } from '../../services/logger.service';
-import { AppGameId, BinaryPair, CountryAssociationPair, Credentials, FamilyPair, GameLevelId, ImagePair, LanguagePair } from '../../modules/card/interfaces/card';
+import { AppGameId, BinaryPair, CountryAssociationPair, Credentials, FamilyPair, GameLevelId, ImagePair, LanguagePair, ShadowPair } from '../../modules/card/interfaces/card';
 import { DEFAULT_GAME, DEFAULT_LEVEL, GAME_LEVELS, GAME_OPTIONS } from '../../modules/card/services/game-config';
 
 // Fill from screen input and upload generated cards into Firestore
@@ -162,6 +162,36 @@ const countryPairs: CountryAssociationPair[] = [
   { country: 'Francia', flag: 'france', landmark: 'eiffel-tower' },
   { country: 'Italia', flag: 'italy', landmark: 'pizza-slice' }
 ];
+const shadowPairs: ShadowPair[] = [
+  { object: 'globo', image: 'balloon', shadow: 'balloon-shadow' },
+  { object: 'barco', image: 'boat', shadow: 'boat-shadow' },
+  { object: 'cámara', image: 'camera', shadow: 'camera-shadow' }
+];
+const capitalsPairs: BinaryPair[] = [
+  { icon: '', left: 'España', right: 'Madrid' },
+  { icon: '', left: 'Francia', right: 'París' },
+  { icon: '', left: 'Italia', right: 'Roma' }
+];
+const communityPairs: BinaryPair[] = [
+  { icon: '', left: 'Andalucía', right: 'Sevilla' },
+  { icon: '', left: 'Galicia', right: 'Santiago de Compostela' },
+  { icon: '', left: 'Cataluña', right: 'Barcelona' }
+];
+const instrumentPairs: BinaryPair[] = [
+  { icon: '', left: 'guitarra', right: 'rasgueo' },
+  { icon: '', left: 'tambor', right: 'redoble' },
+  { icon: '', left: 'piano', right: 'melodía' }
+];
+const professionPairs: BinaryPair[] = [
+  { icon: '', left: 'médico', right: 'fonendoscopio' },
+  { icon: '', left: 'bombero', right: 'manguera' },
+  { icon: '', left: 'científico', right: 'microscopio' }
+];
+const planetPairs: BinaryPair[] = [
+  { icon: '', left: 'Marte', right: 'planeta rojo' },
+  { icon: '', left: 'Saturno', right: 'anillos visibles' },
+  { icon: '', left: 'Júpiter', right: 'el más grande' }
+];
 
 @Component({
   selector: 'app-generate',
@@ -188,7 +218,13 @@ export class GenerateComponent {
     ], null, 2),
     pairs: JSON.stringify(imagePairs, null, 2),
     families: JSON.stringify(familyPairs, null, 2),
-    countries: JSON.stringify(countryPairs, null, 2)
+    countries: JSON.stringify(countryPairs, null, 2),
+    capitals: JSON.stringify(capitalsPairs, null, 2),
+    communities: JSON.stringify(communityPairs, null, 2),
+    instruments: JSON.stringify(instrumentPairs, null, 2),
+    professions: JSON.stringify(professionPairs, null, 2),
+    planets: JSON.stringify(planetPairs, null, 2),
+    shadows: JSON.stringify(shadowPairs, null, 2)
   };
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);

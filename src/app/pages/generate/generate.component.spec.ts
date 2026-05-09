@@ -91,4 +91,19 @@ describe('GenerateComponent', () => {
     expect(component.form.controls.content.value).toContain('"landmark"');
     expect(component.form.controls.content.value).toContain('spain');
   });
+
+  it('should swap the template when changing to the capitals game', () => {
+    component.form.controls.gameId.setValue('capitals');
+
+    expect(component.form.controls.content.value).toContain('"left"');
+    expect(component.form.controls.content.value).toContain('Madrid');
+  });
+
+  it('should swap the template when changing to the shadows game', () => {
+    component.form.controls.gameId.setValue('shadows');
+
+    expect(component.form.controls.content.value).toContain('"object"');
+    expect(component.form.controls.content.value).toContain('"shadow"');
+    expect(component.form.controls.content.value).toContain('balloon-shadow');
+  });
 });

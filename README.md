@@ -5,9 +5,15 @@ Juego web de emparejar cartas construido con Angular y Firebase. La aplicacion a
 - `Sinonimos`: emparejar una palabra con otra de significado equivalente.
 - `Antonimos`: emparejar una palabra con su opuesta.
 - `Matematicas`: emparejar una operacion con su resultado.
+- `Capitales`: emparejar un pais con su capital.
+- `Comunidades`: emparejar una comunidad autonoma con su capital.
+- `Instrumentos`: emparejar un instrumento con su sonido tipico.
+- `Profesiones`: emparejar una profesion con su herramienta habitual.
+- `Planetas`: emparejar un planeta con una caracteristica destacada.
 - `Parejas`: emparejar dos imagenes iguales usando SVGs locales.
 - `Familias`: emparejar dos dibujos distintos de la misma categoria visual.
 - `Países`: emparejar una bandera con un símbolo típico del mismo país.
+- `Sombras`: emparejar cada dibujo con su silueta.
 
 Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independiente.
 
@@ -28,7 +34,7 @@ La app separa la mecanica base del tablero del tipo de contenido que se juega.
 - `GameFacade` coordina el estado principal del tablero, la seleccion de juego, el nivel, el idioma visible, el temporizador y la reconstruccion de la partida.
 - `GameLeaderboardService` carga y guarda tiempos por juego, idioma y dificultad.
 - `DataService` abstrae Firestore, los fallbacks locales y la transformacion de documentos en cartas jugables.
-- `UtilsService` genera mazos para `Idiomas`, juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`, y juegos visuales como `Parejas`, `Familias` y `Países`.
+- `UtilsService` genera mazos para `Idiomas`, juegos binarios como `Sinonimos`, `Antonimos`, `Matematicas`, `Capitales`, `Comunidades`, `Instrumentos`, `Profesiones` y `Planetas`, y juegos visuales como `Parejas`, `Familias`, `Países` y `Sombras`.
 
 Documentacion ampliada:
 - Arquitectura: [docs/arquitectura-aplicacion.md](/Users/javiergarcia/git/cards/docs/arquitectura-aplicacion.md:1)
@@ -56,12 +62,17 @@ Esquema de documento:
 }
 ```
 
-### Cartas de `Sinonimos`, `Antonimos` y `Matematicas`
+### Cartas de `Sinonimos`, `Antonimos`, `Matematicas`, `Capitales`, `Comunidades`, `Instrumentos`, `Profesiones` y `Planetas`
 
 Colecciones por juego y nivel:
 - `games/synonyms/levels/{level}/cards`
 - `games/antonyms/levels/{level}/cards`
 - `games/math/levels/{level}/cards`
+- `games/capitals/levels/{level}/cards`
+- `games/communities/levels/{level}/cards`
+- `games/instruments/levels/{level}/cards`
+- `games/professions/levels/{level}/cards`
+- `games/planets/levels/{level}/cards`
 
 Esquema de documento:
 ```json
@@ -76,6 +87,11 @@ Los seeds cargados actualmente en Firestore son:
 - `synonyms`: 102 pares por nivel
 - `antonyms`: 101 pares por nivel
 - `math`: 100 operaciones por nivel
+- `capitals`: 12 pares por nivel
+- `communities`: 12 pares por nivel
+- `instruments`: 12 pares por nivel
+- `professions`: 12 pares por nivel
+- `planets`: 12 pares por nivel
 
 En `Matematicas`, la complejidad sube por nivel:
 - `easy`: sumas y restas simples
@@ -153,6 +169,29 @@ Notas:
   - `hard`: `6x4` y `150s`
 - el modo `Países` no usa idioma y no permite cambiar a `2 columnas`
 
+### Cartas de `Sombras`
+
+Colecciones por juego y nivel:
+- `games/shadows/levels/{level}/cards`
+
+Esquema de documento:
+```json
+{
+  "object": "globo",
+  "image": "balloon",
+  "shadow": "balloon-shadow"
+}
+```
+
+Notas:
+- las imagenes deben existir como `assets/memory-shadows/balloon.svg` y `assets/memory-shadows/balloon-shadow.svg`
+- el juego usa actualmente 12 parejas visuales base
+- comparte tablero y tiempos con `Parejas`, `Familias` y `Países`:
+  - `easy`: `4x3` y `75s`
+  - `medium`: `4x4` y `105s`
+  - `hard`: `6x4` y `150s`
+- el modo `Sombras` no usa idioma y no permite cambiar a `2 columnas`
+
 ### Ranking
 
 Ranking legacy de `Idiomas`:
@@ -201,7 +240,7 @@ Notas:
 
 ### Seed rapido de juegos
 
-Sube o reemplaza los contenidos de `synonyms`, `antonyms`, `math`, `pairs`, `families` y `countries` en los niveles `easy`, `medium` y `hard`:
+Sube o reemplaza los contenidos de `synonyms`, `antonyms`, `math`, `capitals`, `communities`, `instruments`, `professions`, `planets`, `pairs`, `families`, `countries` y `shadows` en los niveles `easy`, `medium` y `hard`:
 
 ```bash
 npm run seed:firestore-games
@@ -211,9 +250,11 @@ El script:
 - borra los documentos existentes de esas colecciones
 - escribe documentos nuevos con IDs estables
 - genera `100` operaciones nuevas de matematicas por nivel
+- sube `12` pares por nivel para `capitals`, `communities`, `instruments`, `professions` y `planets`
 - sube tambien `12` nombres de SVG por nivel para `pairs`
 - sube tambien `12` parejas visuales por nivel para `families`
 - sube tambien `12` parejas visuales por nivel para `countries`
+- sube tambien `12` parejas visuales por nivel para `shadows`
 - intenta usar `gcloud` si existe y, si no, `firebase-tools` o una service account
 
 ### Replicar niveles legacy
@@ -234,10 +275,11 @@ La pagina `/generate` permite:
 
 Formatos esperados:
 - `Idiomas`: `{ icon, es, gb, it, pt, de }`
-- `Sinonimos`, `Antonimos`, `Matematicas`: `{ icon, left, right }`
+- `Sinonimos`, `Antonimos`, `Matematicas`, `Capitales`, `Comunidades`, `Instrumentos`, `Profesiones`, `Planetas`: `{ icon, left, right }`
 - `Parejas`: `{ image }`
 - `Familias`: `{ family, leftImage, rightImage }`
 - `Países`: `{ country, flag, landmark }`
+- `Sombras`: `{ object, image, shadow }`
 
 ## Notas recientes
 

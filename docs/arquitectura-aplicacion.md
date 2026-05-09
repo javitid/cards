@@ -248,6 +248,34 @@ Temporizadores configurados:
 - `medium`: `105s`
 - `hard`: `150s`
 
+### `Sombras`
+
+Modelo persistido:
+- documento con `object`, `image` y `shadow`
+
+Modelo jugable:
+- dos cartas por grupo
+- una carta muestra el dibujo original
+- la otra muestra su silueta
+- ambas usan `contentType = image`
+- la ruta real del asset se resuelve como `assets/memory-shadows/<image>.svg`
+
+Persistencia:
+- `games/shadows/levels/{level}/cards`
+
+Reglas de tablero:
+- no soporta seleccion de idioma
+- no soporta modo `2 columnas`
+- siempre se mezcla el tablero completo
+- `easy`: `4x3`
+- `medium`: `4x4`
+- `hard`: `6x4`
+
+Temporizadores configurados:
+- `easy`: `75s`
+- `medium`: `105s`
+- `hard`: `150s`
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
@@ -299,10 +327,11 @@ Archivo: [src/app/utils/utils.service.ts](/Users/javiergarcia/git/cards/src/app/
 
 Responsabilidades:
 - generar cartas para `Idiomas`
-- generar cartas para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
+- generar cartas para juegos binarios como `Sinonimos`, `Antonimos`, `Matematicas`, `Capitales`, `Comunidades`, `Instrumentos`, `Profesiones` y `Planetas`
 - generar cartas de imagen para `Parejas`
 - generar cartas de imagen relacionadas para `Familias`
 - generar cartas de imagen relacionadas para `Países`
+- generar cartas de imagen relacionadas para `Sombras`
 - asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
 
 Notas de implementacion:
@@ -347,12 +376,24 @@ sequenceDiagram
   - schema: `icon`, `left`, `right`
 - `games/math/levels/{level}/cards`
   - schema: `icon`, `left`, `right`
+- `games/capitals/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/communities/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/instruments/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/professions/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
+- `games/planets/levels/{level}/cards`
+  - schema: `icon`, `left`, `right`
 - `games/pairs/levels/{level}/cards`
   - schema: `image`
 - `games/families/levels/{level}/cards`
   - schema: `family`, `leftImage`, `rightImage`
 - `games/countries/levels/{level}/cards`
   - schema: `country`, `flag`, `landmark`
+- `games/shadows/levels/{level}/cards`
+  - schema: `object`, `image`, `shadow`
 
 ### Ranking
 
@@ -392,6 +433,7 @@ Mejoras pendientes razonables:
 - afinar todavia mas `Parejas` en movil bajo, sobre todo en `hard`
 - evaluar si `Familias` necesita ayudas visuales extra para categorias menos obvias
 - revisar si `Países` necesita ampliar la colección con más países o familias culturales
+- ampliar `Sombras` con objetos nuevos si el nivel difícil se queda corto
 - bajar el warning del budget SCSS de `card-container.component.scss`
 - anadir tests de componente para render de cartas de imagen
 
