@@ -38,6 +38,18 @@
                         [hideDelay]="2000"
                         aria-label="Instrucciones del juego">
                     </button>
+                    <button
+                        pButton
+                        type="button"
+                        icon="pi pi-wifi"
+                        class="p-button-text p-button-sm board-header__source"
+                        [class.board-header__source--online]="isFirebaseSource()"
+                        [class.board-header__source--fallback]="!isFirebaseSource()"
+                        [pTooltip]="dataSourceTooltip()"
+                        tooltipPosition="bottom"
+                        [hideDelay]="2000"
+                        aria-label="Origen actual de los datos">
+                    </button>
 
                     @if (isGamePickerOpen) {
                         <div class="board-game-picker">
@@ -226,16 +238,6 @@
             </div>
         </div>
         <div class="board-status board-status--header">
-            <div class="board-status__chips">
-                <span
-                    class="status-chip"
-                    [class.status-chip--warning]="facade.isUsingFallbackCards()"
-                    [pTooltip]="facade.cardsSourceReason()"
-                    tooltipPosition="bottom">
-                    <i class="pi" [ngClass]="dataSourceIcon()"></i>
-                    <span>{{ dataSourceLabel() }}</span>
-                </span>
-            </div>
             <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
                     <span>Progreso</span>
