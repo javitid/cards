@@ -226,6 +226,16 @@
             </div>
         </div>
         <div class="board-status board-status--header">
+            <div class="board-status__chips">
+                <span
+                    class="status-chip"
+                    [class.status-chip--warning]="facade.isUsingFallbackCards()"
+                    [pTooltip]="facade.cardsSourceReason()"
+                    tooltipPosition="bottom">
+                    <i class="pi" [ngClass]="dataSourceIcon()"></i>
+                    <span>{{ dataSourceLabel() }}</span>
+                </span>
+            </div>
             <div class="board-status__progress board-status__progress--header">
                 <div class="progress-copy">
                     <span>Progreso</span>

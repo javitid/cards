@@ -141,4 +141,18 @@ describe('CardContainerComponent', () => {
     expect(gameFacadeMock.selectGame).toHaveBeenCalledWith('synonyms');
     expect(gameFacadeMock.loadCards).toHaveBeenCalledTimes(1);
   });
+
+  it('shows Firebase label when cards come from Firestore', () => {
+    gameFacadeMock.isUsingFallbackCards.set(false);
+
+    expect(component.dataSourceLabel()).toBe('Firebase');
+    expect(component.dataSourceIcon()).toBe('pi pi-database');
+  });
+
+  it('shows Fallback label when cards come from local fallback', () => {
+    gameFacadeMock.isUsingFallbackCards.set(true);
+
+    expect(component.dataSourceLabel()).toBe('Fallback');
+    expect(component.dataSourceIcon()).toBe('pi pi-exclamation-triangle');
+  });
 });

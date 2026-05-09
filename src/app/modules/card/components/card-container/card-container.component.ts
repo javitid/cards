@@ -118,4 +118,12 @@ export class CardContainerComponent implements OnInit, OnDestroy {
     this.router.navigateByUrl(path);
   }
 
+  dataSourceLabel(): string {
+    return this.facade.isUsingFallbackCards() ? 'Fallback' : 'Firebase';
+  }
+
+  dataSourceIcon(): string {
+    return this.facade.isUsingFallbackCards() ? 'pi pi-exclamation-triangle' : 'pi pi-database';
+  }
+
 }
