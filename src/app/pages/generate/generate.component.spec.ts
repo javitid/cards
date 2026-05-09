@@ -82,4 +82,13 @@ describe('GenerateComponent', () => {
     expect(component.form.controls.content.value).toContain('"leftImage"');
     expect(component.form.controls.content.value).toContain('"rightImage"');
   });
+
+  it('should swap the template when changing to the countries game', () => {
+    component.form.controls.gameId.setValue('countries');
+
+    expect(component.form.controls.content.value).toContain('"country"');
+    expect(component.form.controls.content.value).toContain('"flag"');
+    expect(component.form.controls.content.value).toContain('"landmark"');
+    expect(component.form.controls.content.value).toContain('spain');
+  });
 });

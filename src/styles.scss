@@ -1,9 +1,10 @@
+@use './styles/flags';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @import url('primeicons/primeicons.css');
-@import './styles/flags';
 
 :root,
 .light-theme {

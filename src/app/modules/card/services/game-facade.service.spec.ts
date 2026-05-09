@@ -217,6 +217,25 @@ describe('GameFacade', () => {
     expect(facade.boardRowCount()).toBe(4);
   });
 
+  it('uses the same image-board rules for the countries game by difficulty', () => {
+    dataServiceMock.getCards.mockReturnValue(of(createImageDeck(12, 'memory-countries')));
+
+    facade.selectGame('countries');
+
+    expect(facade.usesImageCards()).toBe(true);
+    expect(facade.supportsColumnToggle()).toBe(false);
+    expect(facade.boardColumnCount()).toBe(4);
+    expect(facade.boardRowCount()).toBe(3);
+
+    facade.selectLevel('medium');
+    expect(facade.boardColumnCount()).toBe(4);
+    expect(facade.boardRowCount()).toBe(4);
+
+    facade.selectLevel('hard');
+    expect(facade.boardColumnCount()).toBe(6);
+    expect(facade.boardRowCount()).toBe(4);
+  });
+
   it('plays a short match sound when the selected pair is correct', () => {
     const playMatchSoundSpy = jest.spyOn(facade as never, 'playMatchSound' as never);
     const firstCard = facade.cards()[0];

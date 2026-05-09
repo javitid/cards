@@ -27,4 +27,20 @@ describe('CardComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('detects image cards', () => {
+    component.card = {
+      id: 2,
+      value: 'Bandera de España',
+      voice: '',
+      pairs: [3],
+      selected: false,
+      match: false,
+      icon: '',
+      contentType: 'image',
+      imagePath: 'assets/memory-countries/spain.svg'
+    } as any;
+
+    expect(component.isImageCard).toBe(true);
+  });
 });

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BinaryPair, Card, FamilyPair, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
+import { BinaryPair, Card, CountryAssociationPair, FamilyPair, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
 const LANGUAGE_VOICES: Record<LanguageCode, string> = {
@@ -156,7 +156,45 @@ export class UtilsService {
     });
   }
 
-  private getImagePath(folder: 'memory-pairs' | 'memory-families', imageName: string): string {
+  generateCountryCards(pairs: CountryAssociationPair[]): Card[] {
+    return pairs.flatMap((pair: CountryAssociationPair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
+      const flagName = this.normalizeImageName(pair.flag);
+      const landmarkName = this.normalizeImageName(pair.landmark);
+
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [secondId],
+          value: `Bandera de ${pair.country}`,
+          contentType: 'image',
+          imageName: flagName,
+          imagePath: this.getImagePath('memory-countries', flagName),
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [firstId],
+          value: `${pair.country}: ${this.humanizeImageName(landmarkName)}`,
+          contentType: 'image',
+          imageName: landmarkName,
+          imagePath: this.getImagePath('memory-countries', landmarkName),
+          match: false,
+          selected: false
+        }
+      ];
+    });
+  }
+
+  private getImagePath(folder: 'memory-pairs' | 'memory-families' | 'memory-countries', imageName: string): string {
     return `assets/${folder}/${imageName}.svg`;
   }
 

@@ -27,6 +27,16 @@ export const GAME_OPTIONS: GameOption[] = [
     defaultLanguage: 'es'
   },
   {
+    id: 'countries',
+    label: 'Países',
+    description: 'Relaciona cada bandera con un símbolo típico de ese país.',
+    instructions: 'Empareja cada bandera con un dibujo representativo del mismo país.',
+    supportsLanguageSelection: false,
+    supportsColumnToggle: false,
+    cardContent: 'image',
+    defaultLanguage: 'es'
+  },
+  {
     id: 'languages',
     label: 'Idiomas',
     description: 'Empareja una palabra en castellano con su traducción.',
@@ -73,27 +83,27 @@ export const GAME_LEVELS: GameLevelOption[] = [
     label: 'Fácil',
     pairs: 5,
     timerSeconds: 60,
-    pairsByGame: { pairs: 6, families: 6 },
-    timerSecondsByGame: { pairs: 75, families: 75 },
-    boardColumnsByGame: { pairs: 4, families: 4 }
+    pairsByGame: { pairs: 6, families: 6, countries: 6 },
+    timerSecondsByGame: { pairs: 75, families: 75, countries: 75 },
+    boardColumnsByGame: { pairs: 4, families: 4, countries: 4 }
   },
   {
     id: 'medium',
     label: 'Medio',
     pairs: 7,
     timerSeconds: 75,
-    pairsByGame: { pairs: 8, families: 8 },
-    timerSecondsByGame: { math: 150, pairs: 105, families: 105 },
-    boardColumnsByGame: { pairs: 4, families: 4 }
+    pairsByGame: { pairs: 8, families: 8, countries: 8 },
+    timerSecondsByGame: { math: 150, pairs: 105, families: 105, countries: 105 },
+    boardColumnsByGame: { pairs: 4, families: 4, countries: 4 }
   },
   {
     id: 'hard',
     label: 'Difícil',
     pairs: 9,
     timerSeconds: 90,
-    pairsByGame: { pairs: 12, families: 12 },
-    timerSecondsByGame: { math: 240, pairs: 150, families: 150 },
-    boardColumnsByGame: { pairs: 6, families: 6 }
+    pairsByGame: { pairs: 12, families: 12, countries: 12 },
+    timerSecondsByGame: { math: 240, pairs: 150, families: 150, countries: 150 },
+    boardColumnsByGame: { pairs: 6, families: 6, countries: 6 }
   }
 ];
 export const DEFAULT_GAME: AppGameId = 'pairs';

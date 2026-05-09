@@ -249,6 +249,20 @@ const FAMILY_PAIRS = [
   { family: 'mar', leftImage: 'fish', rightImage: 'shell' },
   { family: 'deporte', leftImage: 'ball', rightImage: 'trophy' }
 ];
+const COUNTRY_PAIRS = [
+  { country: 'España', flag: 'spain', landmark: 'flamenco-fan' },
+  { country: 'Francia', flag: 'france', landmark: 'eiffel-tower' },
+  { country: 'Italia', flag: 'italy', landmark: 'pizza-slice' },
+  { country: 'Alemania', flag: 'germany', landmark: 'pretzel' },
+  { country: 'Portugal', flag: 'portugal', landmark: 'tram' },
+  { country: 'Brasil', flag: 'brazil', landmark: 'toucan' },
+  { country: 'Japón', flag: 'japan', landmark: 'pagoda' },
+  { country: 'Canadá', flag: 'canada', landmark: 'maple-leaf' },
+  { country: 'México', flag: 'mexico', landmark: 'sombrero' },
+  { country: 'Argentina', flag: 'argentina', landmark: 'mate' },
+  { country: 'Chile', flag: 'chile', landmark: 'moai' },
+  { country: 'Suecia', flag: 'sweden', landmark: 'dalahorse' }
+];
 
 function getServiceKeyPath() {
   if (process.env.FIREBASE_SERVICE_KEY) {
@@ -528,6 +542,10 @@ const GAME_SEEDS = {
   families: {
     prefix: 'families',
     docsByLevel: buildGameDocsForAllLevels(FAMILY_PAIRS)
+  },
+  countries: {
+    prefix: 'countries',
+    docsByLevel: buildGameDocsForAllLevels(COUNTRY_PAIRS)
   }
 };
 

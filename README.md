@@ -7,6 +7,7 @@ Juego web de emparejar cartas construido con Angular y Firebase. La aplicacion a
 - `Matematicas`: emparejar una operacion con su resultado.
 - `Parejas`: emparejar dos imagenes iguales usando SVGs locales.
 - `Familias`: emparejar dos dibujos distintos de la misma categoria visual.
+- `Países`: emparejar una bandera con un símbolo típico del mismo país.
 
 Cada juego tiene tres dificultades (`easy`, `medium`, `hard`) y ranking independiente.
 
@@ -27,7 +28,7 @@ La app separa la mecanica base del tablero del tipo de contenido que se juega.
 - `GameFacade` coordina el estado principal del tablero, la seleccion de juego, el nivel, el idioma visible, el temporizador y la reconstruccion de la partida.
 - `GameLeaderboardService` carga y guarda tiempos por juego, idioma y dificultad.
 - `DataService` abstrae Firestore, los fallbacks locales y la transformacion de documentos en cartas jugables.
-- `UtilsService` genera mazos para `Idiomas`, juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`, y juegos visuales como `Parejas` y `Familias`.
+- `UtilsService` genera mazos para `Idiomas`, juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`, y juegos visuales como `Parejas`, `Familias` y `Países`.
 
 Documentacion ampliada:
 - Arquitectura: [docs/arquitectura-aplicacion.md](/Users/javiergarcia/git/cards/docs/arquitectura-aplicacion.md:1)
@@ -129,6 +130,29 @@ Notas:
   - `hard`: `6x4` y `150s`
 - el modo `Familias` no usa idioma y no permite cambiar a `2 columnas`
 
+### Cartas de `Países`
+
+Colecciones por juego y nivel:
+- `games/countries/levels/{level}/cards`
+
+Esquema de documento:
+```json
+{
+  "country": "España",
+  "flag": "spain",
+  "landmark": "flamenco-fan"
+}
+```
+
+Notas:
+- las imagenes deben existir como `assets/memory-countries/spain.svg` y `assets/memory-countries/flamenco-fan.svg`
+- el juego usa actualmente 12 parejas visuales base
+- comparte tablero y tiempos con `Parejas` y `Familias`:
+  - `easy`: `4x3` y `75s`
+  - `medium`: `4x4` y `105s`
+  - `hard`: `6x4` y `150s`
+- el modo `Países` no usa idioma y no permite cambiar a `2 columnas`
+
 ### Ranking
 
 Ranking legacy de `Idiomas`:
@@ -177,7 +201,7 @@ Notas:
 
 ### Seed rapido de juegos
 
-Sube o reemplaza los contenidos de `synonyms`, `antonyms`, `math`, `pairs` y `families` en los niveles `easy`, `medium` y `hard`:
+Sube o reemplaza los contenidos de `synonyms`, `antonyms`, `math`, `pairs`, `families` y `countries` en los niveles `easy`, `medium` y `hard`:
 
 ```bash
 npm run seed:firestore-games
@@ -189,6 +213,7 @@ El script:
 - genera `100` operaciones nuevas de matematicas por nivel
 - sube tambien `12` nombres de SVG por nivel para `pairs`
 - sube tambien `12` parejas visuales por nivel para `families`
+- sube tambien `12` parejas visuales por nivel para `countries`
 - intenta usar `gcloud` si existe y, si no, `firebase-tools` o una service account
 
 ### Replicar niveles legacy
@@ -212,6 +237,7 @@ Formatos esperados:
 - `Sinonimos`, `Antonimos`, `Matematicas`: `{ icon, left, right }`
 - `Parejas`: `{ image }`
 - `Familias`: `{ family, leftImage, rightImage }`
+- `Países`: `{ country, flag, landmark }`
 
 ## Notas recientes
 

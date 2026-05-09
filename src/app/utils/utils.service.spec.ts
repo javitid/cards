@@ -57,4 +57,24 @@ describe('UtilsService', () => {
     expect(cards[0].pairs).toEqual([1]);
     expect(cards[1].pairs).toEqual([0]);
   });
+
+  it('should generate one flag card and one landmark card per country pair', () => {
+    const service = new UtilsService();
+
+    const cards = service.generateCountryCards([
+      {
+        country: 'España',
+        flag: 'spain',
+        landmark: 'flamenco-fan'
+      }
+    ]);
+
+    expect(cards).toHaveLength(2);
+    expect(cards[0].contentType).toBe('image');
+    expect(cards[0].imagePath).toBe('assets/memory-countries/spain.svg');
+    expect(cards[1].contentType).toBe('image');
+    expect(cards[1].imagePath).toBe('assets/memory-countries/flamenco-fan.svg');
+    expect(cards[0].pairs).toEqual([1]);
+    expect(cards[1].pairs).toEqual([0]);
+  });
 });

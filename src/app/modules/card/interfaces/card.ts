@@ -21,7 +21,7 @@ export interface Credentials {
   organization: string;
 }
 
-export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs' | 'families';
+export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs' | 'families' | 'countries';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
 export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
 
@@ -32,7 +32,7 @@ export interface GameOption {
   instructions: string;
   supportsLanguageSelection: boolean;
   supportsColumnToggle: boolean;
-  cardContent: 'text' | 'image';
+  cardContent: 'text' | 'image' | 'mixed';
   defaultLanguage: LanguageCode;
 }
 
@@ -91,6 +91,12 @@ export interface FamilyPair {
   family: string;
   leftImage: string;
   rightImage: string;
+}
+
+export interface CountryAssociationPair {
+  country: string;
+  flag: string;
+  landmark: string;
 }
 
 export type SynonymPair = BinaryPair;

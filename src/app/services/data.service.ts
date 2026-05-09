@@ -21,6 +21,7 @@ import {
   BinaryPair,
   Card,
   Credentials,
+  CountryAssociationPair,
   FamilyPair,
   GameLevelId,
   ImagePair,
@@ -127,6 +128,20 @@ const FALLBACK_FAMILY_PAIRS: FamilyPair[] = [
   { family: 'mar', leftImage: 'fish', rightImage: 'shell' },
   { family: 'deporte', leftImage: 'ball', rightImage: 'trophy' },
 ];
+const FALLBACK_COUNTRY_PAIRS: CountryAssociationPair[] = [
+  { country: 'España', flag: 'spain', landmark: 'flamenco-fan' },
+  { country: 'Francia', flag: 'france', landmark: 'eiffel-tower' },
+  { country: 'Italia', flag: 'italy', landmark: 'pizza-slice' },
+  { country: 'Alemania', flag: 'germany', landmark: 'pretzel' },
+  { country: 'Portugal', flag: 'portugal', landmark: 'tram' },
+  { country: 'Brasil', flag: 'brazil', landmark: 'toucan' },
+  { country: 'Japón', flag: 'japan', landmark: 'pagoda' },
+  { country: 'Canadá', flag: 'canada', landmark: 'maple-leaf' },
+  { country: 'México', flag: 'mexico', landmark: 'sombrero' },
+  { country: 'Argentina', flag: 'argentina', landmark: 'mate' },
+  { country: 'Chile', flag: 'chile', landmark: 'moai' },
+  { country: 'Suecia', flag: 'sweden', landmark: 'dalahorse' },
+];
 
 @Injectable({
   providedIn: 'root'
@@ -150,6 +165,10 @@ export class DataService {
 
     if (gameId === 'families') {
       return this.utilsService.generateFamilyCards(FALLBACK_FAMILY_PAIRS);
+    }
+
+    if (gameId === 'countries') {
+      return this.utilsService.generateCountryCards(FALLBACK_COUNTRY_PAIRS);
     }
 
     if (gameId === 'synonyms') {
@@ -238,7 +257,7 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair | FamilyPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair | FamilyPair>> {
+  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair>> {
     const batch = writeBatch(db);
     const cardsCollection = this.getCardsCollection(gameId, level);
 
@@ -265,7 +284,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair | FamilyPair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair | FamilyPair | CountryAssociationPair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -372,6 +391,10 @@ export class DataService {
 
     if (gameId === 'families') {
       return this.utilsService.generateFamilyCards(documents as unknown as FamilyPair[]);
+    }
+
+    if (gameId === 'countries') {
+      return this.utilsService.generateCountryCards(documents as unknown as CountryAssociationPair[]);
     }
 
     if (gameId === 'synonyms') {

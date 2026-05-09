@@ -220,6 +220,34 @@ Temporizadores configurados:
 - `medium`: `105s`
 - `hard`: `150s`
 
+### `Países`
+
+Modelo persistido:
+- documento con `country`, `flag` y `landmark`
+
+Modelo jugable:
+- dos cartas por grupo
+- una carta muestra la bandera
+- la otra muestra un símbolo típico del mismo país
+- ambas usan `contentType = image`
+- la ruta real del asset se resuelve como `assets/memory-countries/<image>.svg`
+
+Persistencia:
+- `games/countries/levels/{level}/cards`
+
+Reglas de tablero:
+- no soporta seleccion de idioma
+- no soporta modo `2 columnas`
+- siempre se mezcla el tablero completo
+- `easy`: `4x3`
+- `medium`: `4x4`
+- `hard`: `6x4`
+
+Temporizadores configurados:
+- `easy`: `75s`
+- `medium`: `105s`
+- `hard`: `150s`
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
@@ -274,6 +302,7 @@ Responsabilidades:
 - generar cartas para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
 - generar cartas de imagen para `Parejas`
 - generar cartas de imagen relacionadas para `Familias`
+- generar cartas de imagen relacionadas para `Países`
 - asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
 
 Notas de implementacion:
@@ -322,6 +351,8 @@ sequenceDiagram
   - schema: `image`
 - `games/families/levels/{level}/cards`
   - schema: `family`, `leftImage`, `rightImage`
+- `games/countries/levels/{level}/cards`
+  - schema: `country`, `flag`, `landmark`
 
 ### Ranking
 
@@ -360,6 +391,7 @@ Si otro agente retoma mejoras sobre estos cambios, los puntos mas utiles para co
 Mejoras pendientes razonables:
 - afinar todavia mas `Parejas` en movil bajo, sobre todo en `hard`
 - evaluar si `Familias` necesita ayudas visuales extra para categorias menos obvias
+- revisar si `Países` necesita ampliar la colección con más países o familias culturales
 - bajar el warning del budget SCSS de `card-container.component.scss`
 - anadir tests de componente para render de cartas de imagen
 
