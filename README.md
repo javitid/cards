@@ -140,12 +140,12 @@ Esquema de documento:
 {
   "country": "España",
   "flag": "spain",
-  "landmark": "flamenco-fan"
+  "landmark": "bull"
 }
 ```
 
 Notas:
-- las imagenes deben existir como `assets/memory-countries/spain.svg` y `assets/memory-countries/flamenco-fan.svg`
+- las imagenes deben existir como `assets/memory-countries/spain.svg` y `assets/memory-countries/bull.svg`
 - el juego usa actualmente 12 parejas visuales base
 - comparte tablero y tiempos con `Parejas` y `Familias`:
   - `easy`: `4x3` y `75s`

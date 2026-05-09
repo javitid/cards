@@ -158,7 +158,7 @@ const familyPairs: FamilyPair[] = [
   { family: 'vehiculos', leftImage: 'car', rightImage: 'bicycle' }
 ];
 const countryPairs: CountryAssociationPair[] = [
-  { country: 'España', flag: 'spain', landmark: 'flamenco-fan' },
+  { country: 'España', flag: 'spain', landmark: 'bull' },
   { country: 'Francia', flag: 'france', landmark: 'eiffel-tower' },
   { country: 'Italia', flag: 'italy', landmark: 'pizza-slice' }
 ];

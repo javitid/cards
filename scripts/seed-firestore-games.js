@@ -250,10 +250,10 @@ const FAMILY_PAIRS = [
   { family: 'deporte', leftImage: 'ball', rightImage: 'trophy' }
 ];
 const COUNTRY_PAIRS = [
-  { country: 'España', flag: 'spain', landmark: 'flamenco-fan' },
+  { country: 'España', flag: 'spain', landmark: 'bull' },
   { country: 'Francia', flag: 'france', landmark: 'eiffel-tower' },
   { country: 'Italia', flag: 'italy', landmark: 'pizza-slice' },
-  { country: 'Alemania', flag: 'germany', landmark: 'pretzel' },
+  { country: 'Alemania', flag: 'germany', landmark: 'beer-mug' },
   { country: 'Portugal', flag: 'portugal', landmark: 'tram' },
   { country: 'Brasil', flag: 'brazil', landmark: 'toucan' },
   { country: 'Japón', flag: 'japan', landmark: 'pagoda' },
@@ -261,7 +261,7 @@ const COUNTRY_PAIRS = [
   { country: 'México', flag: 'mexico', landmark: 'sombrero' },
   { country: 'Argentina', flag: 'argentina', landmark: 'mate' },
   { country: 'Chile', flag: 'chile', landmark: 'moai' },
-  { country: 'Suecia', flag: 'sweden', landmark: 'dalahorse' }
+  { country: 'Suecia', flag: 'sweden', landmark: 'viking-ship' }
 ];
 
 function getServiceKeyPath() {
