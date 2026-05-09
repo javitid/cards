@@ -46,7 +46,8 @@ describe('CardContainerComponent', () => {
       { id: 'synonyms', label: 'Sinonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
       { id: 'antonyms', label: 'Antonimos', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
       { id: 'math', label: 'Matematicas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: true, cardContent: 'text', defaultLanguage: 'es' },
-      { id: 'pairs', label: 'Parejas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' }
+      { id: 'pairs', label: 'Parejas', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' },
+      { id: 'families', label: 'Familias', description: '', instructions: '', supportsLanguageSelection: false, supportsColumnToggle: false, cardContent: 'image', defaultLanguage: 'es' }
     ],
     languages: ['gb', 'it', 'pt', 'de'],
     levels: [

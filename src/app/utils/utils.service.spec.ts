@@ -39,4 +39,22 @@ describe('UtilsService', () => {
     expect(cards[0].pairs).toEqual([1]);
     expect(cards[1].pairs).toEqual([0]);
   });
+
+  it('should generate two linked image cards per family pair', () => {
+    const service = new UtilsService();
+
+    const cards = service.generateFamilyCards([
+      {
+        family: 'frutas',
+        leftImage: 'banana',
+        rightImage: 'strawberry'
+      }
+    ]);
+
+    expect(cards).toHaveLength(2);
+    expect(cards[0].imagePath).toBe('assets/memory-families/banana.svg');
+    expect(cards[1].imagePath).toBe('assets/memory-families/strawberry.svg');
+    expect(cards[0].pairs).toEqual([1]);
+    expect(cards[1].pairs).toEqual([0]);
+  });
 });

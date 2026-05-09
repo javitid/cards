@@ -57,7 +57,7 @@ describe('GameLeaderboardService', () => {
 
     service.loadLeaderboard('languages', 'gb', 'medium');
 
-    expect(dataServiceMock.getTopScores).toHaveBeenCalledWith('languages', 'gb', 'medium', 5);
+    expect(dataServiceMock.getTopScores).toHaveBeenCalledWith('languages', 'gb', 'medium', 10);
     expect(service.leaderboard()[0]?.playerName).toBe('Ana');
   });
 

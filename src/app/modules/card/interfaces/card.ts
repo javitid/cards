@@ -21,7 +21,7 @@ export interface Credentials {
   organization: string;
 }
 
-export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs';
+export type AppGameId = 'languages' | 'synonyms' | 'antonyms' | 'math' | 'pairs' | 'families';
 export type GameLevelId = 'easy' | 'medium' | 'hard';
 export type LanguageCode = 'es' | 'gb' | 'it' | 'pt' | 'de';
 
@@ -85,6 +85,12 @@ export interface BinaryPair {
 
 export interface ImagePair {
   image: string;
+}
+
+export interface FamilyPair {
+  family: string;
+  leftImage: string;
+  rightImage: string;
 }
 
 export type SynonymPair = BinaryPair;

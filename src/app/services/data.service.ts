@@ -21,6 +21,7 @@ import {
   BinaryPair,
   Card,
   Credentials,
+  FamilyPair,
   GameLevelId,
   ImagePair,
   LanguageCode,
@@ -112,6 +113,20 @@ const FALLBACK_IMAGE_PAIRS: ImagePair[] = [
   { image: 'star' },
   { image: 'turtle' },
 ];
+const FALLBACK_FAMILY_PAIRS: FamilyPair[] = [
+  { family: 'frutas', leftImage: 'banana', rightImage: 'strawberry' },
+  { family: 'verduras', leftImage: 'carrot', rightImage: 'broccoli' },
+  { family: 'vehiculos', leftImage: 'car', rightImage: 'bicycle' },
+  { family: 'mascotas', leftImage: 'cat', rightImage: 'dog' },
+  { family: 'clima', leftImage: 'sun', rightImage: 'cloud' },
+  { family: 'colegio', leftImage: 'book', rightImage: 'pencil' },
+  { family: 'jardin', leftImage: 'flower', rightImage: 'leaf' },
+  { family: 'espacio', leftImage: 'planet', rightImage: 'rocket' },
+  { family: 'cocina', leftImage: 'cup', rightImage: 'teapot' },
+  { family: 'musica', leftImage: 'guitar', rightImage: 'piano' },
+  { family: 'mar', leftImage: 'fish', rightImage: 'shell' },
+  { family: 'deporte', leftImage: 'ball', rightImage: 'trophy' },
+];
 
 @Injectable({
   providedIn: 'root'
@@ -131,6 +146,10 @@ export class DataService {
   private getFallbackCards(gameId: AppGameId, language: LanguageCode): Card[] {
     if (gameId === 'pairs') {
       return this.utilsService.generateImageCards(FALLBACK_IMAGE_PAIRS);
+    }
+
+    if (gameId === 'families') {
+      return this.utilsService.generateFamilyCards(FALLBACK_FAMILY_PAIRS);
     }
 
     if (gameId === 'synonyms') {
@@ -219,7 +238,7 @@ export class DataService {
     return this.cardsCache.get(cacheKey)!;
   }
 
-  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair>> {
+  setCards(cards: Array<LanguagePair | BinaryPair | ImagePair | FamilyPair>, gameId: AppGameId = DEFAULT_GAME, level: GameLevelId = 'easy'): Observable<Array<LanguagePair | BinaryPair | ImagePair | FamilyPair>> {
     const batch = writeBatch(db);
     const cardsCollection = this.getCardsCollection(gameId, level);
 
@@ -246,7 +265,7 @@ export class DataService {
         snapshots.docs.forEach((snapshot) => batch.delete(snapshot.ref));
 
         return from(batch.commit()).pipe(
-          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair)),
+          map(() => snapshots.docs.map((snapshot) => snapshot.data() as LanguagePair | BinaryPair | ImagePair | FamilyPair)),
           map((deletedCards) => {
             this.cardsCache.clear();
             return deletedCards;
@@ -257,7 +276,7 @@ export class DataService {
     );
   }
 
-  getTopScores(gameId: AppGameId, language: string, level: GameLevelId, amount = 5): Observable<ScoreEntry[]> {
+  getTopScores(gameId: AppGameId, language: string, level: GameLevelId, amount = 10): Observable<ScoreEntry[]> {
     const cacheKey = `${gameId}:${language}:${level}:${amount}`;
 
     if (!this.leaderboardCache.has(cacheKey)) {
@@ -349,6 +368,10 @@ export class DataService {
   private mapCardsForGame(gameId: AppGameId, documents: Record<string, unknown>[], language: LanguageCode): Card[] {
     if (gameId === 'pairs') {
       return this.utilsService.generateImageCards(documents as unknown as ImagePair[]);
+    }
+
+    if (gameId === 'families') {
+      return this.utilsService.generateFamilyCards(documents as unknown as FamilyPair[]);
     }
 
     if (gameId === 'synonyms') {

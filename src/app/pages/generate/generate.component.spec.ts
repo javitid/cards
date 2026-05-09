@@ -74,4 +74,12 @@ describe('GenerateComponent', () => {
     expect(component.form.controls.content.value).toContain('"image"');
     expect(component.form.controls.content.value).toContain('balloon');
   });
+
+  it('should swap the template when changing to the families game', () => {
+    component.form.controls.gameId.setValue('families');
+
+    expect(component.form.controls.content.value).toContain('"family"');
+    expect(component.form.controls.content.value).toContain('"leftImage"');
+    expect(component.form.controls.content.value).toContain('"rightImage"');
+  });
 });

@@ -192,6 +192,34 @@ Presentacion:
   - [src/app/modules/card/components/card/card.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card/card.component.scss:1)
   - [src/app/modules/card/components/card-container/card-container.component.scss](/Users/javiergarcia/git/cards/src/app/modules/card/components/card-container/card-container.component.scss:1)
 
+### `Familias`
+
+Modelo persistido:
+- documento con `family`, `leftImage` y `rightImage`
+
+Modelo jugable:
+- dos cartas por grupo
+- cada carta muestra una imagen distinta
+- ambas pertenecen a la misma familia visual
+- las cartas usan `contentType = image`
+- la ruta real del asset se resuelve como `assets/memory-families/<image>.svg`
+
+Persistencia:
+- `games/families/levels/{level}/cards`
+
+Reglas de tablero:
+- no soporta seleccion de idioma
+- no soporta modo `2 columnas`
+- siempre se mezcla el tablero completo
+- `easy`: `4x3`
+- `medium`: `4x4`
+- `hard`: `6x4`
+
+Temporizadores configurados:
+- `easy`: `75s`
+- `medium`: `105s`
+- `hard`: `150s`
+
 ## Responsabilidades por servicio
 
 ### `GameFacade`
@@ -245,6 +273,7 @@ Responsabilidades:
 - generar cartas para `Idiomas`
 - generar cartas para juegos binarios como `Sinonimos`, `Antonimos` y `Matematicas`
 - generar cartas de imagen para `Parejas`
+- generar cartas de imagen relacionadas para `Familias`
 - asignar `groupId`, `pairs`, `voice` y estructura inicial del tablero
 
 Notas de implementacion:
@@ -291,6 +320,8 @@ sequenceDiagram
   - schema: `icon`, `left`, `right`
 - `games/pairs/levels/{level}/cards`
   - schema: `image`
+- `games/families/levels/{level}/cards`
+  - schema: `family`, `leftImage`, `rightImage`
 
 ### Ranking
 
@@ -328,6 +359,7 @@ Si otro agente retoma mejoras sobre estos cambios, los puntos mas utiles para co
 
 Mejoras pendientes razonables:
 - afinar todavia mas `Parejas` en movil bajo, sobre todo en `hard`
+- evaluar si `Familias` necesita ayudas visuales extra para categorias menos obvias
 - bajar el warning del budget SCSS de `card-container.component.scss`
 - anadir tests de componente para render de cartas de imagen
 

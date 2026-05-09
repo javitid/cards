@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BinaryPair, Card, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
+import { BinaryPair, Card, FamilyPair, ImagePair, LanguageCode, LanguagePair } from '../modules/card/interfaces/card';
 
 const BASE_LANGUAGE = 'es';
 const LANGUAGE_VOICES: Record<LanguageCode, string> = {
@@ -83,7 +83,7 @@ export class UtilsService {
       const firstId = index * 2;
       const secondId = firstId + 1;
       const imageName = this.normalizeImageName(pair.image);
-      const imagePath = `assets/memory-pairs/${imageName}.svg`;
+      const imagePath = this.getImagePath('memory-pairs', imageName);
       const label = this.humanizeImageName(imageName);
 
       return [
@@ -115,6 +115,49 @@ export class UtilsService {
         }
       ];
     });
+  }
+
+  generateFamilyCards(pairs: FamilyPair[]): Card[] {
+    return pairs.flatMap((pair: FamilyPair, index) => {
+      const firstId = index * 2;
+      const secondId = firstId + 1;
+      const familyName = this.humanizeImageName(pair.family);
+      const leftImageName = this.normalizeImageName(pair.leftImage);
+      const rightImageName = this.normalizeImageName(pair.rightImage);
+
+      return [
+        {
+          id: firstId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [secondId],
+          value: `${familyName}: ${this.humanizeImageName(leftImageName)}`,
+          contentType: 'image',
+          imageName: leftImageName,
+          imagePath: this.getImagePath('memory-families', leftImageName),
+          match: false,
+          selected: false
+        },
+        {
+          id: secondId,
+          groupId: index,
+          icon: '',
+          voice: '',
+          pairs: [firstId],
+          value: `${familyName}: ${this.humanizeImageName(rightImageName)}`,
+          contentType: 'image',
+          imageName: rightImageName,
+          imagePath: this.getImagePath('memory-families', rightImageName),
+          match: false,
+          selected: false
+        }
+      ];
+    });
+  }
+
+  private getImagePath(folder: 'memory-pairs' | 'memory-families', imageName: string): string {
+    return `assets/${folder}/${imageName}.svg`;
   }
 
   private normalizeImageName(imageName: string): string {

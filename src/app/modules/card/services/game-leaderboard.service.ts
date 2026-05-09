@@ -5,7 +5,7 @@ import { AuthService } from '../../../services/auth.service';
 import { DataService } from '../../../services/data.service';
 import { AppGameId, GameLevelId, ScoreEntry } from '../interfaces/card';
 
-const LEADERBOARD_LIMIT = 5;
+const LEADERBOARD_LIMIT = 10;
 
 @Injectable()
 export class GameLeaderboardService {

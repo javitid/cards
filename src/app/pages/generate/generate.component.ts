@@ -6,7 +6,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { DataService } from '../../services/data.service';
 import { LoggerService } from '../../services/logger.service';
-import { AppGameId, BinaryPair, Credentials, GameLevelId, ImagePair, LanguagePair } from '../../modules/card/interfaces/card';
+import { AppGameId, BinaryPair, Credentials, FamilyPair, GameLevelId, ImagePair, LanguagePair } from '../../modules/card/interfaces/card';
 import { DEFAULT_GAME, DEFAULT_LEVEL, GAME_LEVELS, GAME_OPTIONS } from '../../modules/card/services/game-config';
 
 // Fill from screen input and upload generated cards into Firestore
@@ -152,6 +152,11 @@ const imagePairs: ImagePair[] = [
   { image: 'flower' },
   { image: 'guitar' }
 ];
+const familyPairs: FamilyPair[] = [
+  { family: 'frutas', leftImage: 'banana', rightImage: 'strawberry' },
+  { family: 'verduras', leftImage: 'carrot', rightImage: 'broccoli' },
+  { family: 'vehiculos', leftImage: 'car', rightImage: 'bicycle' }
+];
 
 @Component({
   selector: 'app-generate',
@@ -176,7 +181,8 @@ export class GenerateComponent {
       { icon: '', left: '8 x 7', right: '56' },
       { icon: '', left: '(14 + 6) / 2', right: '10' }
     ], null, 2),
-    pairs: JSON.stringify(imagePairs, null, 2)
+    pairs: JSON.stringify(imagePairs, null, 2),
+    families: JSON.stringify(familyPairs, null, 2)
   };
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);

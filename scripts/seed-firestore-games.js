@@ -235,6 +235,20 @@ const IMAGE_PAIRS = [
   'star',
   'turtle'
 ];
+const FAMILY_PAIRS = [
+  { family: 'frutas', leftImage: 'banana', rightImage: 'strawberry' },
+  { family: 'verduras', leftImage: 'carrot', rightImage: 'broccoli' },
+  { family: 'vehiculos', leftImage: 'car', rightImage: 'bicycle' },
+  { family: 'mascotas', leftImage: 'cat', rightImage: 'dog' },
+  { family: 'clima', leftImage: 'sun', rightImage: 'cloud' },
+  { family: 'colegio', leftImage: 'book', rightImage: 'pencil' },
+  { family: 'jardin', leftImage: 'flower', rightImage: 'leaf' },
+  { family: 'espacio', leftImage: 'planet', rightImage: 'rocket' },
+  { family: 'cocina', leftImage: 'cup', rightImage: 'teapot' },
+  { family: 'musica', leftImage: 'guitar', rightImage: 'piano' },
+  { family: 'mar', leftImage: 'fish', rightImage: 'shell' },
+  { family: 'deporte', leftImage: 'ball', rightImage: 'trophy' }
+];
 
 function getServiceKeyPath() {
   if (process.env.FIREBASE_SERVICE_KEY) {
@@ -510,6 +524,10 @@ const GAME_SEEDS = {
   pairs: {
     prefix: 'pairs',
     docsByLevel: buildGameDocsForAllLevels(buildImageDocs(IMAGE_PAIRS))
+  },
+  families: {
+    prefix: 'families',
+    docsByLevel: buildGameDocsForAllLevels(FAMILY_PAIRS)
   }
 };
 
