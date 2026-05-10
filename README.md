@@ -87,11 +87,11 @@ Los seeds cargados actualmente en Firestore son:
 - `synonyms`: 102 pares por nivel
 - `antonyms`: 101 pares por nivel
 - `math`: 100 operaciones por nivel
-- `capitals`: 12 pares por nivel
-- `communities`: 12 pares por nivel
-- `instruments`: 12 pares por nivel
-- `professions`: 12 pares por nivel
-- `planets`: 12 pares por nivel
+- `capitals`: 100 pares por nivel
+- `communities`: 19 pares por nivel
+- `instruments`: 100 pares por nivel
+- `professions`: 100 pares por nivel
+- `planets`: 50 pares por nivel
 
 En `Matematicas`, la complejidad sube por nivel:
 - `easy`: sumas y restas simples
@@ -250,7 +250,9 @@ El script:
 - borra los documentos existentes de esas colecciones
 - escribe documentos nuevos con IDs estables
 - genera `100` operaciones nuevas de matematicas por nivel
-- sube `12` pares por nivel para `capitals`, `communities`, `instruments`, `professions` y `planets`
+- sube `100` pares por nivel para `capitals`, `instruments` y `professions`
+- sube `19` pares por nivel para `communities`
+- sube `50` pares por nivel para `planets`
 - sube tambien `12` nombres de SVG por nivel para `pairs`
 - sube tambien `12` parejas visuales por nivel para `families`
 - sube tambien `12` parejas visuales por nivel para `countries`

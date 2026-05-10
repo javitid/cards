@@ -45,7 +45,9 @@ Si solo se quiere uno de los destinos, debe indicarse de forma explicita.
     - `102` pares de sinonimos por nivel
     - `101` pares de antonimos por nivel
     - `100` operaciones de matematicas por nivel
-    - `12` pares por nivel para `capitals`, `communities`, `instruments`, `professions` y `planets`
+    - `100` pares por nivel para `capitals`, `instruments` y `professions`
+    - `19` pares por nivel para `communities`
+    - `50` pares por nivel para `planets`
     - `12` nombres de SVG para `pairs` por nivel
     - `12` parejas visuales relacionadas para `families` por nivel
     - `12` parejas visuales relacionadas para `countries` por nivel
@@ -126,11 +128,11 @@ Resultado operativo actual:
 - `synonyms`: `102` docs por nivel
 - `antonyms`: `101` docs por nivel
 - `math`: `100` docs por nivel
-- `capitals`: `12` docs por nivel
-- `communities`: `12` docs por nivel
-- `instruments`: `12` docs por nivel
-- `professions`: `12` docs por nivel
-- `planets`: `12` docs por nivel
+- `capitals`: `100` docs por nivel
+- `communities`: `19` docs por nivel
+- `instruments`: `100` docs por nivel
+- `professions`: `100` docs por nivel
+- `planets`: `50` docs por nivel
 - `pairs`: `12` docs por nivel
 - `families`: `12` docs por nivel
 - `countries`: `12` docs por nivel
