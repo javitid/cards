@@ -47,7 +47,7 @@ Si solo se quiere uno de los destinos, debe indicarse de forma explicita.
     - `100` operaciones de matematicas por nivel
     - `100` pares por nivel para `capitals`, `instruments` y `professions`
     - `19` pares por nivel para `communities`
-    - `50` pares por nivel para `planets`
+    - `100` pares por nivel para `planets`
     - `12` nombres de SVG para `pairs` por nivel
     - `12` parejas visuales relacionadas para `families` por nivel
     - `12` parejas visuales relacionadas para `countries` por nivel
@@ -132,7 +132,7 @@ Resultado operativo actual:
 - `communities`: `19` docs por nivel
 - `instruments`: `100` docs por nivel
 - `professions`: `100` docs por nivel
-- `planets`: `50` docs por nivel
+- `planets`: `100` docs por nivel
 - `pairs`: `12` docs por nivel
 - `families`: `12` docs por nivel
 - `countries`: `12` docs por nivel

@@ -91,7 +91,7 @@ Los seeds cargados actualmente en Firestore son:
 - `communities`: 19 pares por nivel
 - `instruments`: 100 pares por nivel
 - `professions`: 100 pares por nivel
-- `planets`: 50 pares por nivel
+- `planets`: 100 pares por nivel
 
 En `Matematicas`, la complejidad sube por nivel:
 - `easy`: sumas y restas simples
@@ -252,7 +252,7 @@ El script:
 - genera `100` operaciones nuevas de matematicas por nivel
 - sube `100` pares por nivel para `capitals`, `instruments` y `professions`
 - sube `19` pares por nivel para `communities`
-- sube `50` pares por nivel para `planets`
+- sube `100` pares por nivel para `planets`
 - sube tambien `12` nombres de SVG por nivel para `pairs`
 - sube tambien `12` parejas visuales por nivel para `families`
 - sube tambien `12` parejas visuales por nivel para `countries`

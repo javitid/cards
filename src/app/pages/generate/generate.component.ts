@@ -188,9 +188,9 @@ const professionPairs: BinaryPair[] = [
   { icon: '', left: 'científico', right: 'microscopio' }
 ];
 const planetPairs: BinaryPair[] = [
+  { icon: '', left: 'Luna', right: 'satélite de la Tierra' },
   { icon: '', left: 'Marte', right: 'planeta rojo' },
-  { icon: '', left: 'Saturno', right: 'anillos visibles' },
-  { icon: '', left: 'Júpiter', right: 'el más grande' }
+  { icon: '', left: 'Saturno', right: 'planeta con anillos' }
 ];
 
 @Component({
